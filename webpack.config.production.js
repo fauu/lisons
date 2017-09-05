@@ -19,11 +19,6 @@ const mainConfig = {
     path: path.resolve(__dirname, "out")
   },
   plugins: [
-    new webpack.DefinePlugin({
-      "process.env": {
-        NODE_ENV: JSON.stringify("production")
-      }
-    }),
     new BabelPlugin({
       test: /\.js$/,
       sourceMaps: true,
@@ -33,20 +28,20 @@ const mainConfig = {
       presets: ["minify"]
     }),
     new webpack.optimize.ModuleConcatenationPlugin()
-  ]
+  ],
+  node: {
+    __dirname: false
+  }
 };
 
 const rendererConfig = {
   entry: "./src/renderer.tsx",
-
   output: {
     filename: "renderer.bundle.js",
     path: path.resolve(__dirname, "out"),
     publicPath: "/"
   },
-
   devtool: "cheap-module-source-map",
-
   module: {
     rules: [
       {
@@ -56,11 +51,9 @@ const rendererConfig = {
       }
     ]
   },
-
   resolve: {
     extensions: [".js", ".ts", ".tsx"]
   },
-
   plugins: [
     new webpack.DefinePlugin({
       "process.env": {

@@ -53,7 +53,14 @@ const mainConfig = {
   output: {
     filename: "main.bundle.js",
     path: path.resolve(__dirname, "out")
-  }
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      "process.env": {
+        NODE_ENV: JSON.stringify("development")
+      }
+    })
+  ]
 };
 
 const isDevServer = process.argv.find(v => v.includes("webpack-dev-server"));
