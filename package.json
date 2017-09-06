@@ -7,13 +7,12 @@
     "clean-out": "rimraf out",
     "webpack:dev": "webpack",
     "webpack:prod": "webpack --config webpack.config.production.js",
-    "build:main": "run-s clean-out webpack:dev",
+    "build:dev": "run-s clean-out webpack:dev",
+    "build:prod": "run-s clean-out webpack:prod",
     "dev-server": "webpack-dev-server",
     "electron:dev": "cross-env NODE_ENV=development electron .",
     "dev-server-and-electron": "run-p dev-server electron:dev",
-    "dev": "run-s build:main copy-index dev-server-and-electron",
-    "copy-index": "copyfiles -u 1 src/index.html out",
-    "build:prod": "run-s clean-out webpack:prod copy-index",
+    "dev": "run-s build:dev dev-server-and-electron",
     "electron:prod": "electron .",
     "prod": "run-s build:prod electron:prod",
     "dist:linux": "electron-builder --linux",
@@ -34,7 +33,6 @@
     "babel-preset-minify": "^0.2.0",
     "babel-preset-react": "^6.24.1",
     "babel-webpack-plugin": "^0.1.1",
-    "copyfiles": "^1.2.0",
     "cross-env": "^5.0.5",
     "electron": "^1.7.5",
     "electron-builder": "^19.27.3",
@@ -52,7 +50,12 @@
     "react-dom": "^15.6.1"
   },
   "babel": {
-    "presets": ["react", "es2015-node"],
-    "plugins": ["react-hot-loader/babel"]
+    "presets": [
+      "react",
+      "es2015-node"
+    ],
+    "plugins": [
+      "react-hot-loader/babel"
+    ]
   }
 }

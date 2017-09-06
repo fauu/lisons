@@ -1,5 +1,7 @@
-var path = require("path");
-var webpack = require("webpack");
+const fs = require("fs");
+const path = require("path");
+const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const rendererConfig = {
   entry: [
@@ -39,6 +41,20 @@ const rendererConfig = {
   }
 };
 
+const templateContent = () => {
+  const scriptTag =
+    '<script type="text/javascript" src="http://localhost:3000/renderer.bundle.js"></script>';
+  const html = fs
+    .readFileSync(path.resolve(process.cwd(), "src/index.html"))
+    .toString();
+  const bodyClosingStart = html.indexOf("</body>");
+  return `
+    ${html.substring(0, bodyClosingStart)}
+    ${scriptTag}
+    ${html.substring(bodyClosingStart)}
+  `;
+};
+
 const mainConfig = {
   target: "electron-main",
   entry: { main: "./src/main.ts" },
@@ -60,6 +76,10 @@ const mainConfig = {
       "process.env": {
         NODE_ENV: JSON.stringify("development")
       }
+    }),
+    new HtmlWebpackPlugin({
+      templateContent: templateContent(),
+      inject: false
     })
   ]
 };

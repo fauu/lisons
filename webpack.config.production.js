@@ -1,5 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const BabelPlugin = require("babel-webpack-plugin");
 
 const mainConfig = {
@@ -38,8 +39,7 @@ const rendererConfig = {
   entry: "./src/renderer.tsx",
   output: {
     filename: "renderer.bundle.js",
-    path: path.resolve(__dirname, "out"),
-    publicPath: "/"
+    path: path.resolve(__dirname, "out")
   },
   devtool: "cheap-module-source-map",
   module: {
@@ -68,7 +68,10 @@ const rendererConfig = {
       comments: false,
       presets: ["minify"]
     }),
-    new webpack.optimize.ModuleConcatenationPlugin()
+    new webpack.optimize.ModuleConcatenationPlugin(),
+    new HtmlWebpackPlugin({
+      template: "src/index.html"
+    })
   ]
 };
 
