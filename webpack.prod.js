@@ -1,28 +1,31 @@
-const path = require("path");
-const webpack = require("webpack");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const BabelPlugin = require("babel-webpack-plugin");
+const path = require("path")
+const webpack = require("webpack")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
+const BabelPlugin = require("babel-webpack-plugin")
+const common = require("./webpack.common")
 
 const mainConfig = {
-  target: "electron-main",
-  entry: { main: "./src/main.ts" },
+  target: common.mainConstants.target,
+  entry: common.mainConstants.entry,
   module: {
     rules: [
       {
         test: /\.ts$/,
-        use: ["babel-loader", "ts-loader"],
+        use: ["ts-loader"],
         exclude: /node_modules/
       }
     ]
   },
-  output: {
-    filename: "main.bundle.js",
-    path: path.resolve(__dirname, "out")
-  },
+  output: common.mainConstants.output,
   plugins: [
+    new webpack.DefinePlugin({
+      "process.env": {
+        NODE_ENV: JSON.stringify("production")
+      }
+    }),
     new BabelPlugin({
       test: /\.js$/,
-      sourceMaps: true,
+      sourceMaps: false,
       compact: true,
       minified: true,
       comments: false,
@@ -33,27 +36,17 @@ const mainConfig = {
   node: {
     __dirname: false
   }
-};
+}
 
 const rendererConfig = {
-  entry: "./src/renderer.tsx",
+  entry: common.rendererConstants.entry,
   output: {
-    filename: "renderer.bundle.js",
-    path: path.resolve(__dirname, "out")
+    filename: common.rendererConstants.outputFilename,
+    path: common.rendererConstants.outputPath
   },
   devtool: "cheap-module-source-map",
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: ["babel-loader", "ts-loader"],
-        exclude: /node_modules/
-      }
-    ]
-  },
-  resolve: {
-    extensions: [".js", ".ts", ".tsx"]
-  },
+  module: common.rendererConstants.module,
+  resolve: common.rendererConstants.resolve,
   plugins: [
     new webpack.DefinePlugin({
       "process.env": {
@@ -70,9 +63,9 @@ const rendererConfig = {
     }),
     new webpack.optimize.ModuleConcatenationPlugin(),
     new HtmlWebpackPlugin({
-      template: "src/index.html"
+      template: common.htmlTemplatePath
     })
   ]
-};
+}
 
-module.exports = [mainConfig, rendererConfig];
+module.exports = [mainConfig, rendererConfig]

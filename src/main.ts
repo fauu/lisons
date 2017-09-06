@@ -4,7 +4,7 @@ const url = require("url");
 
 let win: any;
 
-const isDev = process.env.NODE_ENV === "development";
+const isDev = process.env.NODE_ENV === "dev";
 
 function createWindow() {
   win = new BrowserWindow({ width: 800, height: 600 });

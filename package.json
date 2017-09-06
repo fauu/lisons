@@ -5,12 +5,12 @@
   "license": "MIT",
   "scripts": {
     "clean-out": "rimraf out",
-    "webpack:dev": "webpack",
-    "webpack:prod": "webpack --config webpack.config.production.js",
+    "webpack:dev": "webpack --config webpack.dev.js",
+    "webpack:prod": "webpack --config webpack.prod.js",
     "build:dev": "run-s clean-out webpack:dev",
     "build:prod": "run-s clean-out webpack:prod",
-    "dev-server": "webpack-dev-server",
-    "electron:dev": "cross-env NODE_ENV=development electron .",
+    "dev-server": "webpack-dev-server --config webpack.dev.js",
+    "electron:dev": "cross-env NODE_ENV=dev electron .",
     "dev-server-and-electron": "run-p dev-server electron:dev",
     "dev": "run-s build:dev dev-server-and-electron",
     "electron:prod": "electron .",
@@ -50,12 +50,7 @@
     "react-dom": "^15.6.1"
   },
   "babel": {
-    "presets": [
-      "react",
-      "es2015-node"
-    ],
-    "plugins": [
-      "react-hot-loader/babel"
-    ]
+    "presets": ["react", "es2015-node"],
+    "plugins": ["react-hot-loader/babel"]
   }
 }
