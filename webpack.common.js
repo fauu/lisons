@@ -4,7 +4,9 @@ const path = require("path")
 
 const outDirName = "out"
 const outPath = path.resolve(__dirname, outDirName)
-const htmlTemplatePath = "src/index.html"
+const srcDirName = "src"
+const srcPath = path.resolve(__dirname, srcDirName)
+const htmlTemplatePath = path.join(srcDirName, "index.html")
 
 const mainConstants = {
   target: "electron-main",
@@ -12,6 +14,9 @@ const mainConstants = {
   output: {
     filename: "main.bundle.js",
     path: outPath
+  },
+  resolve: {
+    extensions: [".js", ".ts"]
   }
 }
 
@@ -24,7 +29,7 @@ const rendererConstants = {
       {
         test: /\.tsx?$/,
         use: ["babel-loader", "ts-loader"],
-        exclude: /node_modules/
+        include: srcPath
       }
     ]
   },
@@ -35,6 +40,7 @@ const rendererConstants = {
 
 module.exports = {
   outDirName,
+  srcPath,
   htmlTemplatePath,
   mainConstants,
   rendererConstants

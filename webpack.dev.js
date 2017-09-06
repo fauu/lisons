@@ -27,16 +27,17 @@ const templateContent = () => {
 const mainConfig = {
   target: common.mainConstants.target,
   entry: common.mainConstants.entry,
+  output: common.mainConstants.output,
   module: {
     rules: [
       {
         test: /\.ts$/,
         use: ["babel-loader", "ts-loader"],
-        exclude: /node_modules/
+        include: common.srcPath
       }
     ]
   },
-  output: common.mainConstants.output,
+  resolve: common.mainConstants.resolve,
   plugins: [
     new webpack.DefinePlugin({
       "process.env": {
