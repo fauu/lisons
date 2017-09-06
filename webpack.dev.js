@@ -4,7 +4,9 @@ const webpack = require("webpack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const common = require("./webpack.common")
 
-const devServerUrl = "http://localhost:3000/"
+const devServerHost = "localhost"
+const devServerPort = 3000
+const devServerUrl = `http://${devServerHost}:${devServerPort}/`
 
 const templateContent = () => {
   const scriptTag = `
@@ -69,9 +71,9 @@ const rendererConfig = {
     new webpack.NoEmitOnErrorsPlugin()
   ],
   devServer: {
-    host: "localhost",
+    host: devServerHost,
+    port: devServerPort,
     contentBase: common.outDirName,
-    port: 3000,
     hot: true
   }
 }
