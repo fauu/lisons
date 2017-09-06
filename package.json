@@ -4,20 +4,24 @@
   "main": "out/main.bundle.js",
   "license": "MIT",
   "scripts": {
-    "build:main": "rimraf out && webpack",
+    "clean-out": "rimraf out",
+    "webpack:dev": "webpack",
+    "webpack:prod": "webpack --config webpack.config.production.js",
+    "build:main": "run-s clean-out webpack:dev",
     "dev-server": "webpack-dev-server",
     "electron:dev": "cross-env NODE_ENV=development electron .",
-    "dev": "yarn build:main && run-p dev-server electron:dev",
-    "build:prod":
-      "rimraf out && webpack --config webpack.config.production.js && copyfiles index.html out",
+    "dev-server-and-electron": "run-p dev-server electron:dev",
+    "dev": "run-s build:main copy-index dev-server-and-electron",
+    "copy-index": "copyfiles -u 1 src/index.html out",
+    "build:prod": "run-s clean-out webpack:prod copy-index",
     "electron:prod": "electron .",
-    "prod": "yarn build:prod && yarn electron:prod",
+    "prod": "run-s build:prod electron:prod",
     "dist:linux": "electron-builder --linux",
     "dist:windows": "electron-builder --windows"
   },
   "build": {
     "compression": "store",
-    "files": "out/**"
+    "files": "out"
   },
   "devDependencies": {
     "@types/node": "^8.0.26",

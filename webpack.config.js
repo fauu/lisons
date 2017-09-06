@@ -11,7 +11,7 @@ const rendererConfig = {
   output: {
     filename: "renderer.bundle.js",
     path: path.resolve(__dirname, "out"),
-    publicPath: "http://localhost:3000/out/"
+    publicPath: "http://localhost:3000/"
   },
   devtool: "inline-source-map",
   module: {
@@ -33,6 +33,7 @@ const rendererConfig = {
   ],
   devServer: {
     host: "localhost",
+    contentBase: "out",
     port: 3000,
     hot: true
   }
