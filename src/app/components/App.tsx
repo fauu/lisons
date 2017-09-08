@@ -24,7 +24,7 @@ import styled from "styled-components"
 import { Library } from "~/library/components"
 import { Reader } from "~/reader/components"
 
-import { Spinner } from "~/app/components"
+import { FadeTransition, Spinner } from "~/app/components"
 import { KeyCode } from "~/app/data/KeyCode"
 import { animations, colors, fonts } from "~/app/data/Style"
 import "~/app/GlobalStyle.ts"
@@ -47,7 +47,11 @@ export class App extends React.Component<{}> {
   }
 
   public render(): JSX.Element {
-    return <Wrapper id="app">{this.renderScreen(this.appStore.activeScreen)}</Wrapper>
+    return (
+      <Wrapper id="app">
+        <FadeTransition>{this.renderScreen(this.appStore.activeScreen)}</FadeTransition>
+      </Wrapper>
+    )
   }
 
   private renderScreen(screen?: AppScreen): JSX.Element {
