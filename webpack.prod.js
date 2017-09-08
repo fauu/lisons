@@ -1,6 +1,7 @@
 const path = require("path")
 const webpack = require("webpack")
 const merge = require("webpack-merge")
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const common = require("./webpack.common")
 
@@ -14,7 +15,8 @@ const mainConfig = merge(common.mainConfig, {
         NODE_ENV: JSON.stringify("production")
       }
     }),
-    new webpack.optimize.ModuleConcatenationPlugin()
+    new webpack.optimize.ModuleConcatenationPlugin(),
+    new UglifyJsPlugin()
   ]
 })
 
@@ -27,7 +29,8 @@ const rendererConfig = merge(common.rendererConfig, {
       }
     }),
     new webpack.optimize.ModuleConcatenationPlugin(),
-    new HtmlWebpackPlugin({ template: common.htmlTemplatePath })
+    new HtmlWebpackPlugin({ template: common.htmlTemplatePath }),
+    new UglifyJsPlugin()
   ]
 })
 
