@@ -16,14 +16,15 @@ function createWindow(): void {
     // icon: path.join(__dirname, "assets/icon.png")
   })
 
+  mainWindow.webContents.openDevTools()
+
   if (isDev) {
     electronDebug({ enabled: true, showDevTools: "bottom" })
-    mainWindow.webContents.openDevTools()
 
-    const url = "http://localhost:3000"
-    mainWindow.loadURL(url)
+    const webServerUrl = "http://localhost:3000"
+    mainWindow.loadURL(webServerUrl)
     mainWindow.webContents.on("did-fail-load", () => {
-      setTimeout(() => mainWindow!.loadURL(url), 1000)
+      setTimeout(() => mainWindow!.loadURL(webServerUrl), 1000)
     })
   } else {
     mainWindow.loadURL(

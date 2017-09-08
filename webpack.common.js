@@ -1,30 +1,20 @@
 const path = require("path")
-
-// TODO: use webpack-merge
+const webpack = require("webpack")
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 
 const outDirName = "out"
 const outPath = path.resolve(__dirname, outDirName)
 const srcDirName = "src"
 const srcPath = path.resolve(__dirname, srcDirName)
 const htmlTemplatePath = path.join(srcDirName, "index.html")
+const rendererEntry = "./src/renderer.tsx"
 
-const mainConstants = {
-  target: "electron-main",
-  entry: { main: "./src/main.ts" },
+const rendererConfig = {
+  target: "electron-renderer",
   output: {
-    filename: "main.bundle.js",
+    filename: "renderer.bundle.js",
     path: outPath
   },
-  resolve: {
-    extensions: [".js", ".ts"]
-  }
-}
-
-const rendererConstants = {
-  target: "electron",
-  entry: "./src/renderer.tsx",
-  outputFilename: "renderer.bundle.js",
-  outputPath: outPath,
   module: {
     rules: [
       {
@@ -41,14 +31,39 @@ const rendererConstants = {
     extensions: [".js", ".ts", ".tsx"],
     alias: {
       "~": path.resolve("./src")
-    }
+    },
+    symlinks: false
+  },
+  plugins: [new webpack.NoEmitOnErrorsPlugin(), new ForkTsCheckerWebpackPlugin()]
+}
+
+const mainConfig = {
+  target: "electron-main",
+  entry: { main: "./src/main.ts" },
+  output: {
+    filename: "main.bundle.js",
+    path: outPath
+  },
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        use: ["babel-loader", "ts-loader"],
+        include: srcPath
+      }
+    ]
+  },
+  resolve: {
+    extensions: [".js", ".ts"],
+    symlinks: false
   }
 }
 
 module.exports = {
+  mainConfig,
+  rendererConfig,
   outDirName,
   srcPath,
   htmlTemplatePath,
-  mainConstants,
-  rendererConstants
+  rendererEntry
 }

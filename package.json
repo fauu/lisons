@@ -33,7 +33,6 @@
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-es2015-node": "^6.1.1",
-    "babel-preset-minify": "^0.2.0",
     "babel-preset-react": "^6.24.1",
     "babel-webpack-plugin": "^0.1.1",
     "cross-env": "^5.0.5",
@@ -80,7 +79,8 @@
     "react-dom": "^15.6.1",
     "react-hot-loader": "^3.0.0-beta.6",
     "styled-components": "^2.1.2",
-    "tslib": "^1.7.1"
+    "tslib": "^1.7.1",
+    "webpack-merge": "^4.1.0"
   },
   "babel": {
     "presets": [

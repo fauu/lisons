@@ -1,8 +1,8 @@
 const fs = require("fs")
 const path = require("path")
 const webpack = require("webpack")
+const merge = require("webpack-merge")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
-const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const common = require("./webpack.common")
 
@@ -14,7 +14,7 @@ const templateContent = () => {
   const scriptTag = `
     <script
        type="text/javascript"
-       src="${devServerUrl}${common.rendererConstants.outputFilename}">
+       src="${devServerUrl}${common.rendererConfig.output.filename}">
     </script>
   `
   const html = fs.readFileSync(path.resolve(process.cwd(), common.htmlTemplatePath)).toString()
@@ -26,20 +26,7 @@ const templateContent = () => {
   `
 }
 
-const mainConfig = {
-  target: "electron-main",
-  entry: common.mainConstants.entry,
-  output: common.mainConstants.output,
-  module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        use: ["babel-loader", "ts-loader"],
-        include: common.srcPath
-      }
-    ]
-  },
-  resolve: common.mainConstants.resolve,
+const mainConfig = merge(common.mainConfig, {
   plugins: [
     new webpack.DefinePlugin({
       "process.env": {
@@ -51,29 +38,22 @@ const mainConfig = {
       inject: false
     })
   ]
-}
+})
 
-const rendererConfig = {
-  target: "electron-renderer",
+const rendererConfig = merge(common.rendererConfig, {
   entry: [
     "babel-polyfill",
     "react-hot-loader/patch",
     `webpack-dev-server/client?${devServerUrl}`,
     "webpack/hot/only-dev-server",
-    common.rendererConstants.entry
+    common.rendererEntry
   ],
   output: {
-    filename: common.rendererConstants.outputFilename,
-    path: common.rendererConstants.outputPath,
     publicPath: common.devServerUrl
   },
-  module: common.rendererConstants.module,
-  resolve: common.rendererConstants.resolve,
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NamedModulesPlugin(),
-    new webpack.NoEmitOnErrorsPlugin(),
-    new ForkTsCheckerWebpackPlugin()
+    new webpack.NamedModulesPlugin()
     //new BundleAnalyzerPlugin()
   ],
   devServer: {
@@ -85,7 +65,7 @@ const rendererConfig = {
       "Access-Control-Allow-Origin": "*"
     }
   }
-}
+})
 
 const isDevServer = process.argv.find(v => v.includes("webpack-dev-server"))
 
