@@ -25,15 +25,19 @@ export function Toc({
     <Root onClick={onAnyClick}>
       <Wrapper variant={variant}>
         <SectionList variant={variant}>
-          {sections.map(s => (
-            <SectionLink
-              key={s.startElementNo}
-              current={s.startElementNo === currentSection.startElementNo}
-              onClick={() => onSectionLinkClick(s.startElementNo)}
-            >
-              {s.name}
-            </SectionLink>
-          ))}
+          {sections.map(s => {
+            const isActive = s.startElementNo === currentSection.startElementNo
+            return (
+              <SectionLink
+                key={s.startElementNo}
+                isActive={isActive}
+                variant={variant}
+                onClick={!isActive && (() => onSectionLinkClick(s.startElementNo))}
+              >
+                {s.name}
+              </SectionLink>
+            )
+          })}
         </SectionList>
       </Wrapper>
     </Root>
@@ -54,7 +58,6 @@ const Wrapper = withProps<{ variant: UiColorVariant }>()(styled.div)`
   z-index: 9001;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   background: transparent;
-  animation: ${animations.fadeInTop} ${animations.std};
   font-size: 1.1em;
   overflow-y: auto;
   overflow-x: hidden;
@@ -78,19 +81,20 @@ const SectionList = withProps<{ variant: UiColorVariant }>()(styled.ul)`
   background: ${p => (p.variant === "Light" ? "#22222255" : "#ffffff55")};
   backdrop-filter: blur(10px);
   background-image: url("../res/noise-texture.png");
-  li:not(:last-child) {
-    border-color: ${p => (p.variant === "Light" ? "#ffffff17" : "#00000017")};
-  }
-  li:hover {
-    background: ${p => (p.variant === "Light" ? "#ffffff11" : "#ffffff66")};
-  }
 `
 
-const SectionLink = withProps<{ current: boolean; onClick: any }>()(styled.li)`
+const SectionLink = withProps<{ isActive: boolean; variant: UiColorVariant; onClick: any }>()(
+  styled.li
+)`
+  min-width: 10rem;
   padding: 0.7rem;
   transition: background ${animations.std};
-  ${p => (p.current ? "font-weight: bold;" : "")}
+  ${p => (p.isActive ? "font-weight: bold;" : "")}
+  background: ${p => (p.isActive ? (p.variant === "Light" ? "#ffffff55" : "#ffffffaa") : "")};
+  &:hover {
+    background: ${p => (!p.isActive ? (p.variant === "Light" ? "#ffffff11" : "#ffffff66") : "")};
+  }
   &:not(:last-child) {
-    border-bottom: 1px solid;
+    border-bottom: 1px solid ${p => (p.variant === "Light" ? "#ffffff17" : "#00000017")};
   }
 `

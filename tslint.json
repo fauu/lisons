@@ -24,6 +24,7 @@
     "no-relative-imports": true,
     "jsx-boolean-value": [true, "never"],
     "no-bitwise": false,
-    "member-ordering": [false]
+    "member-ordering": [false],
+    "no-console": false
   }
 }

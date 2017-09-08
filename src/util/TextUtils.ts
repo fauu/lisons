@@ -12,10 +12,10 @@ export const detectLanguage = (input: string): string | undefined => {
   return lang !== "und" ? lang : undefined
 }
 
+const div = document.createElement("div")
 const stripHtml = (input: string): string => {
-  const tmp = document.createElement("div")
-  tmp.innerHTML = input
-  return tmp.textContent || tmp.innerText || ""
+  div.innerHTML = input
+  return div.textContent || ""
 }
 
 export const parseText = (epubOrPlainContent: Epub | string, sampleLength: number): IParsedText => {
@@ -29,7 +29,7 @@ export const parseText = (epubOrPlainContent: Epub | string, sampleLength: numbe
       if (structureEntry) {
         name = structureEntry.name
       }
-      const text = stripHtml(s.toMarkdown!())
+      const text = stripHtml(s.htmlString)
       if (sample.length < sampleLength) {
         sample += text
       }
@@ -51,6 +51,8 @@ export const getEpubOrPlainContent = async (path: string): Promise<Epub | string
     const isDataText = data && (await isText(data, await fileSize(path)))
     if (data && isDataText) {
       return data.toString()
+    } else {
+      console.error("Error parsing file: ", e)
     }
   }
   return ""

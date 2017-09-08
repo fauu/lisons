@@ -121,10 +121,13 @@ export class ReaderStore {
   }
 
   private updateCurrentSection(): void {
-    if (!this.text || !this.text.structure) {
+    if (!this.text) {
       return
     }
     const sections = this.text.structure
+    if (!sections || sections.length < 2) {
+      return
+    }
     const lastElNo = this._textView!.lastPageElementNo!
     if (!lastElNo) {
       this.setCurrentSection(sections[0])
