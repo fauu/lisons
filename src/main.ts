@@ -6,6 +6,9 @@ import * as url from "url"
 let mainWindow: Electron.BrowserWindow | null
 
 const isDev = process.env.NODE_ENV === "dev"
+if (isDev) {
+  electronDebug({ enabled: true, showDevTools: "bottom" })
+}
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
@@ -16,11 +19,7 @@ function createWindow(): void {
     // icon: path.join(__dirname, "assets/icon.png")
   })
 
-  mainWindow.webContents.openDevTools()
-
   if (isDev) {
-    electronDebug({ enabled: true, showDevTools: "bottom" })
-
     const webServerUrl = "http://localhost:3000"
     mainWindow.loadURL(webServerUrl)
     mainWindow.webContents.on("did-fail-load", () => {

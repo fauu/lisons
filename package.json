@@ -61,7 +61,6 @@
     "chinese-tokenizer": "^0.1.2",
     "devtron": "^1.4.0",
     "dexie": "^2.0.0-beta",
-    "electron-compile": "^6.4.1",
     "electron-debug": "^1.4.0",
     "electron-devtools-installer": "^2.2.0",
     "franc-min": "^3.1.1",
