@@ -12,7 +12,7 @@ if (isDev) {
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
-    webPreferences: { experimentalFeatures: true },
+    webPreferences: { experimentalFeatures: true, webSecurity: !isDev },
     minWidth: 960,
     minHeight: 640,
     backgroundColor: "#222"

@@ -62,11 +62,15 @@ const rendererConfig = merge(common.rendererConfig, {
     contentBase: common.outDirName,
     hot: true,
     headers: {
-      "Access-Control-Allow-Origin": "*"
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
     }
   }
 })
 
 const isDevServer = process.argv.find(v => v.includes("webpack-dev-server"))
+
+console.log(rendererConfig)
 
 module.exports = isDevServer ? rendererConfig : mainConfig

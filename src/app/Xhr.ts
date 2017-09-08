@@ -17,7 +17,7 @@ export const xhr = async <T>(
         }
       }
     }
-    req.open(postData ? "POST" : "GET", url, true)
+    req.open(postData ? "POST" : "GET", url.trim(), true)
     req.send(postData && JSON.stringify(postData))
     req.onerror = err => {
       reject({ error: `XHR Error: ${err}` })
