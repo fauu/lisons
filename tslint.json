@@ -1,0 +1,29 @@
+{
+  "rulesDirectory": ["node_modules/tslint-microsoft-contrib", "tslint-rules/"],
+  "defaultSeverity": "error",
+  "extends": ["tslint:latest", "tslint-react", "tslint-config-prettier"],
+  "jsRules": {},
+  "rules": {
+    "jsx-no-lambda": false,
+    "no-default-export": true,
+    "no-invalid-this": true,
+    "typedef": [true, "call-signature", "parameter"],
+    "object-literal-sort-keys": [false],
+    "ordered-imports": [true],
+    "promise-must-complete": true,
+    "react-proper-lifecycle-methods": true,
+    "react-readonly-props-and-state": true,
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-pascal-case",
+      "allow-leading-underscore"
+    ],
+    "no-submodule-imports": false,
+    "no-relative-imports": true,
+    "jsx-boolean-value": [true, "never"],
+    "no-bitwise": false,
+    "member-ordering": [false]
+  }
+}

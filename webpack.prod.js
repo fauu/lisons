@@ -1,18 +1,18 @@
 const path = require("path")
 const webpack = require("webpack")
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
-const BabelPlugin = require("babel-webpack-plugin")
 const common = require("./webpack.common")
 
 const mainConfig = {
-  target: common.mainConstants.target,
+  target: "electron-main",
   entry: common.mainConstants.entry,
   output: common.mainConstants.output,
   module: {
     rules: [
       {
         test: /\.ts$/,
-        use: ["ts-loader"],
+        use: ["babel-loader", "ts-loader"],
         include: common.srcPath
       }
     ]
@@ -24,14 +24,6 @@ const mainConfig = {
         NODE_ENV: JSON.stringify("production")
       }
     }),
-    new BabelPlugin({
-      test: /\.js$/,
-      sourceMaps: false,
-      compact: true,
-      minified: true,
-      comments: false,
-      presets: ["minify"]
-    }),
     new webpack.optimize.ModuleConcatenationPlugin()
   ],
   node: {
@@ -40,13 +32,24 @@ const mainConfig = {
 }
 
 const rendererConfig = {
-  entry: common.rendererConstants.entry,
+  target: "electron-renderer",
+  entry: ["babel-polyfill", common.rendererConstants.entry],
   output: {
     filename: common.rendererConstants.outputFilename,
     path: common.rendererConstants.outputPath
   },
-  devtool: "cheap-module-source-map",
-  module: common.rendererConstants.module,
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: [
+          { loader: "babel-loader" },
+          { loader: "ts-loader", options: { transpileOnly: true } }
+        ],
+        include: common.rendererConstants.srcPath
+      }
+    ]
+  },
   resolve: common.rendererConstants.resolve,
   plugins: [
     new webpack.DefinePlugin({
@@ -54,18 +57,12 @@ const rendererConfig = {
         NODE_ENV: JSON.stringify("production")
       }
     }),
-    new BabelPlugin({
-      test: /\.js$/,
-      sourceMaps: true,
-      compact: true,
-      minified: true,
-      comments: false,
-      presets: ["minify"]
-    }),
+    new webpack.NoEmitOnErrorsPlugin(),
     new webpack.optimize.ModuleConcatenationPlugin(),
     new HtmlWebpackPlugin({
       template: common.htmlTemplatePath
-    })
+    }),
+    new ForkTsCheckerWebpackPlugin()
   ]
 }
 

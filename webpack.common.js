@@ -21,6 +21,7 @@ const mainConstants = {
 }
 
 const rendererConstants = {
+  target: "electron",
   entry: "./src/renderer.tsx",
   outputFilename: "renderer.bundle.js",
   outputPath: outPath,
@@ -28,13 +29,19 @@ const rendererConstants = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: ["babel-loader", "ts-loader"],
+        use: [
+          { loader: "babel-loader" },
+          { loader: "ts-loader", options: { transpileOnly: true } }
+        ],
         include: srcPath
       }
     ]
   },
   resolve: {
-    extensions: [".js", ".ts", ".tsx"]
+    extensions: [".js", ".ts", ".tsx"],
+    alias: {
+      "~": path.resolve("./src")
+    }
   }
 }
 

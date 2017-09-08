@@ -1,47 +1,57 @@
-const { app, BrowserWindow } = require("electron");
-const path = require("path");
-const url = require("url");
+import { app, BrowserWindow } from "electron"
+import electronDebug = require("electron-debug")
+import * as path from "path"
+import * as url from "url"
 
-let win: any;
+let mainWindow: Electron.BrowserWindow | null
 
-const isDev = process.env.NODE_ENV === "dev";
+const isDev = process.env.NODE_ENV === "dev"
 
-function createWindow() {
-  win = new BrowserWindow({ width: 800, height: 600 });
+function createWindow(): void {
+  mainWindow = new BrowserWindow({
+    webPreferences: { experimentalFeatures: true },
+    minWidth: 960,
+    minHeight: 640,
+    backgroundColor: "#222"
+    // icon: path.join(__dirname, "assets/icon.png")
+  })
 
   if (isDev) {
-    const url = "http://localhost:3000";
-    win.loadURL(url);
-    win.webContents.on("did-fail-load", () => {
-      setTimeout(() => win.loadURL(url), 1000);
-    });
+    electronDebug({ enabled: true, showDevTools: "bottom" })
+    mainWindow.webContents.openDevTools()
+
+    const url = "http://localhost:3000"
+    mainWindow.loadURL(url)
+    mainWindow.webContents.on("did-fail-load", () => {
+      setTimeout(() => mainWindow!.loadURL(url), 1000)
+    })
   } else {
-    win.loadURL(
+    mainWindow.loadURL(
       url.format({
         pathname: path.join(__dirname, "index.html"),
         protocol: "file:",
         slashes: true
       })
-    );
+    )
   }
 
-  win.webContents.openDevTools();
+  mainWindow.setMenu(null as any)
 
-  win.on("closed", () => {
-    win = null;
-  });
+  mainWindow.on("closed", () => {
+    mainWindow = null
+  })
 }
 
-app.on("ready", createWindow);
+app.on("ready", createWindow)
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
-    app.quit();
+    app.quit()
   }
-});
+})
 
 app.on("activate", () => {
-  if (win === null) {
-    createWindow();
+  if (mainWindow === null) {
+    createWindow()
   }
-});
+})

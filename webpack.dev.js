@@ -1,6 +1,8 @@
 const fs = require("fs")
 const path = require("path")
 const webpack = require("webpack")
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const common = require("./webpack.common")
 
@@ -25,7 +27,7 @@ const templateContent = () => {
 }
 
 const mainConfig = {
-  target: common.mainConstants.target,
+  target: "electron-main",
   entry: common.mainConstants.entry,
   output: common.mainConstants.output,
   module: {
@@ -52,7 +54,9 @@ const mainConfig = {
 }
 
 const rendererConfig = {
+  target: "electron-renderer",
   entry: [
+    "babel-polyfill",
     "react-hot-loader/patch",
     `webpack-dev-server/client?${devServerUrl}`,
     "webpack/hot/only-dev-server",
@@ -63,19 +67,23 @@ const rendererConfig = {
     path: common.rendererConstants.outputPath,
     publicPath: common.devServerUrl
   },
-  devtool: "inline-source-map",
   module: common.rendererConstants.module,
   resolve: common.rendererConstants.resolve,
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(),
-    new webpack.NoEmitOnErrorsPlugin()
+    new webpack.NoEmitOnErrorsPlugin(),
+    new ForkTsCheckerWebpackPlugin()
+    //new BundleAnalyzerPlugin()
   ],
   devServer: {
     host: devServerHost,
     port: devServerPort,
     contentBase: common.outDirName,
-    hot: true
+    hot: true,
+    headers: {
+      "Access-Control-Allow-Origin": "*"
+    }
   }
 }
 

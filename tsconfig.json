@@ -1,7 +1,9 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "target": "es2015",
+    "lib": ["es6", "es2016.array.include", "dom", "dom.iterable"],
+    "target": "es6",
+    "module": "commonjs",
     "moduleResolution": "node",
     "pretty": true,
     "newLine": "LF",
@@ -9,11 +11,24 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "skipLibCheck": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "importHelpers": true,
+    "noEmitHelpers": true,
     "allowJs": true,
-    "jsx": "react"
-  }
+    "experimentalDecorators": true,
+    "jsx": "react",
+    "baseUrl": "./",
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  },
+  "include": ["src/*"]
 }
-
-

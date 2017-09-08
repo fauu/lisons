@@ -1,17 +1,20 @@
-import { AppContainer } from "react-hot-loader";
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-import { App } from "./App";
+import * as React from "react"
+import * as ReactDOM from "react-dom"
+import { AppContainer } from "react-hot-loader"
 
-const rootEl = document.getElementById("app");
-const render = (App: any) =>
+import { App } from "~/app/components/App"
+
+const rootEl = document.getElementById("app")
+const render = () =>
   ReactDOM.render(
     <AppContainer>
       <App />
     </AppContainer>,
     rootEl
-  );
+  )
+render()
 
-render(App);
-const mdl = module as any;
-if (mdl.hot) mdl.hot.accept("./App", () => render(require("./App").default));
+declare var module: { hot: { accept: (fn: any) => any } }
+if (module.hot) {
+  module.hot.accept(render)
+}

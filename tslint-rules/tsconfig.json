@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "jsx": "react",
+    "strict": true,
+    "sourceMap": true,
+    "noImplicitReturns": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
+  }
+}
