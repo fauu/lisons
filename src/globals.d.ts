@@ -1,3 +1,6 @@
+declare module "*.png"
+declare module "*.woff2"
+
 declare module "franc-min"
 declare module "isbinaryfile"
 

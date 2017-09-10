@@ -151,15 +151,18 @@ const Label = styled.div`
   display: flex;
   align-items: center;
   padding-right: 1em;
+  line-height: 1.1em;
 `
 
 const Input = styled.input`
   flex: 2;
   background: rgba(255, 255, 255, 0.12);
   color: #fefefe;
-  border: 2px solid rgba(255, 255, 255, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
   font-size: 0.95em;
   padding: 0.5rem;
+  height: 41px;
   &:hover {
     transform: translate(0, -1px);
   }
@@ -173,8 +176,8 @@ const Input = styled.input`
     &::-webkit-slider-thumb {
       -webkit-appearance: none;
       height: 2.3rem;
-      width: 16px;
-      background: rgba(255, 255, 255, 0.24);
+      width: 8px;
+      background: rgba(255, 255, 255, 0.2);
       margin: -0.5rem 0;
     }
     &:focus {
@@ -183,12 +186,13 @@ const Input = styled.input`
   }
 `
 
-// XXX: DRY
+// TODO: DRY
 const Select = styled.select`
   flex: 2;
   background: rgba(255, 255, 255, 0.12);
   color: #fefefe;
-  border: 2px solid rgba(255, 255, 255, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
   font-size: 0.95em;
   padding: 0.5rem;
   &:hover {
@@ -199,7 +203,6 @@ const Select = styled.select`
 const Option = styled.option`
   background: #444;
   color: #fefefe;
-  border: 2px solid rgba(255, 255, 255, 0.24);
   font-size: 0.95em;
   padding: 0.5rem;
 `
@@ -207,9 +210,10 @@ const Option = styled.option`
 const Button = withProps<{ warning?: boolean }>()(styled.button)`
   width: 100%;
   background: rgba(255, 255, 255, 0.12);
-  border: 2px solid;
+  border: 1px solid;
+  border-radius: 3px;
   color: #${p => (p.warning ? "f7ca28" : "fefefe")};
-  border-color: #${p => (p.warning ? "rgba(247, 202, 40, 0.5)" : "rgba(255, 255, 255, 0.24)")};
+  border-color: #${p => (p.warning ? "rgba(247, 202, 40, 0.5)" : "rgba(255, 255, 255, 0.2)")};
   padding: 0.5rem 0.6rem;
   transition: all 0.05s ease-out;
   font-size: 0.9em;

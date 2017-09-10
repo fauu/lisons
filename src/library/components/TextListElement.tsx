@@ -63,9 +63,9 @@ const TitleAndAuthor = styled.div`
 
 const Title = styled.span`
   display: inline-block;
-  height: 1.2em;
+  height: 1.3em;
   max-width: 30em;
-  font: oblique bold 1.15em "Merriweather";
+  font: oblique bold 1.15em "PT Serif";
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

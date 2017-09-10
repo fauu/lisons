@@ -9,6 +9,8 @@ import { SettingsStore } from "~/app/stores"
 import { Dictionary, ExampleSentenceList, Settings } from "~/reader/components"
 import { SidebarStore } from "~/reader/stores"
 
+import * as noiseTexture from "~/res/images/noise-texture.png"
+
 export interface ISidebarProps {
   readonly sidebarStore: SidebarStore
   readonly settingsStore: SettingsStore
@@ -80,7 +82,7 @@ const Root = styled.div`
   font-size: 1.4em;
   background: ${colors.primary};
   color: ${colors.secondary};
-  background-image: url("../res/noise-texture.png");
+  background-image: url('${noiseTexture}');
   /* FadeTransition */
   > span {
     display: block;

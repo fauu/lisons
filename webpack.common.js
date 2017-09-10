@@ -1,41 +1,16 @@
 const path = require("path")
 const webpack = require("webpack")
+const CopyWebpackPlugin = require("copy-webpack-plugin")
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
+const HappyPack = require("happypack")
 
 const outDirName = "out"
 const outPath = path.resolve(__dirname, outDirName)
 const srcDirName = "src"
 const srcPath = path.resolve(__dirname, srcDirName)
+const staticResPath = "./src/res/static"
 const htmlTemplatePath = path.join(srcDirName, "index.html")
 const rendererEntry = "./src/renderer.tsx"
-
-const rendererConfig = {
-  target: "electron-renderer",
-  output: {
-    filename: "renderer.bundle.js",
-    path: outPath
-  },
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: [
-          { loader: "babel-loader" },
-          { loader: "ts-loader", options: { transpileOnly: true } }
-        ],
-        include: srcPath
-      }
-    ]
-  },
-  resolve: {
-    extensions: [".js", ".ts", ".tsx"],
-    alias: {
-      "~": path.resolve("./src")
-    },
-    symlinks: false
-  },
-  plugins: [new webpack.NoEmitOnErrorsPlugin(), new ForkTsCheckerWebpackPlugin()]
-}
 
 const mainConfig = {
   target: "electron-main",
@@ -47,7 +22,7 @@ const mainConfig = {
   module: {
     rules: [
       {
-        test: /\.ts$/,
+        test: /.ts$/,
         use: ["babel-loader", "ts-loader"],
         include: srcPath
       }
@@ -56,7 +31,52 @@ const mainConfig = {
   resolve: {
     extensions: [".js", ".ts"],
     symlinks: false
-  }
+  },
+  plugins: [new CopyWebpackPlugin([{ from: staticResPath }])]
+}
+
+const rendererConfig = {
+  context: __dirname,
+  target: "electron-renderer",
+  output: {
+    filename: "renderer.bundle.js",
+    path: outPath
+  },
+  module: {
+    rules: [
+      {
+        test: /tsx?$/,
+        loader: "happypack/loader?id=ts",
+        include: srcPath
+      },
+      {
+        test: /(png|jpg|gif|woff2)$/,
+        loaders: "url-loader?limit=100000"
+      }
+    ]
+  },
+  resolve: {
+    extensions: [".js", ".ts", ".tsx"],
+    alias: {
+      "~": path.resolve("./src")
+    },
+    symlinks: false
+  },
+  plugins: [
+    new HappyPack({
+      id: "ts",
+      threads: 2,
+      loaders: [
+        "babel-loader",
+        {
+          path: "ts-loader",
+          query: { happyPackMode: true }
+        }
+      ]
+    }),
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
+    new webpack.NoEmitOnErrorsPlugin()
+  ]
 }
 
 module.exports = {

@@ -7,6 +7,8 @@ import { withProps } from "~/util/StyleUtils"
 
 import { UiColorVariant } from "~/reader/model"
 
+import * as noiseTexture from "~/res/images/noise-texture.png"
+
 export interface ITocProps {
   readonly sections: ITextSectionInfo[]
   readonly currentSection: ITextSectionInfo
@@ -56,7 +58,7 @@ const Root = styled.div`
 
 const Wrapper = withProps<{ variant: UiColorVariant }>()(styled.div)`
   z-index: 9001;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   background: transparent;
   font-size: 1.1em;
   overflow-y: auto;
@@ -79,8 +81,8 @@ const SectionList = withProps<{ variant: UiColorVariant }>()(styled.ul)`
   color: ${p => (p.variant === "Light" ? "#f9f9f9" : "#333")};
   border: 1px solid ${p => (p.variant === "Light" ? "#ffffff17" : "#00000017")};
   background: ${p => (p.variant === "Light" ? "#22222255" : "#ffffff55")};
-  backdrop-filter: blur(10px);
-  background-image: url("../res/noise-texture.png");
+  backdrop-filter: blur(15px);
+  background-image: url('${noiseTexture}');
 `
 
 const SectionLink = withProps<{ isActive: boolean; variant: UiColorVariant; onClick: any }>()(
@@ -90,9 +92,14 @@ const SectionLink = withProps<{ isActive: boolean; variant: UiColorVariant; onCl
   padding: 0.7rem;
   transition: background ${animations.std};
   ${p => (p.isActive ? "font-weight: bold;" : "")}
-  background: ${p => (p.isActive ? (p.variant === "Light" ? "#ffffff55" : "#ffffffaa") : "")};
+  ${p =>
+    p.isActive
+      ? "box-shadow: inset 0px 11px 8px -10px rgba(0, 0, 0, 0.16), inset 0px -11px 8px -10px rgba(0, 0, 0, 0.16);"
+      : ""}
+  background: ${p =>
+    p.isActive ? (p.variant === "Light" ? "#ffffff11" : "#ffffff66") : "transparent"};
   &:hover {
-    background: ${p => (!p.isActive ? (p.variant === "Light" ? "#ffffff11" : "#ffffff66") : "")};
+    background: ${p => (p.variant === "Light" ? "#ffffff11" : "#ffffff66")};
   }
   &:not(:last-child) {
     border-bottom: 1px solid ${p => (p.variant === "Light" ? "#ffffff17" : "#00000017")};

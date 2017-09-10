@@ -12,7 +12,7 @@ const punctuationChars =
 export class ChineseTokenizer implements ITokenizer {
   private static readonly punctuationRegexp = new RegExp(`[${punctuationChars}]+`, "g")
   private static readonly paragraphBreakRegexp = /[\r\n]/g
-  private static readonly vendorDictPath = "res/cedict_ts.u8"
+  private static readonly vendorDictPath = "out/cedict_ts.u8"
 
   private _tokenizers = {
     simplified: undefined,

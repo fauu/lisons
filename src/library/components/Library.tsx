@@ -16,7 +16,9 @@ export const Library = observer(function _Library({ appStore }: ILibraryProps): 
   const settingsStore = appStore.settingsStore
   return (
     <Root>
-      <Logo>Lisons!</Logo>
+      <Logo>
+        <LogoText>Lisons!</LogoText>
+      </Logo>
       <Body>
         <ReadColumn>
           {isEmpty ? <span>Your library is empty.</span> : <TextList {...{ appStore }} />}
@@ -42,15 +44,22 @@ const Root = styled.div`
 
 const Logo = styled.h1`
   margin-top: 0;
-  padding: 0 0.7rem;
+  padding: 0 0.75rem 0 0.6rem;
   align-self: flex-start;
   color: ${colors.secondary};
   background-color: ${colors.accent};
   background-image: linear-gradient(90deg, #ff9a8b 0%, #ff6a88 55%, #ff99ac 100%);
   background-size: 300% 100%;
+  border-radius: 3px;
   font-size: 4em;
   letter-spacing: -0.04em;
   animation: ${animations.gradientRotate} 3s ease infinite;
+`
+
+const LogoText = styled.span`
+  display: inline-block;
+  vertical-align: bottom;
+  line-height: 1.07em;
 `
 
 const Body = styled.div`
@@ -61,7 +70,7 @@ const Body = styled.div`
 `
 
 const ReadColumn = styled.div`
-  flex: 2.5;
+  flex: 3;
   animation: ${animations.fadeInBottom} ${animations.doubleTime};
 `
 
@@ -76,7 +85,7 @@ const AddTextColumnContent = styled.div`
 `
 
 const ColumnHeader = styled.h2`
-  margin-top: 0;
+  margin: 0;
   padding: 0;
   font-size: 0.9em;
 `

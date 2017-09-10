@@ -59,7 +59,7 @@ const rendererConfig = merge(common.rendererConfig, {
   devServer: {
     host: devServerHost,
     port: devServerPort,
-    contentBase: common.outDirName,
+    contentBase: path.join(__dirname, "out"),
     hot: true
   }
 })

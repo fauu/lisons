@@ -290,7 +290,7 @@ const fieldMargin = "1.3rem"
 
 const Form = withProps<{ unresponsive: boolean }>()(styled.form)`
   position: relative;
-  margin-top: 2rem;
+  margin-top: 1rem;
   font-size: 0.95em;
   ${p => (p.unresponsive ? "* { pointer-events: none }" : "")}
 
@@ -301,6 +301,7 @@ const Form = withProps<{ unresponsive: boolean }>()(styled.form)`
     color: ${colors.primary};
     background: ${colors.inputBg};
     border: 2px solid ${colors.primary};
+    border-radius: 3px;
     font-size: 1em;
     transition: all 0.05s ${animations.stdFunction};
     &:disabled,

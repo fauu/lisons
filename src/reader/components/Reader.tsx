@@ -14,6 +14,8 @@ import { Header, Sidebar, Toc } from "~/reader/components"
 import { UiColorVariant } from "~/reader/model"
 import { ReaderStore, SidebarStore } from "~/reader/stores"
 
+import * as noiseTexture from "~/res/images/noise-texture.png"
+
 export interface IReaderProps {
   readonly appStore: AppStore
 }
@@ -178,10 +180,11 @@ const Body = withProps<ITextAreaProps>()(styled.div)`
     [data-translation]:before {
       position: absolute;
       margin-top: -1.3em;
-      background: ${p => p.userStyle.translationBgColor}aa;
-      border: 1px solid ${p => p.userStyle.translationBgColor}66;
-      backdrop-filter: blur(10px);
-      background-image: url("../res/noise-texture.png");
+      background: ${p => p.userStyle.translationBgColor}88;
+      border: 1px solid ${p => p.userStyle.translationBgColor}44;
+      border-radius: 3px;
+      backdrop-filter: blur(15px);
+      background-image: url('${noiseTexture}');
       color: ${p => p.userStyle.translationTextColor};
       padding: 0.14em 0.3em;
       line-height: 1em;

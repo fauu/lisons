@@ -5,6 +5,7 @@
   - [reader] fix bug where selected text disappears when it's near the bottom edge
   - investigate bug where scrollbars appear after resizing
   - [settings] fade out reset button when settings equal to defaults
+  - [settings] scroll on overflow
   - flag rtl languages in app/data/Languages
 
   PRE 0.1:
