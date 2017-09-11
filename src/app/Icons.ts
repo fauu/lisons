@@ -1,5 +1,6 @@
 export { default as ArrowCollapseRightIcon } from "mdi-react/ArrowCollapseRightIcon"
 export { default as ArrowExpandLeftIcon } from "mdi-react/ArrowExpandLeftIcon"
+export { default as BetaIcon } from "mdi-react/BetaIcon"
 export { default as ChevronLeftIcon } from "mdi-react/ChevronLeftIcon"
 export { default as ChevronRightIcon } from "mdi-react/ChevronRightIcon"
 export { default as CloseIcon } from "mdi-react/CloseIcon"

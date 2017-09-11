@@ -1,6 +1,6 @@
 {
-  "name": "clairlire",
-  "version": "1.0.0",
+  "name": "lisons",
+  "version": "0.0.1",
   "main": "out/main.bundle.js",
   "license": "MIT",
   "scripts": {
@@ -87,13 +87,7 @@
     "webpack-merge": "^4.1.0"
   },
   "babel": {
-    "presets": [
-      "es2015",
-      "stage-0",
-      "react"
-    ],
-    "plugins": [
-      "react-hot-loader/babel"
-    ]
+    "presets": ["es2015", "stage-0", "react"],
+    "plugins": ["react-hot-loader/babel"]
   }
 }

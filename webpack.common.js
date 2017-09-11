@@ -3,6 +3,7 @@ const webpack = require("webpack")
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 const HappyPack = require("happypack")
+const packageJson = require("./package.json")
 
 const outDirName = "out"
 const outPath = path.resolve(__dirname, outDirName)
@@ -63,6 +64,9 @@ const rendererConfig = {
     symlinks: false
   },
   plugins: [
+    new webpack.DefinePlugin({
+      VERSION: JSON.stringify(packageJson.version)
+    }),
     new HappyPack({
       id: "ts",
       threads: 2,

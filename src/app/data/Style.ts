@@ -3,6 +3,7 @@ import { keyframes } from "styled-components"
 export const colors = {
   primary: "#282828",
   primaryFade: "#777",
+  primaryFade2: "#aaa",
   secondary: "#f9f9f9",
   secondaryFade: "#aaa",
   accent: "#ff9a8b",

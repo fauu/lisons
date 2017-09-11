@@ -1,17 +1,20 @@
 /* TODO:
   - [library] polish text list ui
-  - [tatoeba] investigate bug where sentences don't load
   - windows resizing stuff
   - [settings] fade out reset button when settings equal to defaults
   - [settings] scroll on overflow
   - flag rtl languages in app/data/Languages
+  - display current version
+  - "new version available" notification
 
   PRE 0.1:
+  - simple website
   - add icon for all platforms
 
   POST 0.1:
-  - [tokenization] FIX: chinese tokenizer splits into chars words written in other scripts
+  - [tokenization] FIX: chinese tokenizer splits words written in other scripts into chars
   - [reader] don't query tatoeba when no translations available
+  - move intensive operations to main thread
 */
 
 import { useStrict } from "mobx"

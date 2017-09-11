@@ -1,3 +1,5 @@
+declare var VERSION
+
 declare module "*.png"
 declare module "*.woff2"
 
@@ -6,6 +8,7 @@ declare module "isbinaryfile"
 
 declare module "mdi-react/ArrowCollapseRightIcon"
 declare module "mdi-react/ArrowExpandLeftIcon"
+declare module "mdi-react/BetaIcon"
 declare module "mdi-react/DeleteIcon"
 declare module "mdi-react/CloseIcon"
 declare module "mdi-react/ChevronLeftIcon"

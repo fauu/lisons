@@ -3,6 +3,7 @@ import * as React from "react"
 import styled from "styled-components"
 
 import { animations, colors } from "~/app/data/Style"
+import { BetaIcon } from "~/app/Icons"
 import { AppStore } from "~/app/stores"
 
 import { AddTextDialog, TextList } from "~/library/components"
@@ -16,9 +17,12 @@ export const Library = observer(function _Library({ appStore }: ILibraryProps): 
   const settingsStore = appStore.settingsStore
   return (
     <Root>
-      <Logo>
-        <LogoText>Lisons!</LogoText>
-      </Logo>
+      <LogoWrapper>
+        <Logo>
+          <LogoText>Lisons!</LogoText>
+        </Logo>
+        <BetaIndicator />
+      </LogoWrapper>
       <Body>
         <ReadColumn>
           {isEmpty ? <span>Your library is empty.</span> : <TextList {...{ appStore }} />}
@@ -30,6 +34,9 @@ export const Library = observer(function _Library({ appStore }: ILibraryProps): 
           </AddTextColumnContent>
         </AddTextColumn>
       </Body>
+      <VersionPanel>
+        <VersionString>{VERSION}</VersionString>
+      </VersionPanel>
     </Root>
   )
 })
@@ -41,6 +48,8 @@ const Root = styled.div`
   background-color: ${colors.secondary};
   height: 100%;
 `
+
+const LogoWrapper = styled.div`display: flex;`
 
 const Logo = styled.h1`
   margin-top: 0;
@@ -55,6 +64,8 @@ const Logo = styled.h1`
   letter-spacing: -0.04em;
   animation: ${animations.gradientRotate} 3s ease infinite;
 `
+
+const BetaIndicator = styled(BetaIcon)`fill: ${colors.primaryFade2};`
 
 const LogoText = styled.span`
   display: inline-block;
@@ -89,3 +100,11 @@ const ColumnHeader = styled.h2`
   padding: 0;
   font-size: 0.9em;
 `
+
+const VersionPanel = styled.div`
+  position: absolute;
+  right: 0.95rem;
+  top: 0.8rem;
+`
+
+const VersionString = styled.span`color: ${colors.primaryFade2};`
