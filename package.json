@@ -72,6 +72,7 @@
     "isbinaryfile": "^3.0.2",
     "kuromoji": "^0.1.1",
     "lodash.debounce": "^4.0.8",
+    "lodash.isequal": "^4.5.0",
     "lodash.minby": "^4.6.0",
     "lodash.zip": "^4.2.0",
     "mdi-react": "^2.0.46",

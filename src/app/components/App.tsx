@@ -1,8 +1,6 @@
 /* TODO:
   - [library] polish text list ui
   - windows resizing stuff
-  - [settings] fade out reset button when settings equal to defaults
-  - [settings] scroll on overflow
   - "new version available" notification
 
   PRE 0.1:

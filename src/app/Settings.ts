@@ -1,4 +1,5 @@
 import * as path from "path"
+
 import { getUserDataPath, readFile, writeStringToFile } from "~/util/FileUtils"
 
 import { defaultSettings } from "~/app/data/DefaultSettings"

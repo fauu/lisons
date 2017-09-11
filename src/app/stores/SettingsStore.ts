@@ -1,10 +1,12 @@
+import isEqual = require("lodash/isEqual")
 import { action, computed, observable } from "mobx"
 
+import { defaultSettings } from "~/app/data/DefaultSettings"
 import { ISettings } from "~/app/model"
 import { loadSettings, saveSettings } from "~/app/Settings"
 
 export class SettingsStore {
-  @observable private _settings: ISettings
+  @observable.deep private _settings: ISettings
 
   public async init(): Promise<void> {
     this._settings = await loadSettings()
@@ -19,5 +21,10 @@ export class SettingsStore {
   @computed
   public get settings(): ISettings {
     return this._settings
+  }
+
+  @computed
+  public get areSettingsDefault(): boolean {
+    return isEqual(this._settings, defaultSettings)
   }
 }

@@ -5,6 +5,7 @@ import * as React from "react"
 import styled from "styled-components"
 
 import { defaultSettings } from "~/app/data/DefaultSettings"
+import { colors } from "~/app/data/Style"
 import { IReaderStyleSettings } from "~/app/model"
 import { SettingsStore } from "~/app/stores"
 import { withProps } from "~/util/StyleUtils"
@@ -102,7 +103,11 @@ export class Settings extends React.Component<ISettingsProps> {
           ))}
           <Button onClick={this.handleDoneButtonClick}>Done</Button>
         </FormMain>
-        <Button warning onClick={this.handleResetButtonClick}>
+        <Button
+          warning
+          disabled={this.settingsStore.areSettingsDefault}
+          onClick={this.handleResetButtonClick}
+        >
           Reset to defaults
         </Button>
       </Form>
@@ -233,12 +238,16 @@ const Button = withProps<{ warning?: boolean }>()(styled.button)`
   padding: 0.5rem 0.6rem;
   transition: all 0.05s ease-out;
   font-size: 0.9em;
-  &:hover {
+  &:not(:disabled):hover {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
     transform: translate(0, -1px);
   }
   &:active {
     box-shadow: initial;
     transform: initial;
+  }
+  &:disabled {
+    color: ${colors.primaryFade};
+    border-color: ${colors.primaryFade}55;
   }
 `
