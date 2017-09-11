@@ -1,4 +1,3 @@
-// TODO: add letter-spacing
 export interface IReaderStyleSettings {
   width: number
   fontSize: number

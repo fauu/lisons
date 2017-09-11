@@ -73,12 +73,20 @@ export class App extends React.Component<{}> {
     switch (e.keyCode) {
       case KeyCode.LeftArrow:
         if (inReader) {
-          readerStore.showPrevPage()
+          if (e.altKey) {
+            readerStore.skipBackward();
+          } else {
+            readerStore.showPrevPage()
+          }
         }
         break
       case KeyCode.RightArrow:
         if (inReader) {
-          readerStore.showNextPage()
+          if (e.altKey) {
+            readerStore.skipForward();
+          } else {
+            readerStore.showNextPage()
+          }
         }
         break
       case KeyCode.B:
