@@ -1,6 +1,6 @@
 export interface ILanguage {
   name: string
-  nativeName: string
+  localName: string
   codeGt: string
   code6393: string
   flags: number

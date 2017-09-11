@@ -15,7 +15,7 @@ export function LanguageSelect({ value, invalid, onChange }: ILanguageSelectProp
     <Select value={value} invalid={invalid} onChange={onChange}>
       {languages.map(l => (
         <option key={l.code6393} value={l.code6393}>
-          {l.name}
+          {l.localName}
         </option>
       ))}
     </Select>

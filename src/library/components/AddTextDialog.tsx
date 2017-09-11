@@ -193,7 +193,7 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
         {!filePath && this.renderPasteField()}
         {showFinalFields && this.renderFinalFields()}
         {textFileStatus === "Invalid" && (
-          <InvalidFileMsg>Selected file cannot be added.</InvalidFileMsg>
+          <InvalidFileMsg>This file cannot be added.</InvalidFileMsg>
         )}
       </Form>
     )

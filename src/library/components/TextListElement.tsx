@@ -27,7 +27,7 @@ export function TextListElement({ appStore, text }: ITextListElementProps): JSX.
       </Primary>
       <Secondary>
         <Languages>
-          {text.contentLanguage.name} -> {text.translationLanguage.name}
+          {text.contentLanguage.localName} -> {text.translationLanguage.localName}
         </Languages>
         {progress && <Progress>{formatPercentage(progress)} read</Progress>}
       </Secondary>
