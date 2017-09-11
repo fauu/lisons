@@ -305,8 +305,8 @@ const Form = withProps<{ unresponsive: boolean }>()(styled.form)`
     transition: all 0.05s ${animations.stdFunction};
     &:disabled,
     &:hover:disabled {
-      color: ${colors.primaryFade};
-      border-color: ${colors.primaryFade};
+      color: ${colors.primaryFade} !important;
+      border-color: ${colors.primaryFade} !important;
     }
     &:hover:not(:disabled) {
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
@@ -356,7 +356,7 @@ const MessageText = styled.span`
 
 const FileField = Field.extend`
   display: flex;
-  align-items: center;
+  align-items: baseline;
 `
 
 const PasteField = Field.extend`
@@ -371,7 +371,6 @@ const PasteFieldHeader = styled.div`
 
 // TODO: DRY (sidebar header ActionButton)
 const ClearButton = withProps<any>()(styled(CloseIcon))`
-  // XXX
   fill: rgba(0, 0, 0, 0.5);
   transition: fill 0.2s ease;
   &:hover {

@@ -25,5 +25,5 @@ export function LanguageSelect({ value, invalid, onChange }: ILanguageSelectProp
 // TODO: DRY
 const Select = withProps<ILanguageSelectProps>()(styled.select)`
   width: 100%;
-  border: 2px solid ${p => (p.invalid ? colors.danger : colors.primary)};
+  border: 2px solid ${p => (p.invalid ? colors.danger : colors.primary)} !important;
 `
