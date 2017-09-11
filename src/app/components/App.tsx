@@ -1,9 +1,6 @@
 /* TODO:
   - [library] polish text list ui
-  - windows resizing stuff
   - "new version available" notification
-
-  PRE 0.1:
   - simple website
   - add icon for all platforms
 
