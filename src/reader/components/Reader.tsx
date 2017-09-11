@@ -76,12 +76,13 @@ export class Reader extends React.Component<IReaderProps> {
     const userStyle = this.settingsStore.settings.readerStyle
     const variant = this.uiColorVariant
     const isOnlyPage = isFirstPage && isLastPage
+    const isRtl = text!.isRtl
     return (
       <Root>
         <Body
           userStyle={userStyle}
           animateSelection={this.sidebarStore.isMainTranslationLoading}
-          isContentRtl={text!.isRtl}
+          isContentRtl={isRtl}
           areTranslationsRtl={text!.areTranslationsRtl}
         >
           <Header appStore={this.appStore} variant={variant} />
@@ -96,11 +97,19 @@ export class Reader extends React.Component<IReaderProps> {
                 onSectionLinkClick={this.handleTocSectionLinkClick}
               />
             )}
-            <PrevPageButton visible={!isFirstPage} onClick={showPrevPage} variant={variant}>
+            <PrevPageButton
+              visible={isRtl ? !isLastPage : !isFirstPage}
+              onClick={isRtl ? showNextPage : showPrevPage}
+              variant={variant}
+            >
               <ChevronLeftIcon />
             </PrevPageButton>
             <div id="text-view" />
-            <NextPageButton visible={!isLastPage} onClick={showNextPage} variant={variant}>
+            <NextPageButton
+              visible={isRtl ? !isFirstPage : !isLastPage}
+              onClick={isRtl ? showPrevPage : showNextPage}
+              variant={variant}
+            >
               <ChevronRightIcon />
             </NextPageButton>
           </TextWithNavigation>
@@ -113,12 +122,24 @@ export class Reader extends React.Component<IReaderProps> {
   }
 
   private renderTextProgress(): JSX.Element | null {
-    const { readingProgress, isFirstPage, isLastPage, skipBackward, skipForward } = this.readerStore
+    const {
+      text,
+      readingProgress,
+      isFirstPage,
+      isLastPage,
+      skipBackward,
+      skipForward
+    } = this.readerStore
     const variant = this.uiColorVariant
+    const isRtl = text!.isRtl
+    const showLeftButton = (isRtl && !isLastPage) || (!isRtl && !isFirstPage)
+    const showRightButton = (isRtl && !isFirstPage) || (!isRtl && !isLastPage)
     return (
       <TextProgress variant={variant}>
         <SecondaryTextNavButtonWrapper left>
-          {!isFirstPage && <SkipBackwardButton onClick={skipBackward} variant={variant} />}
+          {showLeftButton && (
+            <SkipBackwardButton onClick={isRtl ? skipForward : skipBackward} variant={variant} />
+          )}
         </SecondaryTextNavButtonWrapper>
         <ProgressWrapper>
           {readingProgress instanceof Array ? (
@@ -128,7 +149,9 @@ export class Reader extends React.Component<IReaderProps> {
           )}
         </ProgressWrapper>
         <SecondaryTextNavButtonWrapper>
-          {!isLastPage && <SkipForwardButton onClick={skipForward} variant={variant} />}
+          {showRightButton && (
+            <SkipForwardButton onClick={isRtl ? skipBackward : skipForward} variant={variant} />
+          )}
         </SecondaryTextNavButtonWrapper>
       </TextProgress>
     )
