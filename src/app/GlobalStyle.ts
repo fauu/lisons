@@ -11,6 +11,13 @@ injectGlobal`
   html, body {
     margin: 0;
     padding: 0;
+
+    @media (min-width: 1920px) {
+      font-size: 1.1em;
+    }
+    @media (min-width: 2560px) {
+      font-size: 1.2em;
+    }
   }
 
   @font-face {

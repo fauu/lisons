@@ -3,8 +3,6 @@
   - windows resizing stuff
   - [settings] fade out reset button when settings equal to defaults
   - [settings] scroll on overflow
-  - flag rtl languages in app/data/Languages
-  - display current version
   - "new version available" notification
 
   PRE 0.1:

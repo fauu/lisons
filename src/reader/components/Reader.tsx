@@ -230,6 +230,7 @@ interface ITextNavButtonProps {
 }
 const TextNavButton = withProps<ITextNavButtonProps>()(styled.div)`
   visibility: ${p => (p.visible ? "visible" : "hidden")};
+  min-width: 3rem;
   flex: 1;
   display: flex;
   justify-content: center;

@@ -25,7 +25,7 @@ const formModel: FormModelElement[] = [
   ["Font family", "fontFamily", "text", {}],
   ["Font size", "fontSize", "range", { min: 1, max: 3, step: 0.05 }],
   ["Letter spacing", "letterSpacing", "range", { min: -0.05, max: 0.05, step: 0.01 }],
-  ["Text width", "width", "range", { min: 30, max: 60, step: 2 }],
+  ["Text width", "width", "range", { min: 30, max: 70, step: 2 }],
   [
     "Text alignment",
     "textAlign",
