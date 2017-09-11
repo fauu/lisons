@@ -1,9 +1,7 @@
 /* TODO:
-  - [reader] [prev-page] prettier page delimiter
   - [library] polish text list ui
   - [tatoeba] investigate bug where sentences don't load
-  - [reader] fix bug where selected text disappears when it's near the bottom edge
-  - investigate bug where scrollbars appear after resizing
+  - windows resizing stuff
   - [settings] fade out reset button when settings equal to defaults
   - [settings] scroll on overflow
   - flag rtl languages in app/data/Languages
@@ -13,7 +11,6 @@
 
   POST 0.1:
   - [tokenization] FIX: chinese tokenizer splits into chars words written in other scripts
-  - [reader] [prev-page] see how well it is possible to predict prev page height beforehand
   - [reader] don't query tatoeba when no translations available
 */
 

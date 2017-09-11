@@ -10,7 +10,7 @@ import { SettingsStore, TextStore } from "~/app/stores"
 import { TextRepository } from "~/app/TextRepository"
 
 export class AppStore {
-  private static readonly startInReader = true
+  private static readonly startInReader = false
   @observable public activeScreen?: AppScreen
   @observable public isFullScreen: boolean
   private _db: Database

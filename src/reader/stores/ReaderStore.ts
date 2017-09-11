@@ -7,7 +7,7 @@ import { SidebarStore } from "~/reader/stores"
 import { TextView } from "~/reader/TextView"
 
 export class ReaderStore {
-  private static readonly numPreloadedTextElementsPerPage = 3000
+  private static readonly numPreloadedTextElementsPerPage = 1000
   private static readonly skipLengthElements = 10000
   private static readonly readingProgressFoldThresholdPp = 1.5
 

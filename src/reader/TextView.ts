@@ -7,7 +7,7 @@ import { TextSelection } from "~/reader/TextSelection"
 
 // TODO: Make this code less crap
 export class TextView {
-  private static readonly debug = true
+  private static readonly debug = false
   private static readonly translationAttributeName = "data-translation"
   private static readonly textTransitionTimeMs = 200
 
@@ -113,7 +113,7 @@ export class TextView {
     return new Promise((resolve, _) => {
       setTimeout(() => {
         this.replaceRoot(newRoot)
-        this.fitText()
+        this.updateRange()
         this.fadeInRoot()
         resolve()
       }, TextView.textTransitionTimeMs + window.performance.now() - startTime)
@@ -127,7 +127,7 @@ export class TextView {
     return new Promise((resolve, _) => {
       setTimeout(() => {
         this.doRenderPrevPage(content)
-        this.fitText()
+        this.updateRange()
         this.fadeInRoot()
         resolve()
       }, TextView.textTransitionTimeMs)
@@ -220,19 +220,6 @@ export class TextView {
   }
 
   private handleWindowResize(): void {
-    this.fitText()
-  }
-
-  private fitText(): void {
-    const rootStyle = window.getComputedStyle(this.root)
-    const rootParent = this.root.parentElement!
-    const textProgress = rootParent.previousElementSibling!
-    const textProgressStyle = window.getComputedStyle(textProgress)
-    const margin = this.root.offsetTop + parseInt(textProgressStyle.height!, 10)
-    const lineHeight = parseFloat(rootStyle.lineHeight!)
-    const windowHeight = window.innerHeight
-    const noLines = Math.floor((windowHeight - margin) / lineHeight) - 1
-    this.root.style.height = `${String(lineHeight * noLines)}px`
     this.updateRange()
   }
 

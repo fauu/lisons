@@ -158,6 +158,7 @@ const Body = withProps<ITextAreaProps>()(styled.div)`
   transition: all ${animations.std};
 
   #text-view {
+    height: calc(100vh - 2.25rem - 3rem);
     font-size: ${p => p.userStyle.fontSize}em;
     letter-spacing: ${p => p.userStyle.letterSpacing}em;
     font-family: ${p => p.userStyle.fontFamily};
