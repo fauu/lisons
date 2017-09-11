@@ -83,7 +83,7 @@ const Root = styled.div`
   background: ${colors.primary};
   color: ${colors.secondary};
   background-image: url('${noiseTexture}');
-  /* FadeTransition */
+  /* FadeTransition hack */
   > span {
     display: block;
     height: 100%;

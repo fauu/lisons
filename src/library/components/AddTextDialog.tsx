@@ -275,12 +275,11 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
     return (
       <Message>
         {state === "fulfilled" && (
-          <span>
+          <MessageText>
             {value > 0 ? value : "No"} Tatoeba translations available for the selected language
             configuration.
-          </span>
+          </MessageText>
         )}
-        {state === "pending" && <Spinner color={"Dark"} />}
       </Message>
     )
   }
@@ -346,12 +345,13 @@ const Field = styled.label`
 `
 
 const Message = styled.div`
+  height: 1em;
   margin-bottom: ${fieldMargin};
+`
+
+const MessageText = styled.span`
   font-size: 0.9em;
-  > .spinner {
-    width: 20px;
-    height: 20px;
-  }
+  animation: ${animations.fadeIn} ${animations.std};
 `
 
 const FileField = Field.extend`

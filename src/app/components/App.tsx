@@ -117,7 +117,7 @@ const Wrapper = styled.div`
     box-sizing: border-box;
   }
 
-  /* FadeTransition */
+  /* FadeTransition hack */
   > span {
     display: block;
     height: 100%;
