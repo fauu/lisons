@@ -192,9 +192,6 @@ const Body = withProps<ITextAreaProps>()(styled.div)`
       transition: all ${animations.std};
       direction: ${p => (p.areTranslationsRtl ? "rtl" : "ltr")}
     }
-    span.bound-marked:after {
-      content: "|||";
-    }
   }
 `
 

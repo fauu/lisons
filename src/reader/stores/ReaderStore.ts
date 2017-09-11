@@ -45,12 +45,14 @@ export class ReaderStore {
   }
 
   public showPrevPage = async (): Promise<void> => {
-    const lastNo = this._textView!.lastPageElementNo
-    let from = lastNo! - ReaderStore.numPreloadedTextElementsPerPage
-    from = from < 0 ? 0 : from
-    await this._textView!.renderPrevPage(
-      this.text!.getTokenizedContentSlice(from, ReaderStore.numPreloadedTextElementsPerPage)
-    )
+    const targetElementNo = this._textView!.firstPageElementNo - 1
+    let count = ReaderStore.numPreloadedTextElementsPerPage
+    let from = targetElementNo - ReaderStore.numPreloadedTextElementsPerPage + 1
+    if (from < 0) {
+      from = 0
+      count = targetElementNo + 1
+    }
+    await this._textView!.renderPrevPage(this.text!.getTokenizedContentSlice(from, count))
     this.setSelectedText("")
     this.updateCurrentSection()
   }

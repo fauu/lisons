@@ -7,9 +7,9 @@ import { TextSelection } from "~/reader/TextSelection"
 
 // TODO: Make this code less crap
 export class TextView {
-  private static readonly debug = false
+  private static readonly debug = true
   private static readonly translationAttributeName = "data-translation"
-  private static readonly textTransitionTimeMs = 150
+  private static readonly textTransitionTimeMs = 200
 
   @observable public firstPageElementNo: number
   @observable public lastPageElementNo: number
@@ -86,7 +86,7 @@ export class TextView {
   }
 
   public renderPage(content: ITokenizedTextContent): Promise<void> {
-    this.root.style.opacity = "0"
+    this.fadeOutRoot()
     const startTime = window.performance.now()
     const newRoot = this.createNewRoot()
 
@@ -112,85 +112,83 @@ export class TextView {
 
     return new Promise((resolve, _) => {
       setTimeout(() => {
-        this.swapRoot(newRoot)
+        this.replaceRoot(newRoot)
         this.fitText()
+        this.fadeInRoot()
         resolve()
-      }, TextView.textTransitionTimeMs - window.performance.now() + startTime)
+      }, TextView.textTransitionTimeMs + window.performance.now() - startTime)
     })
   }
 
-  // XXX: HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACKS
   public renderPrevPage(content: ITokenizedTextContent): Promise<void> {
-    this.root.style.opacity = "0"
-    const targetLastElementNo = getElementNo(this.firstVisibleElement)! - 1
+    this.fadeOutRoot()
 
-    // TODO: Refactor
-    // TODO: Don't wait, do the work while fading out previous root
+    // TODO: Don't wait, do the work while fading out previous root if possible
     return new Promise((resolve, _) => {
       setTimeout(() => {
-        const rootClone = this.root.cloneNode(false)
-        this.root!.parentNode!.replaceChild(rootClone, this.root)
-        this.root = rootClone as HTMLElement
-
-        const { types, values, startNo } = content
-        const rootBoundaryRight = this.root.offsetLeft + this.root.offsetWidth
-        let paragraph
-        let targetLastElement
-        for (let i = types.length - 1; i >= 0; i--) {
-          if (!paragraph) {
-            paragraph = document.createElement("p")
-            prependElement(this.root, paragraph)
-          }
-          if (types[i] === TextTokenType.ParagraphBreak) {
-            paragraph = undefined
-            continue
-          }
-
-          const elNo = i + startNo
-          const el = this.createTextElement(types[i], values[i], elNo, TextView.debug)
-          prependElement(paragraph, el)
-          if (!targetLastElement) {
-            if (elNo <= targetLastElementNo) {
-              targetLastElement = el as HTMLElement
-            }
-          }
-          if (targetLastElement) {
-            if (targetLastElement.offsetLeft > rootBoundaryRight) {
-              this.removeFirstTextElement()
-              break
-            }
-          }
-        }
-
-        if (targetLastElement && targetLastElementNo !== getElementNo(this.lastVisibleElement!)) {
-          targetLastElement!.classList.add("bound-marked")
-        }
-
-        if (paragraph && paragraph.children.length === 0) {
-          this.root.removeChild(paragraph)
-        }
-
+        this.doRenderPrevPage(content)
         this.fitText()
-
-        this.root.style.transitionTimingFunction = "ease-in"
-        this.root.style.opacity = "1"
-
+        this.fadeInRoot()
         resolve()
       }, TextView.textTransitionTimeMs)
     })
   }
 
-  private swapRoot(newRoot: HTMLElement): void {
+  private doRenderPrevPage(content: ITokenizedTextContent): void {
+    this.replaceRoot(this.root.cloneNode(false))
+
+    const { types, values, startNo } = content
+    const rootBoundaryRight = this.root.offsetLeft + this.root.offsetWidth
+    this.root.innerHTML = ""
+    let paragraph
+    let targetLastElement
+    for (let i = types.length - 1; i >= 0; i--) {
+      if (types[i] === TextTokenType.ParagraphBreak) {
+        paragraph = undefined
+        continue
+      }
+      if (!paragraph) {
+        paragraph = document.createElement("p")
+        prependElement(this.root, paragraph)
+      }
+
+      const elNo = i + startNo
+      const el = this.createTextElement(types[i], values[i], elNo, TextView.debug)
+      if (!targetLastElement) {
+        targetLastElement = el as HTMLElement
+      }
+      prependElement(paragraph, el)
+
+      if (targetLastElement.offsetLeft > rootBoundaryRight) {
+        this.removeFirstTextElement()
+        break
+      }
+    }
+
+    if (paragraph && paragraph.children.length === 0) {
+      this.root.removeChild(paragraph)
+    }
+  }
+
+  private replaceRoot(newRoot: Node): void {
     this.root!.parentNode!.replaceChild(newRoot, this.root)
     this.root = newRoot as HTMLElement
-    this.fitText()
-    this.root.style.transitionTimingFunction = "ease-in"
+  }
+
+  private fadeOutRoot(): void {
+    this.root.style.opacity = "0"
+  }
+
+  private fadeInRoot(): void {
     this.root.style.opacity = "1"
   }
 
   private createNewRoot(): HTMLElement {
     const newRoot = document.createElement("div")
     newRoot.id = this.rootElementId
+    newRoot.style.opacity = "0"
+    newRoot.style.transitionProperty = "opacity"
+    newRoot.style.transitionTimingFunction = "ease-in"
     return newRoot
   }
 
