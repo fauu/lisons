@@ -1,8 +1,17 @@
 {
   "name": "lisons",
   "version": "0.0.1",
+  "description": "FIXME",
+  "keywords": ["FIX", "ME"],
+  "homepage": "FIXME",
+  "bugs": "https://FIXME",
+  "license": "GPL-3.0",
+  "author": "Piotr Grabowski <fau999@gmail.com> (https://github.com/fauu)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fauu/lisons.git"
+  },
   "main": "out/main.bundle.js",
-  "license": "MIT",
   "scripts": {
     "clean-out": "rimraf out",
     "webpack:dev": "webpack --config webpack.dev.js",
@@ -55,7 +64,7 @@
     "webpack-dev-server": "^2.7.1"
   },
   "dependencies": {
-    "@gxl/epub-parser": "file:../epub-parser",
+    "@gxl/epub-parser": "fauu/epub-parser#dev",
     "@types/react-css-transition-replace": "^2.1.1",
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
