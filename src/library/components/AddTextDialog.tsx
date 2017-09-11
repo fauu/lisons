@@ -6,6 +6,7 @@ import * as React from "react"
 import styled from "styled-components"
 
 import { Spinner } from "~/app/components"
+import { languages } from "~/app/data/Languages"
 import { animations, colors, fonts } from "~/app/data/Style"
 import { CloseIcon } from "~/app/Icons"
 import { SettingsStore } from "~/app/stores"
@@ -94,7 +95,12 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
   }
 
   private handlePastedTextChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
-    this.updateFormData({ pastedText: e.currentTarget.value })
+    const pastedText = e.currentTarget.value
+    if (!pastedText) {
+      this.clearForm()
+    } else {
+      this.updateFormData({ pastedText })
+    }
   }
 
   private handleTitleChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -136,12 +142,12 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
 
   private handleDiscardSelectedFileButtonClick = (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    this.updateFormData({ filePath: "" })
+    this.clearForm()
   }
 
   private handleClearPasteTextAreaButtonClick = (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    this.updateFormData({ pastedText: "" })
+    this.clearForm()
   }
 
   private handleAddTextButtonClick = async (e: React.FormEvent<HTMLButtonElement>) => {
@@ -166,6 +172,9 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
   }
 
   private handleLanguageDetectionFinish = (lang?: string): void => {
+    if (!languages.some(l => l.code6393 === lang)) {
+      lang = undefined
+    }
     this.formData.contentLanguage = lang || AddTextDialog.defaultContentLanguage
   }
 

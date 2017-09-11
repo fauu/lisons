@@ -103,7 +103,7 @@ const ColumnHeader = styled.h2`
 
 const VersionPanel = styled.div`
   position: absolute;
-  right: 0.95rem;
+  right: 0.8rem;
   top: 0.8rem;
 `
 
