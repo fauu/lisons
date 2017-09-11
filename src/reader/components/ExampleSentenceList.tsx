@@ -31,11 +31,10 @@ const Root = styled.ul`
   padding: 1.25rem 2rem;
   font-size: 0.9em;
   list-style-type: none;
-  overflow-x: hidden;
-  overflow-y: scroll;
   flex: 1;
   animation: ${animations.fadeIn} 0.4s ease-out;
-
+  overflow-x: hidden;
+  overflow-y: scroll;
   &::-webkit-scrollbar {
     width: 15px;
   }

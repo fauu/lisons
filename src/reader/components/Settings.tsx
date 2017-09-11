@@ -93,7 +93,7 @@ export class Settings extends React.Component<ISettingsProps> {
   public render(): JSX.Element {
     return (
       <Form>
-        <div>
+        <FormMain>
           {formModel.map(([labelText, key, type, options]) => (
             <Field key={key}>
               <Label>{labelText}:</Label>
@@ -101,7 +101,7 @@ export class Settings extends React.Component<ISettingsProps> {
             </Field>
           ))}
           <Button onClick={this.handleDoneButtonClick}>Done</Button>
-        </div>
+        </FormMain>
         <Button warning onClick={this.handleResetButtonClick}>
           Reset to defaults
         </Button>
@@ -132,17 +132,32 @@ export class Settings extends React.Component<ISettingsProps> {
   }
 }
 
+// TODO: DRY (scroll)
 const Form = styled.form`
   height: 100%;
-  padding: 1.25rem 2rem;
+  padding: 1.25rem calc(2rem - 15px) 1.25rem 2rem;
   font-size: 0.9em;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  &::-webkit-scrollbar {
+    width: 15px;
+  }
+  &::-webkit-scrollbar-track {
+    display: none;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.05);
+  }
 `
+
+const FormMain = styled.div`margin-bottom: 3rem;`
 
 const Field = styled.label`
   display: flex;
+  justify-content: space-between;
   margin-bottom: 1rem;
 `
 
@@ -155,7 +170,7 @@ const Label = styled.div`
 `
 
 const Input = styled.input`
-  flex: 2;
+  width: 14rem;
   background: rgba(255, 255, 255, 0.12);
   color: #fefefe;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -188,7 +203,7 @@ const Input = styled.input`
 
 // TODO: DRY
 const Select = styled.select`
-  flex: 2;
+  width: 14rem;
   background: rgba(255, 255, 255, 0.12);
   color: #fefefe;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -209,11 +224,12 @@ const Option = styled.option`
 
 const Button = withProps<{ warning?: boolean }>()(styled.button)`
   width: 100%;
+  min-height: 41px;
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid;
   border-radius: 3px;
   color: #${p => (p.warning ? "f7ca28" : "fefefe")};
-  border-color: #${p => (p.warning ? "rgba(247, 202, 40, 0.5)" : "rgba(255, 255, 255, 0.2)")};
+  border-color: ${p => (p.warning ? "rgba(247, 202, 40, 0.5)" : "rgba(255, 255, 255, 0.2)")};
   padding: 0.5rem 0.6rem;
   transition: all 0.05s ease-out;
   font-size: 0.9em;
