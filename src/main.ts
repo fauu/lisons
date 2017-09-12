@@ -1,30 +1,29 @@
 import { app, BrowserWindow } from "electron"
-import electronDebug = require("electron-debug")
+import localShortcut = require("electron-localshortcut")
 import * as path from "path"
 import * as url from "url"
 
-let mainWindow: Electron.BrowserWindow | null
+import { colors } from "~/app/data/Style"
 
 const isDev = process.env.NODE_ENV === "dev"
-if (isDev) {
-  electronDebug({ enabled: true, showDevTools: "bottom" })
-}
 
-function createWindow(): void {
+let mainWindow: Electron.BrowserWindow | null
+
+const createWindow = (): Electron.BrowserWindow => {
   mainWindow = new BrowserWindow({
     webPreferences: { experimentalFeatures: true, webSecurity: !isDev },
     minWidth: 1200,
     minHeight: 600,
-    backgroundColor: "#282828",
+    backgroundColor: colors.primary,
     icon: path.join(__dirname, "icon.png")
   })
   mainWindow.maximize()
 
   if (isDev) {
-    const webServerUrl = "http://localhost:3000"
-    mainWindow.loadURL(webServerUrl)
+    const devServerUrl = "http://localhost:3000"
+    mainWindow.loadURL(devServerUrl)
     mainWindow.webContents.on("did-fail-load", () => {
-      setTimeout(() => mainWindow!.loadURL(webServerUrl), 1000)
+      setTimeout(() => mainWindow!.loadURL(devServerUrl), 1000)
     })
   } else {
     mainWindow.loadURL(
@@ -41,9 +40,33 @@ function createWindow(): void {
   mainWindow.on("closed", () => {
     mainWindow = null
   })
+
+  return mainWindow
 }
 
-app.on("ready", createWindow)
+const openDevTools = (win: Electron.BrowserWindow) => {
+  win.webContents.openDevTools({ mode: "bottom" })
+}
+
+const toggleDevTools = () => {
+  BrowserWindow.getFocusedWindow().webContents.toggleDevTools()
+}
+
+const reload = () => {
+  BrowserWindow.getFocusedWindow().webContents.reloadIgnoringCache()
+}
+
+app.on("ready", () => {
+  createWindow()
+  localShortcut.register("F5", reload)
+  localShortcut.register("F12", toggleDevTools)
+})
+
+app.on("browser-window-created", (_, win) => {
+  if (isDev) {
+    openDevTools(win)
+  }
+})
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {

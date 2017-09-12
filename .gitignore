@@ -2,3 +2,4 @@ node_modules
 dist
 out
 yarn-error.log
+manifest.json

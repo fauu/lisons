@@ -32,6 +32,9 @@ const mainConfig = {
   },
   resolve: {
     extensions: [".js", ".ts"],
+    alias: {
+      "~": path.resolve("./src")
+    },
     symlinks: false
   },
   plugins: [new CopyWebpackPlugin([{ from: staticResPath }, { from: browserIconPath }])]

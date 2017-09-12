@@ -27,6 +27,10 @@ const templateContent = () => {
 }
 
 const mainConfig = merge(common.mainConfig, {
+  node: {
+    __dirname: false,
+    __filename: false
+  },
   plugins: [
     new webpack.DefinePlugin({
       "process.env": {

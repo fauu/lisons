@@ -1,8 +1,11 @@
 {
-  "name": "Lisons",
+  "name": "lisons",
   "version": "0.0.1",
   "description": "FIXME",
-  "keywords": ["FIX", "ME"],
+  "keywords": [
+    "FIX",
+    "ME"
+  ],
   "homepage": "FIXME",
   "bugs": "https://FIXME",
   "license": "GPL-3.0",
@@ -43,7 +46,9 @@
       "synopsis": "FIXME",
       "maintainer": "Piotr Grabowski <fau999@gmail.com>",
       "vendor": "Piotr Grabowski <fau999@gmail.com>",
-      "target": ["AppImage"],
+      "target": [
+        "AppImage"
+      ],
       "depends": [],
       "category": "Education",
       "packageCategory": "education"
@@ -99,8 +104,8 @@
     "copy-webpack-plugin": "^4.0.1",
     "devtron": "^1.4.0",
     "dexie": "^2.0.0-beta",
-    "electron-debug": "^1.4.0",
     "electron-devtools-installer": "^2.2.0",
+    "electron-localshortcut": "^2.0.2",
     "file-loader": "^0.11.2",
     "franc-min": "^3.1.1",
     "happypack": "^4.0.0",
@@ -117,14 +122,20 @@
     "react": "^15.6.1",
     "react-css-transition-replace": "^2.2.1",
     "react-dom": "^15.6.1",
-    "react-hot-loader": "^3.0.0-beta.6",
+    "react-hot-loader": "^3.0.0-beta.7",
     "styled-components": "^2.1.2",
     "tslib": "^1.7.1",
     "webpack-merge": "^4.1.0"
   },
   "babel": {
-    "presets": ["es2015", "stage-0", "react"],
-    "plugins": ["react-hot-loader/babel"]
+    "presets": [
+      "es2015",
+      "stage-0",
+      "react"
+    ],
+    "plugins": [
+      "react-hot-loader/babel"
+    ]
   },
   "private": true
 }
