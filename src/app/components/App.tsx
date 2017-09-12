@@ -1,14 +1,6 @@
 /* TODO:
-  - try styled-components ThemeProvider
-  - [library] polish text list ui
   - "new version available" notification
   - simple website
-  - add icon for all platforms
-
-  POST 0.1:
-  - [tokenization] FIX: chinese tokenizer splits words written in other scripts into chars
-  - [reader] don't query tatoeba when no translations available
-  - move intensive operations to main thread
 */
 
 import { useStrict } from "mobx"

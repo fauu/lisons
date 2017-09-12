@@ -1,0 +1,24 @@
+{
+  "name": "lisons-website",
+  "version": "0.1.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "yarn mustache data.json template.mustache > index.html",
+    "dev": "run-p watch serve",
+    "watch": "yarn npm-watch",
+    "serve": "yarn http-server"
+  },
+  "watch": {
+    "build": {
+      "patterns": "*",
+      "extensions": "json,mustache"
+    }
+  },
+  "devDependencies": {
+    "http-server": "^0.10.0",
+    "mustache": "^2.3.0",
+    "npm-run-all": "^4.1.1",
+    "npm-watch": "^0.2.0"
+  },
+  "private": true
+}
