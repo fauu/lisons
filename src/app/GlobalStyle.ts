@@ -1,8 +1,8 @@
 import { injectGlobal } from "styled-components"
 
-import * as lato700 from "~/res/fonts/lato/Lato-Bold.woff2"
-import * as lato700Italic from "~/res/fonts/lato/Lato-BoldItalic.woff2"
-import * as lato400 from "~/res/fonts/lato/Lato-Regular.woff2"
+import * as lato700 from "~/res/fonts/lato/lato-v13-latin-ext_latin-700.woff2"
+import * as lato700Italic from "~/res/fonts/lato/lato-v13-latin-ext_latin-700italic.woff2"
+import * as lato400 from "~/res/fonts/lato/lato-v13-latin-ext_latin-regular.woff2"
 import * as ptSerif700Italic from "~/res/fonts/pt-serif/pt-serif-v8-latin-700italic.woff2"
 import * as ptSerif400 from "~/res/fonts/pt-serif/pt-serif-v8-latin-regular.woff2"
 
