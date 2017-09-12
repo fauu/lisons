@@ -6,7 +6,7 @@ export const defaultSettings: ISettings = {
     width: 50,
     fontSize: 1.7,
     letterSpacing: -0.01,
-    lineHeight: 1.4,
+    lineHeight: 1.5,
     background: "#ffe7d5",
     textColor: "#382d2d",
     fontFamily: "PT Serif",

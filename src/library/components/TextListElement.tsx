@@ -42,7 +42,13 @@ const Root = styled.li`
   padding: 1rem 0 1rem 0.5rem;
   background: transparent;
   &:not(:last-child) {
-    border-bottom: 1px dotted ${colors.primaryFade3};
+    border-bottom: 1px solid ${colors.primaryFade3}88;
+  }
+  &:first-child {
+    border-top-right-radius: 3px;
+  }
+  &:last-child {
+    border-bottom-right-radius: 3px;
   }
   .actions {
     opacity: 0;
@@ -70,7 +76,7 @@ const Primary = styled.div`
 const TitleAndAuthor = styled.div`
   display: flex;
   flex: 1;
-  align-items: center;
+  align-items: baseline;
   margin-bottom: 0.3rem;
   max-width: 40em;
   white-space: nowrap;
@@ -93,7 +99,7 @@ const Title = styled.span`
 `
 
 const Author = styled.span`
-  font-size: 0.9em;
+  font-size: 0.8em;
   color: ${colors.primaryFade};
   max-width: 30%;
   white-space: nowrap;
@@ -111,7 +117,7 @@ const Languages = styled.span`
   color: ${colors.primaryFade};
 
   > .mdi-icon {
-    margin: 0 0.15rem;
+    margin: 0 0.1rem;
     transform: scale(0.7);
     fill: ${colors.primaryFade};
     fill-opacity: 0.8;
@@ -139,5 +145,5 @@ const Progress = styled.span`
   font-size: 0.7em;
   color: ${colors.primaryFade};
   border: 1px solid ${colors.primaryFade};
-  margin-right: 0.7rem;
+  margin-right: 0.8rem;
 `
