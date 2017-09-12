@@ -13,11 +13,12 @@ if (isDev) {
 function createWindow(): void {
   mainWindow = new BrowserWindow({
     webPreferences: { experimentalFeatures: true, webSecurity: !isDev },
-    minWidth: 960,
-    minHeight: 640,
+    minWidth: 1200,
+    minHeight: 600,
     backgroundColor: "#282828",
     icon: path.join(__dirname, "icon.png")
   })
+  mainWindow.maximize()
 
   if (isDev) {
     const webServerUrl = "http://localhost:3000"
