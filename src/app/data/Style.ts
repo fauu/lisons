@@ -4,8 +4,9 @@ export const colors = {
   primary: "#282828",
   primaryFade: "#777777",
   primaryFade2: "#aaaaaa",
+  primaryFade3: "#dddddd",
   secondary: "#f9f9f9",
-  secondaryFade: "#aaa",
+  secondaryFade: "#aaaaaa",
   accent: "#ff9a8b",
   accent2: "#ff99ac",
   danger: "#ff5a4b",
@@ -18,6 +19,7 @@ export const fonts = {
 }
 
 const time = "0.2s"
+const halfTime = "0.1s"
 const doubleTime = "0.4s"
 const timingFunction = "ease-out"
 
@@ -25,6 +27,7 @@ export const animations = {
   stdTime: time,
   stdFunction: timingFunction,
   std: `${time} ${timingFunction}`,
+  halfTime: `${halfTime} ${timingFunction}`,
   doubleTime: `${doubleTime} ${timingFunction}`,
   halfFade: keyframes`
     0% {

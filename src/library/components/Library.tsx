@@ -82,6 +82,9 @@ const Body = styled.div`
 `
 
 const ReadColumn = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: 3;
   animation: ${animations.fadeInBottom} ${animations.doubleTime};
 `

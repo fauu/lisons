@@ -195,10 +195,9 @@ const Input = styled.input`
     background: rgba(255, 255, 255, 0.12);
     &::-webkit-slider-thumb {
       -webkit-appearance: none;
-      height: 2.3rem;
-      width: 8px;
+      height: 2.4rem;
+      width: 10px;
       background: rgba(255, 255, 255, 0.2);
-      margin: -0.5rem 0;
     }
     &:focus {
       outline: none;

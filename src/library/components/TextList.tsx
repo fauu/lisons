@@ -15,7 +15,20 @@ export const TextList = observer(function _TextList({ appStore }: ITextListProps
 })
 
 const Root = styled.ul`
+  margin: 0;
   padding: 0 1rem 0 0;
+  flex: 1;
   list-style-type: none;
-  margin-top: -0.25rem;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  &::-webkit-scrollbar {
+    width: 15px;
+  }
+  &::-webkit-scrollbar-track {
+    display: none;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.05);
+  }
 `

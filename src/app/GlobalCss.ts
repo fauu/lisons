@@ -7,7 +7,6 @@ import * as ptSerif700 from "~/res/fonts/pt-serif/pt-serif-v8-cyrillic-ext_cyril
 import * as ptSerif700Italic from "~/res/fonts/pt-serif/pt-serif-v8-cyrillic-ext_cyrillic_latin-ext_latin-700italic.woff2"
 import * as ptSerif400 from "~/res/fonts/pt-serif/pt-serif-v8-cyrillic-ext_cyrillic_latin-ext_latin-regular.woff2"
 
-// TODO: +PT/bold/normal +Lato/regular/italic -PT/bold/italic -Lato/bold/italic
 // tslint:disable-next-line:no-unused-expression
 injectGlobal`
   html, body {

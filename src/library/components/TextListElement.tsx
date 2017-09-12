@@ -2,7 +2,7 @@ import * as React from "react"
 import styled from "styled-components"
 
 import { animations, colors, fonts } from "~/app/data/Style"
-import { DeleteIcon } from "~/app/Icons"
+import { ArrowRightIcon, DeleteIcon } from "~/app/Icons"
 import { Text } from "~/app/model"
 import { AppStore } from "~/app/stores"
 import { formatPercentage } from "~/util/FormatUtils"
@@ -26,23 +26,37 @@ export function TextListElement({ appStore, text }: ITextListElementProps): JSX.
         </span>
       </Primary>
       <Secondary>
+        {progress && <Progress>{formatPercentage(progress)}</Progress>}
         <Languages>
-          {text.contentLanguage.localName} 🡒 {text.translationLanguage.localName}
+          {text.contentLanguage.localName}
+          <ArrowRightIcon />
+          {text.translationLanguage.localName}
         </Languages>
-        {progress && <Progress>{formatPercentage(progress)} read</Progress>}
       </Secondary>
     </Root>
   )
 }
 
 const Root = styled.li`
-  padding: 0.75rem 0;
+  position: relative;
+  padding: 1rem 0 1rem 0.5rem;
+  background: transparent;
+  &:not(:last-child) {
+    border-bottom: 1px dotted ${colors.primaryFade3};
+  }
   .actions {
     opacity: 0;
-    transition: opacity ${animations.std};
   }
-  &:hover .actions {
-    opacity: 1;
+  &:hover {
+    background: linear-gradient(
+      to right,
+      transparent 50%,
+      ${colors.primaryFade3}55 90%,
+      ${colors.primaryFade3}88 100%
+    );
+    .actions {
+      opacity: 1;
+    }
   }
 `
 
@@ -55,6 +69,7 @@ const Primary = styled.div`
 
 const TitleAndAuthor = styled.div`
   display: flex;
+  flex: 1;
   align-items: center;
   margin-bottom: 0.3rem;
   max-width: 40em;
@@ -65,43 +80,64 @@ const TitleAndAuthor = styled.div`
 
 const Title = styled.span`
   display: inline-block;
-  max-width: 30em;
-  margin-right: 0.5em;
+  max-width: 70%;
+  height: 1.4em;
+  margin-right: 0.7rem;
   font: bold 1.1em ${fonts.serif};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   &:hover {
+    border-bottom: 2px solid ${colors.accent2};
   }
 `
 
 const Author = styled.span`
   font-size: 0.9em;
   color: ${colors.primaryFade};
+  max-width: 30%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
-const Secondary = styled.div`
-  display: flex;
-  height: 1em;
-`
+const Secondary = styled.div`margin-top: -0.2rem;`
 
 const Languages = styled.span`
+  display: inline-flex;
+  align-items: center;
   font-style: italic;
   font-size: 0.8em;
-  color: ${colors.primaryFade2};
+  color: ${colors.primaryFade};
+
+  > .mdi-icon {
+    margin: 0 0.15rem;
+    transform: scale(0.7);
+    fill: ${colors.primaryFade};
+    fill-opacity: 0.8;
+  }
 `
 
+// TODO: Rework without absolute positioning
 const DeleteButton = withProps<{ onClick: () => void }>()(styled(DeleteIcon))`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 1rem;
   fill: ${colors.primaryFade};
   margin-left: 2rem;
   &:hover {
     fill: ${colors.danger};
-    transition: fill ${animations.std};
+    transition: fill ${animations.halfTime};
   }
 `
 
 const Progress = styled.span`
-  font-size: 0.9em;
+  display: inline;
+  padding: 0.2rem 0.3rem;
+  border-radius: 3px;
+  font-size: 0.7em;
   color: ${colors.primaryFade};
-  margin-left: 2rem;
+  border: 1px solid ${colors.primaryFade};
+  margin-right: 0.7rem;
 `
