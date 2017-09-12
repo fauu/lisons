@@ -5,7 +5,7 @@ import { appendElement, getElementNo, prependElement } from "~/util/DomUtils"
 
 import { TextSelection } from "~/reader/TextSelection"
 
-// TODO: Make this code less crap
+// TODO: Make this code more sane
 export class TextView {
   private static readonly debug = false
   private static readonly translationAttributeName = "data-translation"

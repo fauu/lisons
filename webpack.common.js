@@ -10,6 +10,7 @@ const outPath = path.resolve(__dirname, outDirName)
 const srcDirName = "src"
 const srcPath = path.resolve(__dirname, srcDirName)
 const staticResPath = "./src/res/static"
+const browserIconPath = "./build/icon.png"
 const htmlTemplatePath = path.join(srcDirName, "index.html")
 const rendererEntry = "./src/renderer.tsx"
 
@@ -33,7 +34,7 @@ const mainConfig = {
     extensions: [".js", ".ts"],
     symlinks: false
   },
-  plugins: [new CopyWebpackPlugin([{ from: staticResPath }])]
+  plugins: [new CopyWebpackPlugin([{ from: staticResPath }, { from: browserIconPath }])]
 }
 
 const rendererConfig = {

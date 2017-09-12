@@ -15,8 +15,8 @@ function createWindow(): void {
     webPreferences: { experimentalFeatures: true, webSecurity: !isDev },
     minWidth: 960,
     minHeight: 640,
-    backgroundColor: "#282828"
-    // FIXME icon: path.join(__dirname, "assets/icon.png")
+    backgroundColor: "#282828",
+    icon: path.join(__dirname, "icon.png")
   })
 
   if (isDev) {

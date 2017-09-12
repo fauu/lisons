@@ -1,4 +1,5 @@
 /* TODO:
+  - try styled-components ThemeProvider
   - [library] polish text list ui
   - "new version available" notification
   - simple website
@@ -74,7 +75,7 @@ export class App extends React.Component<{}> {
       case KeyCode.LeftArrow:
         if (inReader) {
           if (e.altKey) {
-            readerStore.skipBackward();
+            readerStore.skipBackward()
           } else {
             readerStore.showPrevPage()
           }
@@ -83,7 +84,7 @@ export class App extends React.Component<{}> {
       case KeyCode.RightArrow:
         if (inReader) {
           if (e.altKey) {
-            readerStore.skipForward();
+            readerStore.skipForward()
           } else {
             readerStore.showNextPage()
           }

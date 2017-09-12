@@ -1,5 +1,5 @@
 {
-  "name": "lisons",
+  "name": "Lisons",
   "version": "0.0.1",
   "description": "FIXME",
   "keywords": ["FIX", "ME"],
@@ -24,12 +24,38 @@
     "dev": "run-s build:dev dev-server-and-electron",
     "electron:prod": "electron .",
     "prod": "run-s build:prod electron:prod",
-    "dist:linux": "electron-builder --linux",
-    "dist:windows": "electron-builder --windows"
+    "dist:linux": "electron-builder --linux --x64",
+    "dist:macos": "electron-builder --macos",
+    "dist:windows": "electron-builder --windows --x64"
   },
   "build": {
+    "appId": "io.github.fauu.lisons",
+    "productName": "Lisons!",
+    "copyright": "Copyright © 2017 Lisons authors",
     "compression": "store",
-    "files": "out"
+    "files": "out",
+    "extraFiles": "LICENSE.md",
+    "mac": {
+      "category": "public.app-category.education"
+    },
+    "linux": {
+      "description": "FIXME",
+      "synopsis": "FIXME",
+      "maintainer": "Piotr Grabowski <fau999@gmail.com>",
+      "vendor": "Piotr Grabowski <fau999@gmail.com>",
+      "target": ["AppImage"],
+      "depends": [],
+      "category": "Education",
+      "packageCategory": "education"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true
+    }
   },
   "devDependencies": {
     "@types/electron-debug": "^1.1.0",
@@ -99,5 +125,6 @@
   "babel": {
     "presets": ["es2015", "stage-0", "react"],
     "plugins": ["react-hot-loader/babel"]
-  }
+  },
+  "private": true
 }
