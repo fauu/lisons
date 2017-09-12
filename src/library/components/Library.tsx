@@ -55,23 +55,24 @@ const Logo = styled.h1`
   margin-top: 0;
   padding: 0 0.75rem 0 0.6rem;
   align-self: flex-start;
-  color: ${colors.secondary};
   background-color: ${colors.accent};
   background-image: linear-gradient(90deg, #ff9a8b 0%, #ff6a88 55%, #ff99ac 100%);
   background-size: 300% 100%;
   border-radius: 3px;
-  font-size: 4em;
-  letter-spacing: -0.04em;
   animation: ${animations.gradientRotate} 3s ease infinite;
 `
 
-const BetaIndicator = styled(BetaIcon)`fill: ${colors.primaryFade2};`
-
 const LogoText = styled.span`
   display: inline-block;
-  vertical-align: bottom;
-  line-height: 1.07em;
+  vertical-align: middle;
+  font-size-adjust: 0.5;
+  margin-top: 0.11em;
+  font-size: 2em;
+  letter-spacing: -0.04em;
+  color: ${colors.secondary};
 `
+
+const BetaIndicator = styled(BetaIcon)`fill: ${colors.primaryFade2};`
 
 const Body = styled.div`
   display: flex;
