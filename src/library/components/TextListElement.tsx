@@ -1,7 +1,7 @@
 import * as React from "react"
 import styled from "styled-components"
 
-import { animations, colors } from "~/app/data/Style"
+import { animations, colors, fonts } from "~/app/data/Style"
 import { DeleteIcon } from "~/app/Icons"
 import { Text } from "~/app/model"
 import { AppStore } from "~/app/stores"
@@ -19,7 +19,7 @@ export function TextListElement({ appStore, text }: ITextListElementProps): JSX.
       <Primary>
         <TitleAndAuthor>
           <Title onClick={() => appStore.showReaderScreen(text.id)}>{text.title}</Title>{" "}
-          {text.author && <Author>by {text.author}</Author>}
+          {text.author && <Author>{text.author}</Author>}
         </TitleAndAuthor>
         <span className="actions">
           <DeleteButton onClick={() => appStore.textStore.delete(text.id)} />
@@ -27,7 +27,7 @@ export function TextListElement({ appStore, text }: ITextListElementProps): JSX.
       </Primary>
       <Secondary>
         <Languages>
-          {text.contentLanguage.localName} -> {text.translationLanguage.localName}
+          {text.contentLanguage.localName} 🡒 {text.translationLanguage.localName}
         </Languages>
         {progress && <Progress>{formatPercentage(progress)} read</Progress>}
       </Secondary>
@@ -54,6 +54,8 @@ const Primary = styled.div`
 `
 
 const TitleAndAuthor = styled.div`
+  display: flex;
+  align-items: center;
   margin-bottom: 0.3rem;
   max-width: 40em;
   white-space: nowrap;
@@ -63,15 +65,13 @@ const TitleAndAuthor = styled.div`
 
 const Title = styled.span`
   display: inline-block;
-  height: 1.3em;
   max-width: 30em;
-  font: oblique bold 1.15em "PT Serif";
+  margin-right: 0.5em;
+  font: bold 1.1em ${fonts.serif};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-bottom: 1px dashed ${colors.primary};
   &:hover {
-    border-bottom-style: solid;
   }
 `
 
@@ -86,9 +86,9 @@ const Secondary = styled.div`
 `
 
 const Languages = styled.span`
-  font-variant: small-caps;
+  font-style: italic;
   font-size: 0.8em;
-  color: ${colors.primaryFade};
+  color: ${colors.primaryFade2};
 `
 
 const DeleteButton = withProps<{ onClick: () => void }>()(styled(DeleteIcon))`

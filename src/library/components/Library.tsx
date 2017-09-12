@@ -52,8 +52,8 @@ const Root = styled.div`
 const LogoWrapper = styled.div`display: flex;`
 
 const Logo = styled.h1`
-  margin-top: 0;
-  padding: 0 0.75rem 0 0.6rem;
+  margin: 0;
+  padding: 0 0.6rem;
   align-self: flex-start;
   background-color: ${colors.accent};
   background-image: linear-gradient(90deg, #ff9a8b 0%, #ff6a88 55%, #ff99ac 100%);
@@ -66,7 +66,6 @@ const LogoText = styled.span`
   display: inline-block;
   vertical-align: middle;
   font-size-adjust: 0.5;
-  margin-top: 0.11em;
   font-size: 2em;
   letter-spacing: -0.04em;
   color: ${colors.secondary};
@@ -75,6 +74,7 @@ const LogoText = styled.span`
 const BetaIndicator = styled(BetaIcon)`fill: ${colors.primaryFade2};`
 
 const Body = styled.div`
+  margin-top: 2rem;
   display: flex;
   flex: 1;
   color: ${colors.primary};

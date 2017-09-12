@@ -68,6 +68,7 @@ const Root = withProps<{ variant: UiColorVariant }>()(styled.div)`
   background: ${p => (p.variant === "Light" ? "#ffffff11" : "#00000011")};
   width: 100%;
   position: relative;
+  letter-spacing: -0.03em;
 `
 
 const TextTitle = styled.span`
@@ -78,7 +79,7 @@ const TextTitle = styled.span`
   text-overflow: ellipsis;
   margin-left: 0.7rem;
   font-weight: bold;
-  font-style: oblique;
+  font-size: 0.95em;
 `
 
 const SectionInfo = withProps<{ variant: UiColorVariant }>()(styled.div)`

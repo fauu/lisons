@@ -9,7 +9,7 @@ export const defaultSettings: ISettings = {
     lineHeight: 1.4,
     background: "#ffe7d5",
     textColor: "#382d2d",
-    fontFamily: "'PT Serif', Georgia, serif",
+    fontFamily: "PT Serif",
     textAlign: "left",
     selectionColor: "#dffea3",
     translationBgColor: "#222222",

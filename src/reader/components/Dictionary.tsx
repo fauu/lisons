@@ -1,7 +1,7 @@
 import * as React from "react"
 import styled from "styled-components"
 
-import { animations, colors } from "~/app/data/Style"
+import { animations, colors, fonts } from "~/app/data/Style"
 
 import { IDictionaryEntry } from "~/reader/model"
 
@@ -77,8 +77,8 @@ const EntryHeader = styled.header``
 
 const Word = styled.span`
   font-weight: bold;
-  font-style: oblique;
-  font-family: "PT Serif";
+  font-style: italic;
+  font-family: ${fonts.serif};
 `
 
 const PartOfSpeech = styled.span`

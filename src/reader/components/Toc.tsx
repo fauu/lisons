@@ -54,6 +54,7 @@ const Root = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  letter-spacing: -0.03em;
 `
 
 const Wrapper = withProps<{ variant: UiColorVariant }>()(styled.div)`

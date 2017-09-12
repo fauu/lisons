@@ -22,7 +22,7 @@ import { Reader } from "~/reader/components"
 import { FadeTransition, Spinner } from "~/app/components"
 import { KeyCode } from "~/app/data/KeyCode"
 import { animations, colors, fonts } from "~/app/data/Style"
-import "~/app/GlobalStyle.ts"
+import "~/app/GlobalCss.ts"
 import { AppScreen } from "~/app/model"
 import { AppStore } from "~/app/stores"
 
