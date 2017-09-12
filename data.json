@@ -1,0 +1,24 @@
+{
+  "version": "0.0.1",
+  "downloads": [
+    {
+      "name": "linux",
+      "prettyName": "Linux",
+      "logoFilename": "tux",
+      "extension": "AppImage"
+    },
+    {
+      "name": "macos",
+      "prettyName": "macOS",
+      "logoFilename": "apple-logo",
+      "extension": "dmg"
+    },
+    {
+      "name": "windows",
+      "prettyName": "Windows",
+      "logoFilename": "windows-logo",
+      "extension": "exe"
+    }
+  ],
+  "repoUrl": "https://FIXME"
+}
