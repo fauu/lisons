@@ -5,19 +5,22 @@
       "name": "linux",
       "prettyName": "Linux",
       "logoFilename": "tux",
-      "extension": "AppImage"
+      "extension": "AppImage",
+      "details": "64-bit"
     },
     {
       "name": "macos",
       "prettyName": "macOS",
       "logoFilename": "apple-logo",
-      "extension": "dmg"
+      "extension": "dmg",
+      "details": "10.9 or later"
     },
     {
       "name": "windows",
       "prettyName": "Windows",
       "logoFilename": "windows-logo",
-      "extension": "exe"
+      "extension": "exe",
+      "details": "7 or later, 64-bit"
     }
   ],
   "repoUrl": "https://FIXME"
