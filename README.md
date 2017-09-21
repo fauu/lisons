@@ -4,7 +4,7 @@
 
 Available for Linux, macOS and Windows.
 
-[Go to webiste to download.](http://FIXME)
+[Go to webiste to download.](http://fauu.github.io/lisons)
 
 ![](website/resources/screenshot.png?raw=true)
 
@@ -15,7 +15,7 @@ Note: This is BETA software, and as such is largely untested and may contain bug
 * Epub and plain text support
 * Over 100 supported languages*
 * Machine translations from DeepL and Google
-* Human-translated, translated example sentences from Tatoeba and Reverso Context
+* Human-translated example sentences from Tatoeba and Reverso Context
 * Highly customizable reader interface
 
 <sub>
