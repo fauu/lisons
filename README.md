@@ -6,7 +6,7 @@ Available for Linux, macOS and Windows.
 
 [Go to webiste to download.](http://FIXME)
 
-![](website/resources/screenshot.png)
+![](website/resources/screenshot.png?raw=true)
 
 Note: This is BETA software, and as such is largely untested and may contain bugs.
 
@@ -15,7 +15,7 @@ Note: This is BETA software, and as such is largely untested and may contain bug
 * Epub and plain text support
 * Over 100 supported languages*
 * Machine translations from DeepL and Google
-* Human-translated, translated example sentences from Tatoeba and Reverso Context.
+* Human-translated, translated example sentences from Tatoeba and Reverso Context
 * Highly customizable reader interface
 
 <sub>
@@ -28,7 +28,7 @@ Note: This is BETA software, and as such is largely untested and may contain bug
 
 ### Building
 
-1. Clone the repository: ```git clone FIXME```
+1. Clone the repository: ```git clone https://github.com/fauu/lisons.git```
 2. Change to project root directory: ```cd lisons```
 3. Install dependencies: ```yarn install```
 4. Build: ``yarn build:prod``
@@ -38,4 +38,4 @@ Note: This is BETA software, and as such is largely untested and may contain bug
 
 ### License
 
-See [COPYING.md](COPYING.md) and [LICENSE.md](LICENSE.md).
+See [COPYING](COPYING.md) and [LICENSE](LICENSE.md).
