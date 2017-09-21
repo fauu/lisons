@@ -1,6 +1,6 @@
-## Lisons!
+# Lisons!
 
-**Lisons!** is a desktop eBook reader for language learners. It facilitates learning from reading by providing machine translations ([DeepL](https://www.deepl.com/translator), [Google](https://translate.google.com/)) as well as community-contributed, translated example sentences ([Tatoeba](https://tatoeba.org/)).
+**Lisons!** is a desktop e-book reader for language learners. It facilitates learning from reading by providing machine translations ([DeepL](https://www.deepl.com/translator), [Google](https://translate.google.com/)) as well as human-translated example sentences ([Tatoeba](https://tatoeba.org/), [Reverso Context](http://context.reverso.net)).
 
 Available for Linux, macOS and Windows.
 
@@ -12,11 +12,11 @@ Note: This is BETA software, and as such is largely untested and may contain bug
 
 ### Features
 
-* Epub and plain text support.
-* Machine translations from DeepL and Google.
-* Community-contributed, translated example sentences from Tatoeba.
-* Over 100 supported languages.*
-* Highly customizable reader interface.
+* Epub and plain text support
+* Over 100 supported languages*
+* Machine translations from DeepL and Google
+* Human-translated, translated example sentences from Tatoeba and Reverso Context.
+* Highly customizable reader interface
 
 <sub>
 * Most of language configurations have not yet been tested and may not work as intended.

@@ -21,7 +21,7 @@ export class ReversoContextSource implements ISentenceSource {
   ])
 
   public get name(): string {
-    return "ReversoContext"
+    return "Reverso Context"
   }
   public get domain(): string {
     return "context.reverso.net"
