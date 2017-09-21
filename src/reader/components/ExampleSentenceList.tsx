@@ -1,42 +1,51 @@
+import { shell } from "electron"
 import * as React from "react"
 import styled from "styled-components"
 
 import { animations, colors } from "~/app/data/Style"
-import { LanguageFlag } from "~/app/model"
-import { ISentenceWithTranslations } from "~/app/Tatoeba"
+import { IExampleSentences, LanguageFlag } from "~/app/model"
 import { withProps } from "~/util/StyleUtils"
 
 export interface IExampleSentenceListProps {
-  readonly sentences: ISentenceWithTranslations[]
+  readonly sentences: IExampleSentences
 }
 export function ExampleSentenceList({ sentences }: IExampleSentenceListProps): JSX.Element {
-  const sentencesRtl = (sentences[0].sentenceLanguage.flags & LanguageFlag.Rtl) > 0
-  const translationsRtl = (sentences[0].translationsLanguage.flags & LanguageFlag.Rtl) > 0
+  const sentencesRtl = (sentences.data[0].sentenceLanguage.flags & LanguageFlag.Rtl) > 0
+  const translationsRtl = (sentences.data[0].translationsLanguage.flags & LanguageFlag.Rtl) > 0
   return (
     <Root>
-      {sentences.map((se, idx) => (
-        <Element key={idx}>
-          <Sentence dangerouslySetInnerHTML={{ __html: se.sentence }} rtl={sentencesRtl} />
-          {se.translations[0].length > 0 && (
-            <Translation rtl={translationsRtl}>{se.translations[0]}</Translation>
-          )}
-        </Element>
-      ))}
+      <SourceLink onClick={() => shell.openExternal(sentences.sourceUrl)}>
+        View at <Domain>{sentences.sourceDomain}</Domain>
+      </SourceLink>
+      <List>
+        {sentences.data.map((se, idx) => (
+          <Element key={idx}>
+            <Sentence dangerouslySetInnerHTML={{ __html: se.sentence }} rtl={sentencesRtl} />
+            {se.translations[0].length > 0 && (
+              <Translation rtl={translationsRtl}>{se.translations[0]}</Translation>
+            )}
+          </Element>
+        ))}
+      </List>
     </Root>
   )
 }
 
-const Root = styled.ul`
+const scrollbarWidth = "15px"
+
+const Root = styled.div`
   margin: 0;
   padding: 1.25rem 2rem;
   font-size: 0.9em;
-  list-style-type: none;
   flex: 1;
-  animation: ${animations.fadeIn} 0.4s ease-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: ${animations.fadeIn} ${animations.doubleTime};
   overflow-x: hidden;
   overflow-y: scroll;
   &::-webkit-scrollbar {
-    width: 15px;
+    width: ${scrollbarWidth};
   }
   &::-webkit-scrollbar-track {
     display: none;
@@ -44,6 +53,31 @@ const Root = styled.ul`
   &::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.05);
   }
+`
+
+const SourceLink = styled.span`
+  position: absolute;
+  bottom: 0;
+  right: ${scrollbarWidth};
+  padding: 0.3rem 0.45rem;
+  border: 1px solid rgba(20, 20, 20, 0.15);
+  border-bottom: none;
+  background: rgba(20, 20, 20, 0.3);
+  backdrop-filter: blur(15px);
+  font-size: 0.9rem;
+  color: ${colors.secondaryFade};
+  transition: color ${animations.stdTime};
+  &:hover {
+    color: ${colors.secondary};
+  }
+`
+
+const Domain = styled.span`font-style: italic;`
+
+const List = styled.ul`
+  list-style-type: none;
+  margin: 0 0 1.2rem 0;
+  padding: 0;
 `
 
 const Element = styled.li`

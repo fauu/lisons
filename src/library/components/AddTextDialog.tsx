@@ -421,7 +421,7 @@ const SelectedFileGroup = styled.span`display: flex;`
 
 const SelectedFileName = styled.span`
   margin: 0 0.5rem 0 1rem;
-  max-width: 28rem;
+  max-width: 24.5rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

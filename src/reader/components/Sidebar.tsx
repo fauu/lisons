@@ -33,7 +33,7 @@ export const Sidebar = observer(function _Sidebar({
   const dictinaryLoading = dictionaryEntriesState === "Loading"
   const sentencesLoading = exampleSentencesState === "Loading"
   const sentencesLoaded = exampleSentencesState === "Loaded"
-  const hasSentences = exampleSentences.length > 0
+  const hasSentences = exampleSentences && exampleSentences.data.length > 0
   return (
     <Root>
       <FadeTransition>
@@ -52,12 +52,14 @@ export const Sidebar = observer(function _Sidebar({
                     Dictionary: <SourceName>{sources.dictionarySource}</SourceName>
                   </Source>
                   <Source>
-                    Example sentences: <SourceName>{sources.sentencesSource}</SourceName>
+                    Example sentences: <SourceName>{sources.sentencesSource.name}</SourceName>
                   </Source>
                 </Sources>
               </IdleContent>
             )}
+
             {hasDictionaryEntries && <Dictionary entries={dictionaryEntries} />}
+
             {!notLoading && (
               <ExampleSentencesWrapper>
                 {sentencesLoading && <Spinner color={"Light"} />}
@@ -66,7 +68,7 @@ export const Sidebar = observer(function _Sidebar({
                   (!hasSentences ? (
                     <Message>No relevant sentences found</Message>
                   ) : (
-                    <ExampleSentenceList sentences={exampleSentences} />
+                    <ExampleSentenceList sentences={exampleSentences!} />
                   ))}
               </ExampleSentencesWrapper>
             )}
@@ -122,7 +124,7 @@ const Sources = styled.ul`
   margin-bottom: 1.25rem;
   padding-left: 2rem;
   list-style-type: none;
-  font-size: 0.7em;
+  font-size: 0.8em;
   color: #666;
 `
 

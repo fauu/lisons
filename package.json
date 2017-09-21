@@ -2,10 +2,7 @@
   "name": "lisons",
   "version": "0.0.1",
   "description": "FIXME",
-  "keywords": [
-    "FIX",
-    "ME"
-  ],
+  "keywords": ["FIX", "ME"],
   "homepage": "FIXME",
   "bugs": "https://FIXME",
   "license": "GPL-3.0",
@@ -46,9 +43,7 @@
       "synopsis": "FIXME",
       "maintainer": "Piotr Grabowski <fau999@gmail.com>",
       "vendor": "Piotr Grabowski <fau999@gmail.com>",
-      "target": [
-        "AppImage"
-      ],
+      "target": ["AppImage"],
       "depends": [],
       "category": "Education",
       "packageCategory": "education"
@@ -128,14 +123,8 @@
     "webpack-merge": "^4.1.0"
   },
   "babel": {
-    "presets": [
-      "es2015",
-      "stage-0",
-      "react"
-    ],
-    "plugins": [
-      "react-hot-loader/babel"
-    ]
+    "presets": ["es2015", "stage-0", "react"],
+    "plugins": ["react-hot-loader/babel"]
   },
   "private": true
 }

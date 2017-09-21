@@ -1,10 +1,9 @@
 import { Epub } from "@gxl/epub-parser/build/types/epubParser"
 import { action, computed, observable, reaction, runInAction } from "mobx"
-import { fromPromise, IPromiseBasedObservable } from "mobx-utils"
+import { IPromiseBasedObservable } from "mobx-utils"
 
 import { IParsedText } from "~/app/model"
 import { TextStore } from "~/app/stores"
-import { getSentenceCount } from "~/app/Tatoeba"
 import { detectLanguage, getEpubOrPlainContent, isEpub, parseText } from "~/util/TextUtils"
 
 import { FileStatus, IAddTextFormData, IEpubInfo } from "~/library/model"
@@ -82,9 +81,9 @@ export class AddTextDialogStore {
     [contentLanguage, translationLanguage]: [string, string]
   ): void {
     this.isLanguageConfigurationInvalid = contentLanguage === translationLanguage
-    this.tatoebaTranslationCount = this.isLanguageConfigurationInvalid
-      ? undefined
-      : fromPromise(getSentenceCount(contentLanguage, translationLanguage))
+    // this.tatoebaTranslationCount = this.isLanguageConfigurationInvalid
+    //   ? undefined
+    //   : fromPromise(getSentenceCount(contentLanguage, translationLanguage))
   }
 
   @computed

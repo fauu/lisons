@@ -1,20 +1,25 @@
 import zip = require("lodash/zip")
 import { action, observable, runInAction } from "mobx"
 
-import { ILanguage } from "~/app/model"
-import { emphasizePhrase, fetchSentences, ISentenceWithTranslations } from "~/app/Tatoeba"
+import { IExampleSentences, ILanguage } from "~/app/model"
+import { emphasizePhrase } from "~/util/ExampleSentenceUtils"
 import { hasSpace } from "~/util/StringUtils"
 
 import { deeplTranslate, isLanguageConfigurationSupportedByDeepl } from "~/reader/DeeplTranslate"
 import { googleTranslate } from "~/reader/GoogleTranslate"
 import { IDictionaryEntry, ISources, ITranslation, ResourceState } from "~/reader/model"
+import { ReversoContextSource } from "~/reader/ReversoContextSource"
+import { TatoebaSource } from "~/reader/TatoebaSource"
 
 type TranslationPair = [ITranslation | undefined, ITranslation | undefined]
 
 export class SidebarStore {
+  private static tatoebaSource = new TatoebaSource()
+  private static reversoContextSource = new ReversoContextSource()
+
   @observable public isVisible: boolean = true
   @observable public isMainTranslationLoading: boolean
-  @observable.ref public exampleSentences: ISentenceWithTranslations[] = []
+  @observable.ref public exampleSentences?: IExampleSentences
   @observable public exampleSentencesState: ResourceState = "NotLoading"
   @observable.ref public dictionaryEntries: IDictionaryEntry[] = []
   @observable public dictionaryEntriesState: ResourceState = "NotLoading"
@@ -23,7 +28,7 @@ export class SidebarStore {
   public sources: ISources = {
     translationSource: "Google",
     dictionarySource: "Google",
-    sentencesSource: "Tatoeba"
+    sentencesSource: SidebarStore.tatoebaSource
   }
 
   @action
@@ -33,6 +38,14 @@ export class SidebarStore {
       translationLanguage
     )
     this.sources.translationSource = canDoDeeplTranslation ? "DeepL" : "Google"
+
+    const canGetRCSentences = SidebarStore.reversoContextSource.hasSentences(
+      contentLanguage,
+      translationLanguage
+    )
+    this.sources.sentencesSource = canGetRCSentences
+      ? SidebarStore.reversoContextSource
+      : SidebarStore.tatoebaSource
   }
 
   public update = async (
@@ -101,7 +114,7 @@ export class SidebarStore {
 
   @action
   public setResourcesNotLoading(): void {
-    this.exampleSentences = []
+    this.exampleSentences = undefined
     this.exampleSentencesState = "NotLoading"
     this.dictionaryEntries = []
     this.dictionaryEntriesState = "NotLoading"
@@ -123,9 +136,16 @@ export class SidebarStore {
     translationLanguage: ILanguage
   ): Promise<void> {
     this.setExampleSentencesState("Loading")
-    const exampleSentences = await fetchSentences(phrase, contentLanguage, translationLanguage)
+    const exampleSentences = await this.sources.sentencesSource.fetchSentences(
+      phrase,
+      contentLanguage,
+      translationLanguage
+    )
     runInAction(() => {
-      this.exampleSentences = exampleSentences.map(s => emphasizePhrase(phrase, s))
+      this.exampleSentences = {
+        ...exampleSentences,
+        data: exampleSentences.data.map(s => emphasizePhrase(phrase, s))
+      }
       this.exampleSentencesState = "Loaded"
     })
   }
