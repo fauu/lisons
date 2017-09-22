@@ -10,7 +10,7 @@ Available for Linux, macOS and Windows.
 
 Note: This is BETA software, and as such is largely untested and may contain bugs.
 
-### Features
+## Features
 
 * Epub and plain text support
 * Over 100 supported languages*
@@ -22,11 +22,11 @@ Note: This is BETA software, and as such is largely untested and may contain bug
 * Most of language configurations have not yet been tested and may not work as intended.
 </sub>
 
-### Roadmap
+## Roadmap
 
 ...
 
-### Building
+## Building
 
 1. Clone the repository: ```git clone https://github.com/fauu/lisons.git```
 2. Change to project root directory: ```cd lisons```
@@ -36,6 +36,6 @@ Note: This is BETA software, and as such is largely untested and may contain bug
 
 <sub>* Might require additional tools. Please consult [electron-builder documentation](https://www.electron.build/).</sub>
 
-### License
+## License
 
 See [COPYING](COPYING.md) and [LICENSE](LICENSE.md).
