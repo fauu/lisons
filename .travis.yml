@@ -22,6 +22,7 @@ before_install:
   - mkdir -p /tmp/git-lfs && curl -L https://github.com/github/git-lfs/releases/download/v2.3.0/git-lfs-darwin-amd64-2.3.0.tar.gz | tar -xz -C /tmp/git-lfs --strip-components 1 && /tmp/git-lfs/git-lfs pull
   - curl -L https://yarnpkg.com/latest.tar.gz | tar xvz && mv yarn-* $HOME/.yarn
   - export PATH="$HOME/.yarn/bin:$PATH"
+  - openssl aes-256-cbc -K $encrypted_5af690707dae_key -iv $encrypted_5af690707dae_iv -in utilities/.dropbox_uploader.enc -out ~\/.dropbox_uploader -d
 
 script:
   - yarn build:prod
@@ -29,6 +30,11 @@ script:
 
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
+
+after_success:
+  - find dist/*.AppImage -exec ./utilities/dropbox_uploader.sh upload {} / \; 
+  - find dist/*.dmg -exec ./utilities/dropbox_uploader.sh upload {} / \; 
+  - find dist/*.exe -exec ./utilities/dropbox_uploader.sh upload {} / \; 
 
 branches:
   except:
