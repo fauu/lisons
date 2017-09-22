@@ -27,7 +27,7 @@
     "dist:linux": "electron-builder --linux --x64",
     "dist:macos": "electron-builder --macos",
     "dist:windows": "electron-builder --windows --x64",
-    "dist:all": "electron-builder --linux --macos --windows --x64"
+    "dist:all": "electron-builder --linux --macos --windows --x64 --publish never"
   },
   "build": {
     "appId": "io.github.fauu.lisons",
