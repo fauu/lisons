@@ -24,6 +24,7 @@ before_install:
   - export PATH="$HOME/.yarn/bin:$PATH"
 
 script:
+  - brew install wine
   - yarn build:prod
   - yarn dist:all
 
