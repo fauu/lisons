@@ -94,9 +94,9 @@ const Title = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   &:hover {
-    // border-bottom: 2px solid ${colors.accent2};
-    text-shadow: 1px 1px 0 ${colors.secondary}, -1px 1px 0 ${colors.secondary}, 2px 0 0 ${colors.secondary}, -2px 0 0 ${colors.secondary};
-    box-shadow: inset 0 0px 0 0 ${colors.secondary}, inset 0 -2px 0 0 ${colors.accent2};
+    text-shadow: 1px 1px 0 ${colors.secondary}, -1px 1px 0 ${colors.secondary},
+      2px 0 0 ${colors.secondary}, -2px 0 0 ${colors.secondary};
+    box-shadow: inset 0 -3px 0 0 ${colors.secondary}, inset 0 -5px 0 0 ${colors.accent2};
   }
 `
 

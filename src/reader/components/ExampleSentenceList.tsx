@@ -72,9 +72,10 @@ const SourceLink = styled.span`
   }
 `
 
-const Domain = styled.span`font-style: italic;`
+const Domain = styled.span`font-weight: bold;`
 
 const List = styled.ul`
+  width: 100%;
   list-style-type: none;
   margin: 0 0 1.2rem 0;
   padding: 0;
@@ -90,8 +91,10 @@ const Element = styled.li`
     border-bottom: 1px solid #333;
   }
   & em {
-    border-bottom: 2px solid ${colors.secondary};
     font-style: normal;
+    text-shadow: 1px 1px 0 ${colors.primary}, -1px 1px 0 ${colors.primary},
+      2px 0 0 ${colors.primary}, -2px 0 0 ${colors.primary};
+    box-shadow: inset 0 -1px 0 0 ${colors.primary}, inset 0 -3px 0 0 ${colors.secondaryFade};
   }
 `
 
