@@ -5,15 +5,20 @@ export const xhr = async <T>(
 ): Promise<T> =>
   new Promise<T>((resolve, reject) => {
     const req = new XMLHttpRequest()
-    let response
     req.onreadystatechange = () => {
       if (req.readyState === req.DONE) {
-        response = req.responseText
-        if (response) {
+        const response = req.responseText
+        if (req.status === 200 && response) {
           if (isResponseJson) {
-            response = JSON.parse(response)
+            try {
+              resolve(JSON.parse(response))
+            } catch (e) {
+              reject(e.message)
+            }
           }
-          resolve(response)
+          resolve(response as any)
+        } else {
+          reject()
         }
       }
     }

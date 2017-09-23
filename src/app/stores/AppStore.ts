@@ -1,5 +1,5 @@
 import { remote } from "electron"
-import { action, observable } from "mobx"
+import { action, observable, runInAction } from "mobx"
 
 import { LibraryStore } from "~/library/stores"
 import { ReaderStore } from "~/reader/stores"
@@ -8,11 +8,16 @@ import { Database } from "~/app/Database"
 import { AppScreen } from "~/app/model"
 import { SettingsStore, TextStore } from "~/app/stores"
 import { TextRepository } from "~/app/TextRepository"
+import { xhr } from "~/app/Xhr"
 
 export class AppStore {
+  public static readonly websiteUrl = "https://fauu.github.io/lisons"
+  private static readonly websiteDataPath = "/data.json"
   private static readonly startInReader = false
+
   @observable public activeScreen?: AppScreen
   @observable public isFullScreen: boolean
+  @observable private _newestVersion?: string
   private _db: Database
   private _textRepository: TextRepository
   private _settingsStore: SettingsStore
@@ -38,6 +43,7 @@ export class AppStore {
     } else {
       this.showLibraryScreen()
     }
+    this.fetchCurrentVersion()
   }
 
   public async showReaderScreen(textId: number): Promise<void> {
@@ -57,6 +63,23 @@ export class AppStore {
     const win = remote.getCurrentWindow()
     this.isFullScreen = !win.isFullScreen()
     win.setFullScreen(this.isFullScreen)
+  }
+
+  private async fetchCurrentVersion(): Promise<void> {
+    let websiteData: any
+    try {
+      const url = `${AppStore.websiteUrl}${AppStore.websiteDataPath}`
+      websiteData = await xhr<{ version: string }>(url, undefined, true)
+    } catch (e) {
+      console.error("Error fetching website data:", e)
+    }
+    runInAction(() => {
+      this._newestVersion = websiteData && websiteData.version
+    })
+  }
+
+  public get isNewVersionAvailable(): boolean {
+    return this._newestVersion !== undefined && this._newestVersion !== VERSION
   }
 
   public get settingsStore(): SettingsStore {

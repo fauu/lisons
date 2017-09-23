@@ -1,3 +1,4 @@
+import { shell } from "electron"
 import { observer } from "mobx-react"
 import * as React from "react"
 import styled from "styled-components"
@@ -14,7 +15,7 @@ export interface ILibraryProps {
 export const Library = observer(function _Library({ appStore }: ILibraryProps): JSX.Element {
   const isEmpty = appStore.textStore.texts.size === 0
   const addTextDialogStore = appStore.libraryStore.addTextDialogStore
-  const settingsStore = appStore.settingsStore
+  const { settingsStore, isNewVersionAvailable } = appStore
   return (
     <Root>
       <LogoWrapper>
@@ -35,7 +36,15 @@ export const Library = observer(function _Library({ appStore }: ILibraryProps): 
         </AddTextColumn>
       </Body>
       <VersionPanel>
-        <VersionString>{VERSION}</VersionString>
+        {isNewVersionAvailable && (
+          <span>
+            <NewVersionMessage onClick={() => shell.openExternal(AppStore.websiteUrl)}>
+              New version available!
+            </NewVersionMessage>
+            <Separator />
+          </span>
+        )}
+        <span>{VERSION}</span>
       </VersionPanel>
     </Root>
   )
@@ -108,7 +117,21 @@ const ColumnHeader = styled.h2`
 const VersionPanel = styled.div`
   position: absolute;
   right: 0.8rem;
-  top: 0.8rem;
+  top: 0.7rem;
+  color: ${colors.primaryFade2};
 `
 
-const VersionString = styled.span`color: ${colors.primaryFade2};`
+const NewVersionMessage = styled.span`
+  text-decoration: underline;
+  transition: color ${animations.std};
+  &:hover {
+    color: ${colors.accent2};
+  }
+`
+
+const Separator = styled.span`
+  margin: 0 0.5rem;
+  &::after {
+    content: "·";
+  }
+`

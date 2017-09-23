@@ -46,6 +46,5 @@ export const tokenize = async (
   text: string,
   language: ILanguage
 ): Promise<ITokenizedTextContent> => {
-  console.log("Tokenizing...")
   return getTokenizer(language).tokenize(text, languageOpts.get(language.code6393))
 }
