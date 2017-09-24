@@ -26,10 +26,6 @@ Note: This is BETA software, and as such is largely untested and may contain bug
 * Most of language configurations have not yet been tested and may not work as intended.
 </sub>
 
-## Roadmap
-
-...
-
 ## Building
 
 1. Clone the repository: ```git clone https://github.com/fauu/lisons.git```
