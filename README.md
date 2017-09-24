@@ -1,8 +1,9 @@
 # Lisons!
-<p align="center">
+<p>
 <a href="https://travis-ci.org/fauu/lisons"><img src="https://api.travis-ci.org/fauu/lisons.svg?branch=master" alt="Build Status"></a>
 <a href="https://david-dm.org/fauu/lisons"><img src="https://david-dm.org/fauu/lisons.svg" alt="Dependency Status"></a>
 <a href="https://david-dm.org/fauu/lisons/?type=dev"><img src="https://david-dm.org/fauu/lisons/dev-status.svg" alt="devDependency Status"></a>
+</p>
 
 A desktop e-book reader for language learners, which facilitates learning from reading by providing machine translations ([DeepL](https://www.deepl.com/translator), [Google](https://translate.google.com/)) as well as human-translated example sentences ([Tatoeba](https://tatoeba.org/), [Reverso Context](http://context.reverso.net)).
 
