@@ -24,7 +24,7 @@ export class SettingsStore {
   }
 
   @computed
-  public get areSettingsDefault(): boolean {
-    return isEqual(this._settings, defaultSettings)
+  public get areReaderSettingsDefault(): boolean {
+    return isEqual(this._settings.readerStyle, defaultSettings.readerStyle)
   }
 }

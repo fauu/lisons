@@ -105,7 +105,7 @@ export class Settings extends React.Component<ISettingsProps> {
         </FormMain>
         <Button
           warning
-          disabled={this.settingsStore.areSettingsDefault}
+          disabled={this.settingsStore.areReaderSettingsDefault}
           onClick={this.handleResetButtonClick}
         >
           Reset to defaults
