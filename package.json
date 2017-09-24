@@ -1,7 +1,7 @@
 {
   "name": "lisons",
   "version": "0.0.1",
-  "description": "FIXME",
+  "description": "Desktop e-book reader for language learners.",
   "keywords": ["FIX", "ME"],
   "homepage": "https://fauu.github.io/lisons",
   "bugs": "https://github.com/fauu/lisons/issues",
@@ -33,15 +33,14 @@
     "appId": "io.github.fauu.lisons",
     "productName": "Lisons!",
     "copyright": "Copyright © 2017 Lisons authors",
-    "compression": "store",
     "files": "out",
     "extraFiles": "LICENSE.md",
     "mac": {
       "category": "public.app-category.education"
     },
     "linux": {
-      "description": "FIXME",
-      "synopsis": "FIXME",
+      "description": "Desktop e-book reader for language learners.",
+      "synopsis": "A desktop e-book reader for language learners, which facilitates learning from reading by providing machine translations (DeepL, Google) as well as human-translated example sentences (Tatoeba, Reverso Context).",
       "maintainer": "Piotr Grabowski <fau999@gmail.com>",
       "vendor": "Piotr Grabowski <fau999@gmail.com>",
       "target": ["AppImage"],

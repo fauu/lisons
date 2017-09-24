@@ -10,7 +10,7 @@ const outPath = path.resolve(__dirname, outDirName)
 const srcDirName = "src"
 const srcPath = path.resolve(__dirname, srcDirName)
 const staticResPath = "./src/res/static"
-const browserIconPath = "./build/icon.png"
+const browserIconPath = "./build/icons/128x128.png"
 const htmlTemplatePath = path.join(srcDirName, "index.html")
 const rendererEntry = "./src/renderer.tsx"
 
