@@ -10,6 +10,9 @@ export class TatoebaSource implements ISentenceSource {
   public get domain(): string {
     return "tatoeba.org"
   }
+  public get url(): string {
+    return `https://${this.domain}`
+  }
   private parser = new DOMParser()
 
   public async fetchSentences(
@@ -35,8 +38,7 @@ export class TatoebaSource implements ISentenceSource {
   }
 
   private getSentencesDocumentUrl(query: string, fromLang: string, toLang: string): string {
-    const domain = this.domain
-    return `https://${domain}/eng/sentences\/search?from=${fromLang}&to=${toLang}&query=${query}`
+    return `${this.url}/eng/sentences\/search?from=${fromLang}&to=${toLang}&query=${query}`
   }
 
   private async fetchSentencesDocument(url: string): Promise<Document> {

@@ -1,3 +1,4 @@
+import { shell } from "electron"
 import { observer } from "mobx-react"
 import * as React from "react"
 import styled from "styled-components"
@@ -7,6 +8,7 @@ import { animations, colors } from "~/app/data/Style"
 import { SettingsStore } from "~/app/stores"
 
 import { Dictionary, ExampleSentenceList, Settings } from "~/reader/components"
+import { ISource } from "~/reader/model"
 import { SidebarStore } from "~/reader/stores"
 
 import * as noiseTexture from "~/res/images/noise-texture.png"
@@ -24,8 +26,7 @@ export const Sidebar = observer(function _Sidebar({
     dictionaryEntriesState,
     exampleSentences,
     exampleSentencesState,
-    isSettingsTabActive,
-    sources
+    isSettingsTabActive
   } = sidebarStore
   const notLoading =
     dictionaryEntriesState === "NotLoading" && exampleSentencesState === "NotLoading"
@@ -34,6 +35,11 @@ export const Sidebar = observer(function _Sidebar({
   const sentencesLoading = exampleSentencesState === "Loading"
   const sentencesLoaded = exampleSentencesState === "Loaded"
   const hasSentences = exampleSentences && exampleSentences.data.length > 0
+  const sources: Array<[string, ISource]> = [
+    ["Main translation", sidebarStore.sources.mainTranslationSource],
+    ["Dictionary", sidebarStore.sources.dictionarySource],
+    ["Example sentences", sidebarStore.sources.sentencesSource]
+  ]
   return (
     <Root>
       <FadeTransition>
@@ -45,15 +51,14 @@ export const Sidebar = observer(function _Sidebar({
               <IdleContent>
                 <Message>Select text to show translations</Message>
                 <Sources>
-                  <Source>
-                    Main translation: <SourceName>{sources.translationSource}</SourceName>
-                  </Source>
-                  <Source>
-                    Dictionary: <SourceName>{sources.dictionarySource}</SourceName>
-                  </Source>
-                  <Source>
-                    Example sentences: <SourceName>{sources.sentencesSource.name}</SourceName>
-                  </Source>
+                  {sources.map(([category, source]) => (
+                    <Source>
+                      {category}:{" "}
+                      <SourceLink onClick={() => shell.openExternal(source.url)}>
+                        {source.name}
+                      </SourceLink>
+                    </Source>
+                  ))}
                 </Sources>
               </IdleContent>
             )}
@@ -130,9 +135,14 @@ const Sources = styled.ul`
 
 const Source = styled.li``
 
-const SourceName = styled.span`
+const SourceLink = styled.span`
+  margin-left: 0.15rem;
   font-weight: bold;
   font-size: 1.1em;
+  transition: color ${animations.std};
+  &:hover {
+    color: ${colors.secondaryFade};
+  }
 `
 
 const ExampleSentencesWrapper = styled.div`

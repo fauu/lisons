@@ -14,8 +14,12 @@ import { TatoebaSource } from "~/reader/TatoebaSource"
 type TranslationPair = [ITranslation | undefined, ITranslation | undefined]
 
 export class SidebarStore {
-  private static tatoebaSource = new TatoebaSource()
-  private static reversoContextSource = new ReversoContextSource()
+  private static readonly sources = {
+    tatoeba: new TatoebaSource(),
+    reversoContext: new ReversoContextSource(),
+    deepl: { name: "DeepL", url: "https://www.deepl.com/translator" },
+    google: { name: "Google", url: "https://translate.google.com" }
+  }
 
   @observable public isVisible: boolean = true
   @observable public isMainTranslationLoading: boolean
@@ -26,9 +30,9 @@ export class SidebarStore {
   @observable public isSettingsTabActive: boolean
   @observable
   public sources: ISources = {
-    translationSource: "Google",
-    dictionarySource: "Google",
-    sentencesSource: SidebarStore.tatoebaSource
+    mainTranslationSource: SidebarStore.sources.google,
+    dictionarySource: SidebarStore.sources.google,
+    sentencesSource: SidebarStore.sources.tatoeba
   }
 
   @action
@@ -37,15 +41,17 @@ export class SidebarStore {
       contentLanguage,
       translationLanguage
     )
-    this.sources.translationSource = canDoDeeplTranslation ? "DeepL" : "Google"
+    this.sources.mainTranslationSource = canDoDeeplTranslation
+      ? SidebarStore.sources.deepl
+      : SidebarStore.sources.google
 
-    const canGetRCSentences = SidebarStore.reversoContextSource.hasSentences(
+    const canGetRCSentences = SidebarStore.sources.reversoContext.hasSentences(
       contentLanguage,
       translationLanguage
     )
     this.sources.sentencesSource = canGetRCSentences
-      ? SidebarStore.reversoContextSource
-      : SidebarStore.tatoebaSource
+      ? SidebarStore.sources.reversoContext
+      : SidebarStore.sources.tatoeba
   }
 
   public update = async (
@@ -156,7 +162,7 @@ export class SidebarStore {
     translationLanguage: ILanguage
   ): Promise<TranslationPair> {
     const isSingleWord = !hasSpace(phrase)
-    const canDoDeeplTranslation = this.sources.translationSource === "DeepL"
+    const canDoDeeplTranslation = this.sources.mainTranslationSource.name === "DeepL"
 
     const willDoGoogleTranslation = !canDoDeeplTranslation || isSingleWord
     const willDoDeeplTranslation =

@@ -1,10 +1,7 @@
-import { ISentenceSource } from "~/reader/model"
-
-export type TranslationSource = "DeepL" | "Google"
-export type DictionarySource = "Google"
+import { ISentenceSource, ISource } from "~/reader/model"
 
 export interface ISources {
-  translationSource: TranslationSource
-  dictionarySource: DictionarySource
+  mainTranslationSource: ISource
+  dictionarySource: ISource
   sentencesSource: ISentenceSource
 }

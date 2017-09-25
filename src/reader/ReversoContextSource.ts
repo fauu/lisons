@@ -26,6 +26,9 @@ export class ReversoContextSource implements ISentenceSource {
   public get domain(): string {
     return "context.reverso.net"
   }
+  public get url(): string {
+    return `http://${this.domain}`
+  }
   private parser = new DOMParser()
 
   public hasSentences(from: ILanguage, to: ILanguage): boolean {
@@ -65,7 +68,7 @@ export class ReversoContextSource implements ISentenceSource {
   }
 
   private getSentencesDocumentUrl(query: string, fromLang: string, toLang: string): string {
-    return `http://${this.domain}/translation/${fromLang}-${toLang}/${query}`
+    return `${this.url}/translation/${fromLang}-${toLang}/${query}`
   }
 
   private async fetchSentencesDocument(url: string): Promise<Document> {
