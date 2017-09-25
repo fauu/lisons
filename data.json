@@ -6,21 +6,24 @@
       "prettyName": "Linux",
       "logoFilename": "tux",
       "extension": "AppImage",
-      "details": "64-bit"
+      "details": "64-bit",
+      "downloadUrl": "https://github.com/fauu/lisons/releases/download/v0.1.0/Lisons-0.1.0.AppImage"
     },
     {
       "name": "macos",
       "prettyName": "macOS",
       "logoFilename": "apple-logo",
       "extension": "dmg",
-      "details": "10.9 or later"
+      "details": "10.9 or later",
+      "downloadUrl": "https://github.com/fauu/lisons/releases/download/v0.1.0/Lisons-0.1.0.dmg"
     },
     {
       "name": "windows",
       "prettyName": "Windows",
       "logoFilename": "windows-logo",
       "extension": "exe",
-      "details": "7 or later, 64-bit"
+      "details": "7 or later, 64-bit",
+      "downloadUrl": "https://github.com/fauu/lisons/releases/download/v0.1.0/Lisons.Setup-0.1.0.exe"
     }
   ],
   "repoUrl": "https://github.com/fauu/lisons"
