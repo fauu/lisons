@@ -58,7 +58,9 @@ const Root = styled.div`
   height: 100%;
 `
 
-const LogoWrapper = styled.div`display: flex;`
+const LogoWrapper = styled.div`
+  display: flex;
+`
 
 const Logo = styled.h1`
   margin: 0;
@@ -80,7 +82,9 @@ const LogoText = styled.span`
   color: ${colors.secondary};
 `
 
-const BetaIndicator = styled(BetaIcon)`fill: ${colors.primaryFade2};`
+const BetaIndicator = styled(BetaIcon)`
+  fill: ${colors.primaryFade2};
+`
 
 const Body = styled.div`
   margin-top: 2rem;

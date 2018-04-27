@@ -16,6 +16,7 @@ const htmlTemplatePath = path.join(srcDirName, "index.html")
 const rendererEntry = "./src/renderer.tsx"
 
 const mainConfig = {
+  mode: "none",
   target: "electron-main",
   entry: { main: "./src/main.ts" },
   output: {
@@ -38,10 +39,16 @@ const mainConfig = {
     },
     symlinks: false
   },
-  plugins: [new CopyWebpackPlugin([{ from: staticResPath }, { from: browserIconPath, to: browserIconOutFilename }])]
+  plugins: [
+    new CopyWebpackPlugin([
+      { from: staticResPath },
+      { from: browserIconPath, to: browserIconOutFilename }
+    ])
+  ]
 }
 
 const rendererConfig = {
+  mode: "none",
   context: __dirname,
   target: "electron-renderer",
   output: {
