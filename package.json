@@ -31,7 +31,7 @@
   "build": {
     "appId": "io.github.fauu.lisons",
     "productName": "Lisons!",
-    "copyright": "Copyright © 2017 Lisons authors",
+    "copyright": "Copyright © 2017—2018 Lisons authors",
     "files": "out",
     "extraFiles": "LICENSE.md",
     "mac": {
@@ -39,7 +39,8 @@
     },
     "linux": {
       "description": "Desktop e-book reader for language learners.",
-      "synopsis": "A desktop e-book reader for language learners, which facilitates learning from reading by providing machine translations (DeepL, Google) as well as human-translated example sentences (Tatoeba, Reverso Context).",
+      "synopsis":
+        "A desktop e-book reader for language learners, which facilitates learning from reading by providing machine translations (DeepL, Google) as well as human-translated example sentences (Tatoeba, Reverso Context).",
       "maintainer": "Piotr Grabowski <fau999@gmail.com>",
       "vendor": "Piotr Grabowski <fau999@gmail.com>",
       "target": ["AppImage"],
@@ -57,11 +58,11 @@
     }
   },
   "devDependencies": {
-    "@types/electron-debug": "^1.1.0",
     "@types/kuromoji": "^0.0.28",
     "@types/lodash": "^4.14.74",
-    "@types/node": "^8.0.27",
+    "@types/node": "^8.9.3",
     "@types/react": "^16.0.5",
+    "@types/react-css-transition-replace": "^2.1.1",
     "@types/react-dom": "^15.5.4",
     "@types/react-hot-loader": "^3.0.4",
     "babel-core": "^6.26.0",
@@ -70,7 +71,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-webpack-plugin": "^0.1.1",
     "cross-env": "^5.0.5",
-    "electron": "1.7.6",
+    "electron": "2.0.0-beta.7",
     "electron-builder": "^19.27.3",
     "fork-ts-checker-webpack-plugin": "^0.2.8",
     "html-webpack-plugin": "^2.30.1",
@@ -90,7 +91,6 @@
   },
   "dependencies": {
     "@gxl/epub-parser": "fauu/epub-parser#dev",
-    "@types/react-css-transition-replace": "^2.1.1",
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
