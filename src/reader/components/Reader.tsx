@@ -1,10 +1,10 @@
+import { ChevronLeftIcon, ChevronRightIcon, SkipBackwardIcon, SkipForwardIcon } from "mdi-react"
 import { computed } from "mobx"
 import { observer } from "mobx-react"
 import * as React from "react"
 import styled from "styled-components"
 
 import { animations } from "~/app/data/Style"
-import { ChevronLeftIcon, ChevronRightIcon, SkipBackwardIcon, SkipForwardIcon } from "~/app/Icons"
 import { IReaderStyleSettings } from "~/app/model"
 import { AppStore, SettingsStore } from "~/app/stores"
 import { formatPercentage } from "~/util/FormatUtils"
@@ -292,5 +292,7 @@ const SecondaryTextNavButton = withProps<{ variant: UiColorVariant; onClick: any
     margin-right: 0.6rem;
   }
 `
+// @ts-ignore
 const SkipBackwardButton = SecondaryTextNavButton.withComponent(SkipBackwardIcon)
+// @ts-ignore
 const SkipForwardButton = SecondaryTextNavButton.withComponent(SkipForwardIcon)

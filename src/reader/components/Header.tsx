@@ -1,8 +1,3 @@
-import { observer } from "mobx-react"
-import * as React from "react"
-import styled from "styled-components"
-
-import { animations } from "~/app/data/Style"
 import {
   ArrowCollapseRightIcon,
   ArrowExpandLeftIcon,
@@ -11,7 +6,12 @@ import {
   FullscreenExitIcon,
   FullscreenIcon,
   MenuDownIcon
-} from "~/app/Icons"
+} from "mdi-react"
+import { observer } from "mobx-react"
+import * as React from "react"
+import styled from "styled-components"
+
+import { animations } from "~/app/data/Style"
 import { AppStore } from "~/app/stores"
 import { withProps } from "~/util/StyleUtils"
 
@@ -136,9 +136,15 @@ const ActionButton = withProps<{ onClick?: any }>()(styled.div)`
     margin-right: 0.6rem;
   }
 `
+// @ts-ignore
 const HideSidebarButton = ActionButton.withComponent(ArrowCollapseRightIcon)
+// @ts-ignore
 const ShowSidebarButton = ActionButton.withComponent(ArrowExpandLeftIcon)
+// @ts-ignore
 const SettingsButton = ActionButton.withComponent(FormatFontIcon)
+// @ts-ignore
 const FullScreenButton = ActionButton.withComponent(FullscreenIcon)
+// @ts-ignore
 const FullScreenExitButton = ActionButton.withComponent(FullscreenExitIcon)
+// @ts-ignore
 const CloseButton = ActionButton.withComponent(CloseIcon)

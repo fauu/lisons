@@ -1,8 +1,8 @@
+import { ArrowRightIcon, DeleteIcon } from "mdi-react"
 import * as React from "react"
 import styled from "styled-components"
 
 import { animations, colors, fonts } from "~/app/data/Style"
-import { ArrowRightIcon, DeleteIcon } from "~/app/Icons"
 import { Text } from "~/app/model"
 import { AppStore } from "~/app/stores"
 import { formatPercentage } from "~/util/FormatUtils"
@@ -109,7 +109,9 @@ const Author = styled.span`
   text-overflow: ellipsis;
 `
 
-const Secondary = styled.div`margin-top: -0.2rem;`
+const Secondary = styled.div`
+  margin-top: -0.2rem;
+`
 
 const Languages = styled.span`
   display: inline-flex;

@@ -1,4 +1,5 @@
 import { remote } from "electron"
+import { CloseIcon } from "mdi-react"
 import { action, autorun, observable, reaction } from "mobx"
 import { observer } from "mobx-react"
 import * as path from "path"
@@ -8,7 +9,6 @@ import styled from "styled-components"
 import { Spinner } from "~/app/components"
 import { languages } from "~/app/data/Languages"
 import { animations, colors, fonts } from "~/app/data/Style"
-import { CloseIcon } from "~/app/Icons"
 import { SettingsStore } from "~/app/stores"
 import { withProps } from "~/util/StyleUtils"
 

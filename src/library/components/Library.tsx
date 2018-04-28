@@ -1,10 +1,10 @@
 import { shell } from "electron"
+import { BetaIcon } from "mdi-react"
 import { observer } from "mobx-react"
 import * as React from "react"
 import styled from "styled-components"
 
 import { animations, colors } from "~/app/data/Style"
-import { BetaIcon } from "~/app/Icons"
 import { AppStore } from "~/app/stores"
 
 import { AddTextDialog, TextList } from "~/library/components"
