@@ -4,12 +4,15 @@ import { action, computed, observable } from "mobx"
 import { defaultSettings } from "~/app/data/DefaultSettings"
 import { ISettings } from "~/app/model"
 import { loadSettings, saveSettings } from "~/app/Settings"
+import { flowed } from "~/util/Flowed"
 
 export class SettingsStore {
-  @observable.deep private _settings: ISettings = defaultSettings
+  @observable.deep private _settings: ISettings = defaultSettings;
 
-  public async init(): Promise<void> {
-    this._settings = await loadSettings()
+  @flowed
+  public *init(): IterableIterator<Promise<ISettings>> {
+    const loadedSettings = yield loadSettings()
+    this._settings = loadedSettings
   }
 
   @action

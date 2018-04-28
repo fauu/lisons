@@ -1,4 +1,4 @@
-import { useStrict } from "mobx"
+import { configure } from "mobx"
 import { observer } from "mobx-react"
 import * as React from "react"
 import { hot } from "react-hot-loader"
@@ -14,7 +14,7 @@ import "~/app/GlobalCss.ts"
 import { AppScreen } from "~/app/model"
 import { AppStore } from "~/app/stores"
 
-useStrict(true)
+configure({ computedRequiresReaction: true, enforceActions: true })
 
 @hot(module)
 @observer

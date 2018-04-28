@@ -1,8 +1,9 @@
 import { remote } from "electron"
-import { action, observable, runInAction } from "mobx"
+import { action, observable } from "mobx"
 
 import { LibraryStore } from "~/library/stores"
 import { ReaderStore } from "~/reader/stores"
+import { flowed } from "~/util/Flowed"
 
 import { Database } from "~/app/Database"
 import { AppScreen } from "~/app/model"
@@ -65,17 +66,16 @@ export class AppStore {
     win.setFullScreen(this.isFullScreen)
   }
 
-  private async fetchCurrentVersion(): Promise<void> {
-    let websiteData: any
+  @flowed
+  private *fetchCurrentVersion(): IterableIterator<Promise<{ version: string }>> {
+    let websiteData = { version: "0.0" }
     try {
       const url = `${AppStore.websiteUrl}${AppStore.websiteDataPath}`
-      websiteData = await xhr<{ version: string }>(url, undefined, true)
+      websiteData = yield xhr<{ version: string }>(url, undefined, true)
     } catch (e) {
       console.error("Error fetching website data:", e)
     }
-    runInAction(() => {
-      this._newestVersion = websiteData && websiteData.version
-    })
+    this._newestVersion = websiteData && websiteData.version
   }
 
   public get isNewVersionAvailable(): boolean {

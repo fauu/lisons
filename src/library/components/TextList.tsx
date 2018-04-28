@@ -11,7 +11,11 @@ export interface ITextListProps {
 }
 export const TextList = observer(function _TextList({ appStore }: ITextListProps): JSX.Element {
   const texts = appStore.textStore.texts.values()
-  return <Root>{texts.map(t => <TextListElement key={t.id} appStore={appStore} text={t} />)}</Root>
+  return (
+    <Root>
+      {Array.from(texts).map(t => <TextListElement key={t.id} appStore={appStore} text={t} />)}
+    </Root>
+  )
 })
 
 const Root = styled.ul`

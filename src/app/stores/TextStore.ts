@@ -1,16 +1,20 @@
-import { action, observable, ObservableMap, runInAction } from "mobx"
+import { action, observable, ObservableMap } from "mobx"
 
 import { IParsedText, ITextInfo, ITextProgress, Text } from "~/app/model"
 import { TextRepository } from "~/app/TextRepository"
+import { flowed } from "~/util/Flowed"
 
 export class TextStore {
-  public texts: ObservableMap<Text> = observable.shallowMap<Text>()
+  public texts: ObservableMap<number, Text> = observable.map<number, Text>(undefined, {
+    deep: false
+  })
 
   public constructor(private _textRepository: TextRepository) {}
 
-  public loadAll = async (): Promise<void> => {
-    const texts = await this._textRepository.loadAll()
-    runInAction(() => texts.forEach(t => this.texts.set(String(t.id), t)))
+  @flowed
+  public *loadAll(): IterableIterator<Promise<Text[]>> {
+    const texts: Text[] = yield this._textRepository.loadAll()
+    texts.forEach(t => this.texts.set(t.id, t))
   }
 
   public async add(info: ITextInfo, parsed: IParsedText): Promise<void> {
@@ -18,9 +22,10 @@ export class TextStore {
     this.setText(newText)
   }
 
-  public async delete(id: number): Promise<void> {
-    await this._textRepository.delete(id)
-    runInAction(() => this.texts.delete(String(id)))
+  @flowed
+  public *delete(id: number): IterableIterator<Promise<void>> {
+    yield this._textRepository.delete(id)
+    this.texts.delete(id)
   }
 
   // TODO: Make progress observable and sync automatically?
@@ -31,6 +36,6 @@ export class TextStore {
 
   @action
   private setText(text: Text): void {
-    this.texts.set(String(text.id), text)
+    this.texts.set(text.id, text)
   }
 }

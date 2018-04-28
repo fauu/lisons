@@ -1,9 +1,10 @@
 import { Epub } from "@gxl/epub-parser/build/types/epubParser"
-import { action, computed, observable, reaction, runInAction } from "mobx"
+import { action, computed, observable, reaction } from "mobx"
 import { IPromiseBasedObservable } from "mobx-utils"
 
 import { IParsedText } from "~/app/model"
 import { TextStore } from "~/app/stores"
+import { flowed } from "~/util/Flowed"
 import { detectLanguage, getEpubOrPlainContent, isEpub, parseText } from "~/util/TextUtils"
 
 import { FileStatus, IAddTextFormData, IEpubInfo } from "~/library/model"
@@ -27,7 +28,8 @@ export class AddTextDialogStore {
     reaction(() => this.parsedText, text => this.handleParsedTextChange(text))
   }
 
-  public async saveText(formData: IAddTextFormData): Promise<void> {
+  @flowed
+  public *saveText(formData: IAddTextFormData): IterableIterator<Promise<void>> {
     if (!this.fileContent && !this.pastedContent) {
       return
     }
@@ -35,7 +37,7 @@ export class AddTextDialogStore {
     const parsedText =
       this.parsedText ||
       parseText(this.pastedContent!, AddTextDialogStore.languageDetectionSampleLength)
-    await this.textStore.add(
+    yield this.textStore.add(
       {
         title: formData.title,
         author: formData.author,
@@ -46,26 +48,23 @@ export class AddTextDialogStore {
       },
       parsedText
     )
-    runInAction(() => {
-      this.pastedContent = undefined
-      this.fileContent = undefined
-      this.parsedText = undefined
-      this.isSavingText = false
-    })
+    this.pastedContent = undefined
+    this.fileContent = undefined
+    this.parsedText = undefined
+    this.isSavingText = false
   }
 
-  public async processFile(path: string): Promise<void> {
+  @flowed
+  public *processFile(path: string): IterableIterator<Promise<string | Epub>> {
     this.setProcessingFile(true)
-    const epubOrPlainContent = await getEpubOrPlainContent(path)
-    runInAction(() => {
-      this.fileContent = epubOrPlainContent
-      this.parsedText = parseText(
-        epubOrPlainContent,
-        AddTextDialogStore.languageDetectionSampleLength
-      )
-      this.detectedLanguage = detectLanguage(this.parsedText!.sample)
-      this.isProcessingFile = false
-    })
+    const epubOrPlainContent: string | Epub = yield getEpubOrPlainContent(path)
+    this.fileContent = epubOrPlainContent
+    this.parsedText = parseText(
+      epubOrPlainContent,
+      AddTextDialogStore.languageDetectionSampleLength
+    )
+    this.detectedLanguage = detectLanguage(this.parsedText!.sample)
+    this.isProcessingFile = false
   }
 
   public handleSelectedFilePathChange(filePath: string): void {
