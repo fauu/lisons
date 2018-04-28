@@ -16,7 +16,6 @@ const htmlTemplatePath = path.join(srcDirName, "index.html")
 const rendererEntry = "./src/renderer.tsx"
 
 const mainConfig = {
-  mode: "none",
   target: "electron-main",
   entry: { main: "./src/main.ts" },
   output: {
@@ -48,7 +47,6 @@ const mainConfig = {
 }
 
 const rendererConfig = {
-  mode: "none",
   context: __dirname,
   target: "electron-renderer",
   output: {
@@ -59,7 +57,22 @@ const rendererConfig = {
     rules: [
       {
         test: /tsx?$/,
-        loader: "happypack/loader?id=ts",
+        //loader: "happypack/loader?id=ts",
+        use: [
+          {
+            loader: "babel-loader",
+            options: {
+              plugins: ["react-hot-loader/babel"]
+            }
+          },
+          {
+            loader: "ts-loader",
+            options: {
+              transpileOnly: true,
+              experimentalWatchApi: true
+            }
+          }
+        ],
         include: srcPath
       },
       {
@@ -79,22 +92,22 @@ const rendererConfig = {
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(packageJson.version)
     }),
-    new HappyPack({
-      id: "ts",
-      threads: 2,
-      loaders: [
-        {
-          path: "babel-loader",
-          options: {
-            plugins: ["react-hot-loader/babel"]
-          }
-        },
-        {
-          path: "ts-loader",
-          query: { happyPackMode: true }
-        }
-      ]
-    }),
+    // new HappyPack({
+    //   id: "ts",
+    //   threads: 2,
+    //   loaders: [
+    //     {
+    //       path: "babel-loader",
+    //       options: {
+    //         plugins: ["react-hot-loader/babel"]
+    //       }
+    //     },
+    //     {
+    //       path: "ts-loader",
+    //       query: { happyPackMode: true }
+    //     }
+    //   ]
+    // }),
     new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
     new webpack.NoEmitOnErrorsPlugin()
   ]
