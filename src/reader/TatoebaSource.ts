@@ -24,12 +24,11 @@ export class TatoebaSource implements ISentenceSource {
     const doc = await this.fetchSentencesDocument(sourceUrl)
 
     return {
-      // @ts-ignore
-      data: [...doc.querySelectorAll(".sentence-and-translations")].map(sat => ({
+      data: Array.from(doc.querySelectorAll(".sentence-and-translations")).map(sat => ({
         sentence: sat.querySelector(".sentence > .text")!.textContent!.trim(),
         sentenceLanguage: from,
         translationsLanguage: to,
-        translations: [...sat.querySelectorAll(".translation > .text")].map(te =>
+        translations: Array.from(sat.querySelectorAll(".translation > .text")).map(te =>
           te.textContent!.trim()
         )
       })),

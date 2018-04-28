@@ -7,7 +7,6 @@ import { setConfig } from "react-hot-loader"
 setConfig({ logLevel: "debug" })
 
 ReactDOM.render(
-  // @ts-ignore
   <React.StrictMode>
     <App />
   </React.StrictMode>,

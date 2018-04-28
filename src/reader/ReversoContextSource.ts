@@ -52,13 +52,14 @@ export class ReversoContextSource implements ISentenceSource {
     const doc = await this.fetchSentencesDocument(sourceUrl)
 
     return {
-      // @ts-ignore
-      data: [...doc.querySelectorAll("#examples-content > .example:not(.blocked)")].map(sat => ({
-        sentence: sat.children[0].children[0].textContent!.trim(),
-        sentenceLanguage: from,
-        translationsLanguage: to,
-        translations: [sat.children[1].children[1].textContent!.trim()]
-      })),
+      data: Array.from(doc.querySelectorAll("#examples-content > .example:not(.blocked)")).map(
+        sat => ({
+          sentence: sat.children[0].children[0].textContent!.trim(),
+          sentenceLanguage: from,
+          translationsLanguage: to,
+          translations: [sat.children[1].children[1].textContent!.trim()]
+        })
+      ),
       sourceDomain: this.domain,
       sourceUrl
     }

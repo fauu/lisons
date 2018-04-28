@@ -112,7 +112,7 @@ const Wrapper = styled.div`
   }
 
   /* FadeTransition hack */
-  > span {
+  > div {
     display: block;
     height: 100%;
     > span {
