@@ -1,11 +1,14 @@
 const path = require("path")
 const webpack = require("webpack")
 const merge = require("webpack-merge")
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const common = require("./webpack.common")
 
+const mode = "production"
+
 const mainConfig = merge(common.mainConfig, {
+  mode: mode,
   node: {
     __dirname: false
   },
@@ -21,6 +24,7 @@ const mainConfig = merge(common.mainConfig, {
 })
 
 const rendererConfig = merge(common.rendererConfig, {
+  mode: mode,
   entry: ["babel-polyfill", common.rendererEntry],
   plugins: [
     new webpack.DefinePlugin({

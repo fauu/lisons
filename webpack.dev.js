@@ -6,6 +6,7 @@ const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPl
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const common = require("./webpack.common")
 
+const mode = "development"
 const devServerHost = "localhost"
 const devServerPort = 3000
 const devServerUrl = `http://${devServerHost}:${devServerPort}/`
@@ -27,6 +28,7 @@ const templateContent = () => {
 }
 
 const mainConfig = merge(common.mainConfig, {
+  mode: mode,
   node: {
     __dirname: false,
     __filename: false
@@ -45,6 +47,7 @@ const mainConfig = merge(common.mainConfig, {
 })
 
 const rendererConfig = merge(common.rendererConfig, {
+  mode: mode,
   entry: [`webpack-dev-server/client?${devServerUrl}`, common.rendererEntry],
   output: {
     publicPath: common.devServerUrl
