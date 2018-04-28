@@ -1,4 +1,5 @@
 import { app, BrowserWindow } from "electron"
+import installExtension, { MOBX_DEVTOOLS, REACT_DEVELOPER_TOOLS } from "electron-devtools-installer"
 import localShortcut = require("electron-localshortcut")
 import * as path from "path"
 import * as url from "url"
@@ -64,6 +65,12 @@ app.on("ready", () => {
 
 app.on("browser-window-created", (_, win) => {
   if (isDev) {
+    installExtension(REACT_DEVELOPER_TOOLS.id)
+      .then((name: any) => console.log(`Added Extension: ${name}`))
+      .catch((err: any) => console.log("An error occurred: ", err))
+    installExtension(MOBX_DEVTOOLS.id)
+      .then((name: any) => console.log(`Added Extension: ${name}`))
+      .catch((err: any) => console.log("An error occurred: ", err))
     openDevTools(win)
   }
 })

@@ -32,7 +32,7 @@ const mainConfig = {
     ]
   },
   resolve: {
-    extensions: [".js", ".ts"],
+    extensions: [".js", ".ts", ".json"],
     alias: {
       "~": path.resolve("./src")
     },
