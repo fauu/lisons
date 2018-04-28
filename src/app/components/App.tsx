@@ -1,11 +1,7 @@
-/* TODO:
-  - "new version available" notification
-  - simple website
-*/
-
 import { useStrict } from "mobx"
 import { observer } from "mobx-react"
 import * as React from "react"
+import { hot } from "react-hot-loader"
 import styled from "styled-components"
 
 import { Library } from "~/library/components"
@@ -20,6 +16,7 @@ import { AppStore } from "~/app/stores"
 
 useStrict(true)
 
+@hot(module)
 @observer
 export class App extends React.Component<{}> {
   private appStore!: AppStore

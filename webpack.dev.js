@@ -47,7 +47,6 @@ const mainConfig = merge(common.mainConfig, {
 const rendererConfig = merge(common.rendererConfig, {
   entry: [
     "babel-polyfill",
-    "react-hot-loader/patch",
     `webpack-dev-server/client?${devServerUrl}`,
     "webpack/hot/only-dev-server",
     common.rendererEntry
