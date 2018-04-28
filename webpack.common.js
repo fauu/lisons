@@ -57,23 +57,7 @@ const rendererConfig = {
     rules: [
       {
         test: /tsx?$/,
-        //loader: "happypack/loader?id=ts",
-        use: [
-          {
-            loader: "babel-loader",
-            options: {
-              plugins: ["react-hot-loader/babel"]
-            }
-          },
-          {
-            loader: "ts-loader",
-            options: {
-              transpileOnly: true,
-              experimentalWatchApi: true
-            }
-          }
-        ],
-        include: srcPath
+        loader: "happypack/loader?id=ts"
       },
       {
         test: /(png|jpg|gif|woff2)$/,
@@ -92,22 +76,19 @@ const rendererConfig = {
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(packageJson.version)
     }),
-    // new HappyPack({
-    //   id: "ts",
-    //   threads: 2,
-    //   loaders: [
-    //     {
-    //       path: "babel-loader",
-    //       options: {
-    //         plugins: ["react-hot-loader/babel"]
-    //       }
-    //     },
-    //     {
-    //       path: "ts-loader",
-    //       query: { happyPackMode: true }
-    //     }
-    //   ]
-    // }),
+    new HappyPack({
+      id: "ts",
+      threads: 2,
+      loaders: [
+        {
+          path: "babel-loader"
+        },
+        {
+          path: "ts-loader",
+          query: { happyPackMode: true }
+        }
+      ]
+    }),
     new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
     new webpack.NoEmitOnErrorsPlugin()
   ]
