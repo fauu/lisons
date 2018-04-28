@@ -24,6 +24,7 @@ export class TatoebaSource implements ISentenceSource {
     const doc = await this.fetchSentencesDocument(sourceUrl)
 
     return {
+      // @ts-ignore
       data: [...doc.querySelectorAll(".sentence-and-translations")].map(sat => ({
         sentence: sat.querySelector(".sentence > .text")!.textContent!.trim(),
         sentenceLanguage: from,

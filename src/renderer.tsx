@@ -3,6 +3,9 @@ import * as ReactDOM from "react-dom"
 
 import { App } from "~/app/components"
 
+import { setConfig } from "react-hot-loader"
+setConfig({ logLevel: "debug" })
+
 ReactDOM.render(
   // @ts-ignore
   <React.StrictMode>

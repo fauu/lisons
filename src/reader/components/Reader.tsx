@@ -142,11 +142,9 @@ export class Reader extends React.Component<IReaderProps> {
           )}
         </SecondaryTextNavButtonWrapper>
         <ProgressWrapper>
-          {readingProgress instanceof Array ? (
-            readingProgress.map(val => formatPercentage(val)).join(" – ")
-          ) : (
-            formatPercentage(readingProgress!)
-          )}
+          {readingProgress instanceof Array
+            ? readingProgress.map(val => formatPercentage(val)).join(" – ")
+            : formatPercentage(readingProgress!)}
         </ProgressWrapper>
         <SecondaryTextNavButtonWrapper>
           {showRightButton && (
@@ -250,9 +248,13 @@ const TextNavButton = withProps<ITextNavButtonProps>()(styled.div)`
   }
 `
 
-const PrevPageButton = TextNavButton.extend`margin-right: 1em;`
+const PrevPageButton = TextNavButton.extend`
+  margin-right: 1em;
+`
 
-const NextPageButton = TextNavButton.extend`margin-left: 1em;`
+const NextPageButton = TextNavButton.extend`
+  margin-left: 1em;
+`
 
 const TextProgress = withProps<{ variant: UiColorVariant }>()(styled.div)`
   position: absolute;
@@ -267,7 +269,9 @@ const TextProgress = withProps<{ variant: UiColorVariant }>()(styled.div)`
   z-index: 5;
 `
 
-const ProgressWrapper = styled.div`padding: 0 1.25rem;`
+const ProgressWrapper = styled.div`
+  padding: 0 1.25rem;
+`
 
 const SecondaryTextNavButtonWrapper = withProps<{ left?: boolean }>()(styled.div)`
   flex: 1;

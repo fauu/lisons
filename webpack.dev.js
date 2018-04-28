@@ -45,25 +45,18 @@ const mainConfig = merge(common.mainConfig, {
 })
 
 const rendererConfig = merge(common.rendererConfig, {
-  entry: [
-    "babel-polyfill",
-    `webpack-dev-server/client?${devServerUrl}`,
-    "webpack/hot/only-dev-server",
-    common.rendererEntry
-  ],
+  entry: [`webpack-dev-server/client?${devServerUrl}`, common.rendererEntry],
   output: {
     publicPath: common.devServerUrl
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin()
     //new BundleAnalyzerPlugin()
   ],
   devServer: {
     host: devServerHost,
     port: devServerPort,
-    contentBase: path.join(__dirname, "out"),
-    hot: true
+    contentBase: path.join(__dirname, "out")
   }
 })
 

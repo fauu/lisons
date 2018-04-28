@@ -83,7 +83,12 @@ const rendererConfig = {
       id: "ts",
       threads: 2,
       loaders: [
-        "babel-loader",
+        {
+          path: "babel-loader",
+          options: {
+            plugins: ["react-hot-loader/babel"]
+          }
+        },
         {
           path: "ts-loader",
           query: { happyPackMode: true }
