@@ -6,7 +6,7 @@ import { ISettings } from "~/app/model"
 import { loadSettings, saveSettings } from "~/app/Settings"
 
 export class SettingsStore {
-  @observable.deep private _settings: ISettings
+  @observable.deep private _settings: ISettings = defaultSettings
 
   public async init(): Promise<void> {
     this._settings = await loadSettings()

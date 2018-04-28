@@ -11,30 +11,36 @@ import {
 
 export class Text {
   public static fromPersisted(data: ITextInfo): Text {
-    const text = new Text()
-    text._id = data.id!
-    text._title = data.title
-    text._author = data.author
-    text._contentLanguage = languageFromCode6393(data.contentLanguage)!
-    text._translationLanguage = languageFromCode6393(data.translationLanguage)!
-    text._progress = {
-      elementNo: data.progressElementNo,
-      percentage: data.progressPercentage
-    }
-    return text
+    return new Text(
+      data.id!,
+      data.title,
+      data.author,
+      languageFromCode6393(data.contentLanguage)!,
+      languageFromCode6393(data.translationLanguage)!,
+      {
+        elementNo: data.progressElementNo,
+        percentage: data.progressPercentage
+      }
+    )
   }
 
-  private _id: number
-  private _title: string
-  private _author: string
-  private _contentLanguage: ILanguage
-  private _translationLanguage: ILanguage
-  private _tokenizedContent: ITokenizedTextContent
-  private _elementCount: number
-  private _structure?: ITextSectionInfo[]
-  private _progress: ITextProgress
+  constructor(
+    private _id: number,
+    private _title: string,
+    private _author: string,
+    private _contentLanguage: ILanguage,
+    private _translationLanguage: ILanguage,
+    private _progress: ITextProgress,
+    private _elementCount: number = 0,
+    private _tokenizedContent?: ITokenizedTextContent,
+    private _structure?: ITextSectionInfo[]
+  ) {}
 
-  public getTokenizedContentSlice(from: number, count: number): ITokenizedTextContent {
+  public getTokenizedContentSlice(from: number, count: number): ITokenizedTextContent | undefined {
+    if (!this.tokenizedContent) {
+      return undefined
+    }
+
     return {
       types: this.tokenizedContent.types.slice(from, from + count),
       values: this.tokenizedContent.values.slice(from, from + count),
@@ -62,12 +68,14 @@ export class Text {
     return this._translationLanguage
   }
 
-  public get tokenizedContent(): ITokenizedTextContent {
+  public get tokenizedContent(): ITokenizedTextContent | undefined {
     return this._tokenizedContent
   }
 
-  public set tokenizedContent(value: ITokenizedTextContent) {
-    this._elementCount = value.types.length
+  public set tokenizedContent(value: ITokenizedTextContent | undefined) {
+    if (value) {
+      this._elementCount = value.types.length
+    }
     this._tokenizedContent = value
   }
 

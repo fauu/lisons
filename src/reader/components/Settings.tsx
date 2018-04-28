@@ -49,8 +49,8 @@ export class Settings extends React.Component<ISettingsProps> {
 
   @observable private formData: IReaderStyleSettings = defaultSettings.readerStyle
 
-  private settingsStore: SettingsStore
-  private sidebarStore: SidebarStore
+  private settingsStore!: SettingsStore
+  private sidebarStore!: SidebarStore
 
   public componentWillMount(): void {
     this.settingsStore = this.props.settingsStore
@@ -158,7 +158,9 @@ const Form = styled.form`
   }
 `
 
-const FormMain = styled.div`margin-bottom: 3rem;`
+const FormMain = styled.div`
+  margin-bottom: 3rem;
+`
 
 const Field = styled.label`
   display: flex;

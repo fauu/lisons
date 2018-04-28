@@ -14,9 +14,9 @@ export class AddTextDialogStore {
   @observable.ref public fileContent?: Epub | string
   @observable public pastedContent?: string
   @observable public detectedLanguage?: string | undefined
-  @observable public isProcessingFile: boolean
-  @observable public isLanguageConfigurationInvalid: boolean
-  @observable public isSavingText: boolean
+  @observable public isProcessingFile: boolean = false
+  @observable public isLanguageConfigurationInvalid: boolean = false
+  @observable public isSavingText: boolean = false
   public tatoebaTranslationCount?: IPromiseBasedObservable<number>
   @observable private parsedText?: IParsedText
 
@@ -77,9 +77,10 @@ export class AddTextDialogStore {
   }
 
   @action
-  public handleSelectedLanguagesChange(
-    [contentLanguage, translationLanguage]: [string, string]
-  ): void {
+  public handleSelectedLanguagesChange([contentLanguage, translationLanguage]: [
+    string,
+    string
+  ]): void {
     this.isLanguageConfigurationInvalid = contentLanguage === translationLanguage
     // this.tatoebaTranslationCount = this.isLanguageConfigurationInvalid
     //   ? undefined

@@ -16,14 +16,14 @@ export class AppStore {
   private static readonly startInReader = false
 
   @observable public activeScreen?: AppScreen
-  @observable public isFullScreen: boolean
+  @observable public isFullScreen: boolean = false
   @observable private _newestVersion?: string
-  private _db: Database
-  private _textRepository: TextRepository
-  private _settingsStore: SettingsStore
-  private _textStore: TextStore
-  private _libraryStore: LibraryStore
-  private _readerStore: ReaderStore
+  private _db!: Database
+  private _textRepository!: TextRepository
+  private _settingsStore!: SettingsStore
+  private _textStore!: TextStore
+  private _libraryStore!: LibraryStore
+  private _readerStore!: ReaderStore
 
   public constructor() {
     this.init()

@@ -21,10 +21,10 @@ export interface IReaderProps {
 }
 @observer
 export class Reader extends React.Component<IReaderProps> {
-  private appStore: AppStore
-  private settingsStore: SettingsStore
-  private readerStore: ReaderStore
-  private sidebarStore: SidebarStore
+  private appStore!: AppStore
+  private settingsStore!: SettingsStore
+  private readerStore!: ReaderStore
+  private sidebarStore!: SidebarStore
 
   public componentWillMount(): void {
     this.appStore = this.props.appStore

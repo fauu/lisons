@@ -11,13 +11,13 @@ export class TextView {
   private static readonly translationAttributeName = "data-translation"
   private static readonly textTransitionTimeMs = 200
 
-  @observable public firstPageElementNo: number
-  @observable public lastPageElementNo: number
+  @observable public firstPageElementNo: number = 0
+  @observable public lastPageElementNo: number = 0
   @observable private _range?: [number, number]
   private selection?: TextSelection
-  private mouse1Down: boolean
-  private rootElementId: string
-  private root: HTMLElement
+  private mouse1Down: boolean = false
+  private rootElementId!: string
+  private root!: HTMLElement
 
   public constructor(
     private onSelect: (t: string) => void,
@@ -259,10 +259,6 @@ export class TextView {
     }
     this.selection = new TextSelection()
     this.selection.update(el)
-  }
-
-  private get range(): [number, number] | undefined {
-    return this._range
   }
 
   private handleBodyMouseDown = (e: MouseEvent) => {

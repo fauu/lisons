@@ -22,12 +22,12 @@ export class SidebarStore {
   }
 
   @observable public isVisible: boolean = true
-  @observable public isMainTranslationLoading: boolean
+  @observable public isMainTranslationLoading: boolean = false
   @observable.ref public exampleSentences?: IExampleSentences
   @observable public exampleSentencesState: ResourceState = "NotLoading"
   @observable.ref public dictionaryEntries: IDictionaryEntry[] = []
   @observable public dictionaryEntriesState: ResourceState = "NotLoading"
-  @observable public isSettingsTabActive: boolean
+  @observable public isSettingsTabActive: boolean = false
   @observable
   public sources: ISources = {
     mainTranslationSource: SidebarStore.sources.google,
@@ -168,15 +168,17 @@ export class SidebarStore {
     const willDoDeeplTranslation =
       canDoDeeplTranslation && !(willDoGoogleTranslation && !this.isVisible)
 
-    const translationPromises = zip<any>(
+    const translationPromises = (zip<boolean | typeof googleTranslate>(
       [willDoGoogleTranslation, willDoDeeplTranslation],
       [googleTranslate, deeplTranslate]
-    ).map(([condition, func]: [boolean, typeof googleTranslate]) => {
-      if (condition) {
-        return func(phrase, contentLanguage, translationLanguage)
+    ) as Array<[boolean, typeof googleTranslate]>).map(
+      ([condition, func]: [boolean, typeof googleTranslate]) => {
+        if (condition) {
+          return func(phrase, contentLanguage, translationLanguage)
+        }
+        return
       }
-      return
-    })
+    )
 
     return Promise.all(translationPromises) as Promise<TranslationPair>
   }

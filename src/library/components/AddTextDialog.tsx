@@ -34,9 +34,9 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
     contentLanguage: "",
     translationLanguage: ""
   }
-  @observable private isPickingFile: boolean
-  private settingsStore: SettingsStore
-  private addTextDialogStore: AddTextDialogStore
+  @observable private isPickingFile: boolean = false
+  private settingsStore!: SettingsStore
+  private addTextDialogStore!: AddTextDialogStore
 
   public componentWillMount(): void {
     this.settingsStore = this.props.settingsStore
@@ -396,13 +396,19 @@ const TextArea = styled.textarea`
   font: 1em ${fonts.serif};
 `
 
-const FinalFields = styled.div`animation: ${animations.fadeInBottom} ${animations.doubleTime};`
+const FinalFields = styled.div`
+  animation: ${animations.fadeInBottom} ${animations.doubleTime};
+`
 
-const TextInput = styled.input`width: 100%;`
+const TextInput = styled.input`
+  width: 100%;
+`
 
 const Button = styled.button``
 
-const InvalidFileMsg = styled.span`animation: ${animations.fadeInBottom} ${animations.doubleTime};`
+const InvalidFileMsg = styled.span`
+  animation: ${animations.fadeInBottom} ${animations.doubleTime};
+`
 
 const AddTextButton = Button.extend`
   margin-top: 1rem;
@@ -417,7 +423,9 @@ const AddTextButton = Button.extend`
   }
 `
 
-const SelectedFileGroup = styled.span`display: flex;`
+const SelectedFileGroup = styled.span`
+  display: flex;
+`
 
 const SelectedFileName = styled.span`
   margin: 0 0.5rem 0 1rem;

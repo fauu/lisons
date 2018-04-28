@@ -22,7 +22,7 @@ useStrict(true)
 
 @observer
 export class App extends React.Component<{}> {
-  private appStore: AppStore
+  private appStore!: AppStore
 
   public componentWillMount(): void {
     this.appStore = new AppStore()

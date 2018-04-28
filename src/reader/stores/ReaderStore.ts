@@ -11,11 +11,11 @@ export class ReaderStore {
   private static readonly skipLengthElements = 10000
   private static readonly readingProgressFoldThresholdPp = 1.5
 
-  @observable public isTocOpen: boolean
+  @observable public isTocOpen: boolean = false
   @observable.ref public text?: Text
   @observable public readingProgress?: [number, number] | number
   @observable.ref public currentSection?: ITextSectionInfo
-  @observable private _selectedText: string
+  @observable private _selectedText: string = ""
   @observable.ref private _textView?: TextView
   private _sidebarStore: SidebarStore
 
@@ -52,7 +52,7 @@ export class ReaderStore {
       from = 0
       count = targetElementNo + 1
     }
-    await this._textView!.renderPrevPage(this.text!.getTokenizedContentSlice(from, count))
+    await this._textView!.renderPrevPage(this.text!.getTokenizedContentSlice(from, count)!)
     this.setSelectedText("")
     this.updateCurrentSection()
   }
@@ -82,7 +82,7 @@ export class ReaderStore {
       to = text.elementCount - 1
     }
     await this._textView!.renderPage(
-      this.text!.getTokenizedContentSlice(to, ReaderStore.numPreloadedTextElementsPerPage)
+      this.text!.getTokenizedContentSlice(to, ReaderStore.numPreloadedTextElementsPerPage)!
     )
     this.updateCurrentSection()
     this.setSelectedText("")
