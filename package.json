@@ -57,14 +57,17 @@
       "allowToChangeInstallationDirectory": true
     }
   },
+  "resolutions": {
+    "@types/react": "^16.3.13"
+  },
   "devDependencies": {
     "@types/kuromoji": "^0.0.28",
     "@types/lodash": "^4.14.108",
     "@types/node": "^8.9.3",
-    "@types/react": "^16.0.5",
-    "@types/react-css-transition-replace": "^2.1.1",
-    "@types/react-dom": "^15.5.4",
-    "@types/react-hot-loader": "^3.0.4",
+    "@types/react": "^16.3.13",
+    "@types/react-css-transition-replace": "^2.1.2",
+    "@types/react-dom": "^16.0.5",
+    "@types/react-hot-loader": "^4.1.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
     "babel-polyfill": "^6.26.0",
@@ -116,10 +119,10 @@
     "mobx-react": "^4.3.4",
     "mobx-utils": "^3.1.1",
     "react": "^16.3.2",
-    "react-css-transition-replace": "^2.2.1",
+    "react-css-transition-replace": "^3.0.3",
     "react-dom": "^16.3.2",
-    "react-hot-loader": "^3.0.0-beta.7",
-    "styled-components": "^2.1.2",
+    "react-hot-loader": "^4.1.2",
+    "styled-components": "^3.2.6",
     "tslib": "^1.9.0"
   },
   "babel": {

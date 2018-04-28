@@ -7,8 +7,11 @@ import { App } from "~/app/components/App"
 const rootEl = document.getElementById("app")
 const render = () =>
   ReactDOM.render(
+    // @ts-ignore
     <AppContainer>
-      <App />
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
     </AppContainer>,
     rootEl
   )
