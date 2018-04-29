@@ -7,19 +7,21 @@ import { withProps } from "~/util/StyleUtils"
 export interface ISpinnerProps {
   readonly color: string | "Light" | "Dark"
 }
-export const Spinner = ({ color }: ISpinnerProps): JSX.Element => (
-  <SkCubeGrid color={color} className="spinner">
-    <div className="sk-cube sk-cube1" />
-    <div className="sk-cube sk-cube2" />
-    <div className="sk-cube sk-cube3" />
-    <div className="sk-cube sk-cube4" />
-    <div className="sk-cube sk-cube5" />
-    <div className="sk-cube sk-cube6" />
-    <div className="sk-cube sk-cube7" />
-    <div className="sk-cube sk-cube8" />
-    <div className="sk-cube sk-cube9" />
-  </SkCubeGrid>
-)
+export function Spinner({ color }: ISpinnerProps): JSX.Element {
+  return (
+    <SkCubeGrid color={color} className="spinner">
+      <div className="sk-cube sk-cube1" />
+      <div className="sk-cube sk-cube2" />
+      <div className="sk-cube sk-cube3" />
+      <div className="sk-cube sk-cube4" />
+      <div className="sk-cube sk-cube5" />
+      <div className="sk-cube sk-cube6" />
+      <div className="sk-cube sk-cube7" />
+      <div className="sk-cube sk-cube8" />
+      <div className="sk-cube sk-cube9" />
+    </SkCubeGrid>
+  )
+}
 
 const skCubeGridDelay = keyframes`
   0%,
@@ -42,7 +44,9 @@ const SkCubeGrid = withProps<{ color: string }>()(styled.div)`
     background-color: ${p =>
       p.color === "Light"
         ? "rgba(255, 255, 255, 0.5)"
-        : p.color === "Dark" ? "rgba(0, 0, 0, 0.2)" : p.color};
+        : p.color === "Dark"
+          ? "rgba(0, 0, 0, 0.2)"
+          : p.color};
     float: left;
     animation: ${skCubeGridDelay} 1.3s infinite ease-in-out;
   }

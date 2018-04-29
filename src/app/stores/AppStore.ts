@@ -3,7 +3,7 @@ import { action, observable } from "mobx"
 
 import { LibraryStore } from "~/library/stores"
 import { ReaderStore } from "~/reader/stores"
-import { flowed } from "~/util/Flowed"
+import { flowed} from "~/util/MobxUtils"
 
 import { Database } from "~/app/Database"
 import { AppScreen } from "~/app/model"

@@ -4,7 +4,7 @@ import { action, computed, observable } from "mobx"
 import { defaultSettings } from "~/app/data/DefaultSettings"
 import { ISettings } from "~/app/model"
 import { loadSettings, saveSettings } from "~/app/Settings"
-import { flowed } from "~/util/Flowed"
+import { flowed} from "~/util/MobxUtils"
 
 export class SettingsStore {
   @observable.deep private _settings: ISettings = defaultSettings;

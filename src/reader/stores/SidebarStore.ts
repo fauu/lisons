@@ -3,7 +3,7 @@ import { action, observable } from "mobx"
 
 import { IExampleSentences, ILanguage } from "~/app/model"
 import { emphasizePhrase } from "~/util/ExampleSentenceUtils"
-import { flowed } from "~/util/Flowed"
+import { flowed} from "~/util/MobxUtils"
 import { hasSpace } from "~/util/StringUtils"
 
 import { deeplTranslate, isLanguageConfigurationSupportedByDeepl } from "~/reader/DeeplTranslate"

@@ -72,7 +72,9 @@ const SourceLink = styled.span`
   }
 `
 
-const Domain = styled.span`font-weight: bold;`
+const Domain = styled.span`
+  font-weight: bold;
+`
 
 const List = styled.ul`
   width: 100%;

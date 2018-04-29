@@ -1,6 +1,7 @@
 import { ThemedStyledFunction } from "styled-components"
 
 // https://github.com/styled-components/styled-components/issues/630#issuecomment-317277803
+// Probably going to be fixed in 2.9 https://github.com/Microsoft/TypeScript/pull/23430
 export const withProps = <U>() => <P, T, O>(
   fn: ThemedStyledFunction<P, T, O>
   // @ts-ignore

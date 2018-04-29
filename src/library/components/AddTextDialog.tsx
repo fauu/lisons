@@ -183,7 +183,7 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
     const filePath = this.formData.filePath
     const showFinalFields = textFileStatus === "Valid" || pastedContent
     return (
-      <Form unresponsive={isSavingText}>
+      <Form disabled={isSavingText}>
         {isSavingText && (
           <SavingIndicatorOverlay>
             <Spinner color={"Dark"} />
@@ -296,11 +296,11 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
 
 const fieldMargin = "1.3rem"
 
-const Form = withProps<{ unresponsive: boolean }>()(styled.form)`
+const Form = withProps<{ disabled: boolean }>()(styled.form)`
   position: relative;
   margin-top: 1rem;
   font-size: 0.95em;
-  ${p => (p.unresponsive ? "* { pointer-events: none }" : "")}
+  ${p => (p.disabled ? "* { pointer-events: none }" : "")}
 
   input, select, button, textarea {
     display: block;

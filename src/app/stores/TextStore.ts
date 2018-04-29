@@ -2,7 +2,7 @@ import { action, observable, ObservableMap } from "mobx"
 
 import { IParsedText, ITextInfo, ITextProgress, Text } from "~/app/model"
 import { TextRepository } from "~/app/TextRepository"
-import { flowed } from "~/util/Flowed"
+import { flowed} from "~/util/MobxUtils"
 
 export class TextStore {
   public texts: ObservableMap<number, Text> = observable.map<number, Text>(undefined, {

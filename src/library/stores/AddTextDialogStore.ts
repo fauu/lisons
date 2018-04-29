@@ -4,7 +4,7 @@ import { IPromiseBasedObservable } from "mobx-utils"
 
 import { IParsedText } from "~/app/model"
 import { TextStore } from "~/app/stores"
-import { flowed } from "~/util/Flowed"
+import { flowed} from "~/util/MobxUtils"
 import { detectLanguage, getEpubOrPlainContent, isEpub, parseText } from "~/util/TextUtils"
 
 import { FileStatus, IAddTextFormData, IEpubInfo } from "~/library/model"

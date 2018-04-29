@@ -39,6 +39,7 @@ const formModel: FormModelElement[] = [
   ["Translation pop-up text color", "translationTextColor", "color", {}]
 ]
 
+// TODO: Rename to 'StyleCustomizer' or sth?
 export interface ISettingsProps {
   readonly sidebarStore: SidebarStore
   readonly settingsStore: SettingsStore
