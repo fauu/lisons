@@ -1,4 +1,4 @@
-// TODO: Typed import
+// TODO: no-var-require
 // tslint:disable-next-line:no-var-requires
 const kuromoji = require("kuromoji")
 

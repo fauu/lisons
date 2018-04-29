@@ -1,6 +1,11 @@
 import parser from "@gxl/epub-parser"
 import { Epub } from "@gxl/epub-parser/build/types/epubParser"
 import * as franc from "franc-min"
+import * as iconv from "iconv-lite"
+
+// TODO: no-var-require
+// tslint:disable-next-line:no-var-requires
+const jschardet = require("jschardet")
 
 import { IParsedText } from "~/app/model"
 import { fileSize, isText, readFile } from "~/util/FileUtils"
@@ -50,7 +55,7 @@ export const getEpubOrPlainContent = async (path: string): Promise<Epub | string
   } catch (e) {
     const isDataText = data && (await isText(data, await fileSize(path)))
     if (data && isDataText) {
-      return data.toString()
+      return iconv.decode(data, jschardet.detect(data).encoding).toString()
     } else {
       console.error("Error parsing file: ", e)
     }
