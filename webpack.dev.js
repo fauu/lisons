@@ -48,18 +48,24 @@ const mainConfig = merge(common.mainConfig, {
 
 const rendererConfig = merge(common.rendererConfig, {
   mode: mode,
-  entry: [`webpack-dev-server/client?${devServerUrl}`, common.rendererEntry],
+  entry: [
+    `webpack-dev-server/client?${devServerUrl}`,
+    "webpack/hot/only-dev-server",
+    common.rendererEntry
+  ],
   output: {
     publicPath: common.devServerUrl
   },
   plugins: [
+    new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin()
     //new BundleAnalyzerPlugin()
   ],
   devServer: {
     host: devServerHost,
     port: devServerPort,
-    contentBase: path.join(__dirname, "out")
+    contentBase: path.join(__dirname, "out"),
+    hot: true
   }
 })
 

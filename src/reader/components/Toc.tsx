@@ -34,7 +34,7 @@ export function Toc({
                 key={s.startElementNo}
                 isActive={isActive}
                 variant={variant}
-                onClick={!isActive && (() => onSectionLinkClick(s.startElementNo))}
+                onClick={!isActive ? () => onSectionLinkClick(s.startElementNo) : undefined}
               >
                 {s.name}
               </SectionLink>

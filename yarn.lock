@@ -58,9 +58,9 @@
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@types/electron-devtools-installer/-/electron-devtools-installer-2.0.3.tgz#905b9f7d9762fa9bfa5fc87ad6cb81945a0dfc79"
 
-"@types/kuromoji@^0.0.28":
-  version "0.0.28"
-  resolved "https://registry.yarnpkg.com/@types/kuromoji/-/kuromoji-0.0.28.tgz#b31833ee689dbf4be20d7ebdcd3037ce6996a2e2"
+"@types/kuromoji@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@types/kuromoji/-/kuromoji-0.1.0.tgz#c8576688644864afa0c81f4d841a7142ad5293a6"
   dependencies:
     "@types/doublearray" "*"
 

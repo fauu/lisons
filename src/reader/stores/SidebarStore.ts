@@ -135,6 +135,7 @@ export class SidebarStore {
     this.dictionaryEntriesState = value
   }
 
+  @flowed
   private *fetchExampleSentences(
     phrase: string,
     contentLanguage: ILanguage,

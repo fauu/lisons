@@ -52,7 +52,7 @@ export const Sidebar = observer(function _Sidebar({
                 <Message>Select text to show translations</Message>
                 <Sources>
                   {sources.map(([category, source]) => (
-                    <Source>
+                    <Source key={category}>
                       {category}:{" "}
                       <SourceLink onClick={() => shell.openExternal(source.url)}>
                         {source.name}
