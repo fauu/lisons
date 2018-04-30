@@ -14,7 +14,10 @@ const devServerPort = 3000
 const devServerUrl = `http://${devServerHost}:${devServerPort}/`
 
 const templateContent = () => {
-  const scriptTags = `
+  const html = fs.readFileSync(path.resolve(process.cwd(), common.htmlTemplatePath)).toString()
+  const bodyClosingStart = html.indexOf("</body>")
+  return `
+    ${html.substring(0, bodyClosingStart)}
     <script
        type="text/javascript"
        src="${devServerUrl}${common.dllConfig.vendorBundleFilename}">
@@ -23,12 +26,6 @@ const templateContent = () => {
        type="text/javascript"
        src="${devServerUrl}${common.rendererConfig.output.filename}">
     </script>
-  `
-  const html = fs.readFileSync(path.resolve(process.cwd(), common.htmlTemplatePath)).toString()
-  const bodyClosingStart = html.indexOf("</body>")
-  return `
-    ${html.substring(0, bodyClosingStart)}
-    ${scriptTags}
     ${html.substring(bodyClosingStart)}
   `
 }
