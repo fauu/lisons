@@ -11,7 +11,7 @@ export function FadeTransition({ children }: IFadeTransitionProps): JSX.Element 
       transitionEnterTimeout={1000}
       transitionLeaveTimeout={1000}
     >
-      {children}
+      <span>lel</span>
     </ReactCSSTransitionReplace>
   )
 }

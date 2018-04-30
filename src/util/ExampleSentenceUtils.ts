@@ -1,4 +1,5 @@
-import levenshteinDistance = require("~/vendor/natural/LevenshteinDistance")
+// tslint:disable-next-line:no-var-requires
+const levenshteinDistance = require("~/vendor/natural/LevenshteinDistance")
 
 import { ISentenceWithTranslations, LanguageFlag } from "~/app/model"
 

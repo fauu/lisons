@@ -1,4 +1,26 @@
 {
-  "plugins": ["react-hot-loader/babel"],
-  "presets": ["env"]
+  "presets": [
+    [
+      "@babel/env",
+      {
+        "modules": false,
+        "debug": true
+      }
+    ],
+    "@babel/stage-3",
+    "@babel/react",
+    "@babel/typescript"
+  ],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"],
+        "root": ["./src"]
+      }
+    ],
+    ["@babel/plugin-proposal-class-properties", { "loose": true }],
+    ["@babel/plugin-proposal-decorators", { "legacy": true }],
+    "react-hot-loader/babel"
+  ]
 }

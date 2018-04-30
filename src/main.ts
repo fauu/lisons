@@ -1,8 +1,10 @@
 import { app, BrowserWindow } from "electron"
 import installExtension, { MOBX_DEVTOOLS, REACT_DEVELOPER_TOOLS } from "electron-devtools-installer"
-import localShortcut = require("electron-localshortcut")
 import * as path from "path"
 import * as url from "url"
+
+// tslint:disable-next-line:no-var-requires
+const localShortcut = require("electron-localshortcut")
 
 import { colors } from "~/app/data/Style"
 

@@ -31,7 +31,7 @@ const mainConfig = {
     rules: [
       {
         test: /.ts$/,
-        use: ["cache-loader", "babel-loader", "ts-loader"],
+        use: ["cache-loader", "babel-loader"],
         include: srcPath
       }
     ]
@@ -84,16 +84,9 @@ const rendererConfig = {
     new HappyPack({
       id: "ts",
       threads: 2,
-      loaders: [
-        "cache-loader",
-        "babel-loader",
-        {
-          path: "ts-loader",
-          query: { happyPackMode: true }
-        }
-      ]
+      loaders: ["cache-loader", "babel-loader"]
     }),
-    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
+    //new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
     new webpack.NoEmitOnErrorsPlugin()
   ]
 }

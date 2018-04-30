@@ -2,9 +2,10 @@
   "compileOnSave": false,
   "compilerOptions": {
     "lib": ["es7", "dom"],
-    "target": "es6",
+    "target": "esnext",
     "module": "commonjs",
     "moduleResolution": "node",
+    "noEmit": true,
     "pretty": true,
     "newLine": "LF",
     "allowSyntheticDefaultImports": true,

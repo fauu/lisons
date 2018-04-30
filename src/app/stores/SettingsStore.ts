@@ -1,10 +1,12 @@
-import isEqual = require("lodash/isEqual")
 import { action, computed, observable } from "mobx"
+
+// tslint:disable-next-line:no-var-requires
+const isEqual = require("lodash/isEqual")
 
 import { defaultSettings } from "~/app/data/DefaultSettings"
 import { ISettings } from "~/app/model"
 import { loadSettings, saveSettings } from "~/app/Settings"
-import { flowed} from "~/util/MobxUtils"
+import { flowed } from "~/util/MobxUtils"
 
 export class SettingsStore {
   @observable.deep private _settings: ISettings = defaultSettings;

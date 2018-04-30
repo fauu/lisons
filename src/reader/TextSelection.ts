@@ -32,8 +32,8 @@ export class TextSelection {
 
   public update(el: Element): void {
     if (!this._firstElement || !this._lastElement || !this._initialElement) {
-      const no = getElementNo(el)
-      this._initialElement = { no: no!, el }
+      const no = getElementNo(el)!
+      this._initialElement = { no, el }
       this._firstElement = this._initialElement
       this._lastElement = this._initialElement
       this.setSelectedClass(this._initialElement.el, true)
@@ -44,26 +44,26 @@ export class TextSelection {
       return
     }
 
-    const sel = { no: getElementNo(el), el }
-    if (sel.no! < this._firstElement.no) {
+    const sel = { no: getElementNo(el)!, el }
+    if (sel.no < this._firstElement.no) {
       this.trim("End", this._initialElement)
       let currentElement = sel.el
       while (currentElement !== this._firstElement.el) {
         this.setSelectedClass(currentElement, true)
         currentElement = currentElement.nextElementSibling!
       }
-      this._firstElement = { no: sel.no!, el: sel.el }
-    } else if (sel.no! > this._lastElement.no) {
+      this._firstElement = { no: sel.no, el: sel.el }
+    } else if (sel.no > this._lastElement.no) {
       this.trim("Start", this._initialElement)
       let currentElement = sel.el
       while (currentElement !== this._lastElement.el) {
         this.setSelectedClass(currentElement, true)
         currentElement = currentElement.previousElementSibling!
       }
-      this._lastElement = { no: sel.no!, el: sel.el }
+      this._lastElement = { no: sel.no, el: sel.el }
     } else {
-      this.trim(sel.no! < this._initialElement.no ? "Start" : "End", {
-        no: sel.no!,
+      this.trim(sel.no < this._initialElement.no ? "Start" : "End", {
+        no: sel.no,
         el: sel.el
       })
     }
@@ -93,9 +93,12 @@ export class TextSelection {
 
   private forEachElement(f: (el: Element) => void): void {
     let currentElement: Element = this._firstElement!.el
+    let currentElementNo = -1
+    const lastElementNo = this._lastElement!.no
     do {
       f(currentElement)
       currentElement = currentElement.nextElementSibling!
-    } while (getElementNo(currentElement!)! <= this._lastElement!.no)
+      currentElementNo = getElementNo(currentElement)!
+    } while (currentElementNo <= lastElementNo)
   }
 }
