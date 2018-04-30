@@ -3,7 +3,9 @@ const path = require("path")
 const webpack = require("webpack")
 const merge = require("webpack-merge")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
+const CopyWebpackPlugin = require("copy-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
+
 const common = require("./webpack.common")
 
 const mode = "development"
@@ -12,7 +14,11 @@ const devServerPort = 3000
 const devServerUrl = `http://${devServerHost}:${devServerPort}/`
 
 const templateContent = () => {
-  const scriptTag = `
+  const scriptTags = `
+    <script
+       type="text/javascript"
+       src="${devServerUrl}${common.dllConfig.vendorBundleFilename}">
+    </script>
     <script
        type="text/javascript"
        src="${devServerUrl}${common.rendererConfig.output.filename}">
@@ -22,7 +28,7 @@ const templateContent = () => {
   const bodyClosingStart = html.indexOf("</body>")
   return `
     ${html.substring(0, bodyClosingStart)}
-    ${scriptTag}
+    ${scriptTags}
     ${html.substring(bodyClosingStart)}
   `
 }
@@ -57,8 +63,25 @@ const rendererConfig = merge(common.rendererConfig, {
     publicPath: common.devServerUrl
   },
   plugins: [
+    new CopyWebpackPlugin([
+      {
+        from: path.join(
+          __dirname,
+          common.dllConfig.dllRelativePath,
+          common.dllConfig.vendorBundleFilename
+        )
+      }
+    ]),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NamedModulesPlugin()
+    new webpack.NamedModulesPlugin(),
+    new webpack.DllReferencePlugin({
+      context: __dirname,
+      manifest: require(path.join(
+        __dirname,
+        common.dllConfig.dllRelativePath,
+        common.dllConfig.vendorManifestFilename
+      ))
+    })
     //new BundleAnalyzerPlugin()
   ],
   devServer: {

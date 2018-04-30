@@ -14,6 +14,11 @@ const browserIconPath = "./build/icons/128x128.png"
 const browserIconOutFilename = "icon.png"
 const htmlTemplatePath = path.join(srcDirName, "index.html")
 const rendererEntry = "./src/renderer.tsx"
+const dllConfig = {
+  dllRelativePath: "./dll",
+  vendorBundleFilename: "vendor.bundle.js",
+  vendorManifestFilename: "vendor-manifest.json"
+}
 
 const mainConfig = {
   target: "electron-main",
@@ -99,5 +104,6 @@ module.exports = {
   outDirName,
   srcPath,
   htmlTemplatePath,
-  rendererEntry
+  rendererEntry,
+  dllConfig
 }

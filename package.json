@@ -12,9 +12,11 @@
   },
   "main": "out/main.bundle.js",
   "scripts": {
-    "postinstall": "rimraf .cache-loader",
+    "postinstall": "run-s clean-cache webpack:dev.renderer-vendor",
     "clean-out": "rimraf out",
+    "clean-cache": "rimraf .cache-loader",
     "webpack:dev": "webpack --config webpack.dev.js",
+    "webpack:dev.renderer-vendor": "webpack --config webpack.dev.renderer-vendor.js",
     "webpack:prod": "webpack --config webpack.prod.js",
     "build:dev": "run-s clean-out webpack:dev",
     "build:prod": "run-s clean-out webpack:prod",
@@ -123,7 +125,6 @@
     "react": "^16.3.2",
     "react-css-transition-replace": "^3.0.3",
     "react-dom": "^16.3.2",
-    "react-hint": "^3.0.1",
     "react-hot-loader": "^4.1.2",
     "styled-components": "^3.2.6",
     "tslib": "^1.9.0"
