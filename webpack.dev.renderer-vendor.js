@@ -11,6 +11,7 @@ module.exports = {
   },
   entry: {
     library: [
+      "core-js",
       "franc-min",
       "iconv-lite",
       "jschardet",
