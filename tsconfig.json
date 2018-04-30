@@ -1,8 +1,8 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "lib": ["es6", "es2016.array.include", "dom", "dom.iterable"],
-    "target": "es5",
+    "lib": ["es7", "dom"],
+    "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
     "pretty": true,

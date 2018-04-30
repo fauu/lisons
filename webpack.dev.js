@@ -55,6 +55,7 @@ const mainConfig = merge(common.mainConfig, {
 const rendererConfig = merge(common.rendererConfig, {
   mode: mode,
   entry: [
+    "babel-polyfill",
     `webpack-dev-server/client?${devServerUrl}`,
     "webpack/hot/only-dev-server",
     common.rendererEntry

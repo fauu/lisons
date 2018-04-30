@@ -126,8 +126,7 @@
     "react-css-transition-replace": "^3.0.3",
     "react-dom": "^16.3.2",
     "react-hot-loader": "^4.1.2",
-    "styled-components": "^3.2.6",
-    "tslib": "^1.9.0"
+    "styled-components": "^3.2.6"
   },
   "private": true
 }

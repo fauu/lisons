@@ -23,8 +23,7 @@ module.exports = {
       "react",
       "react-css-transition-replace",
       "react-dom",
-      "styled-components",
-      "tslib"
+      "styled-components"
     ]
   },
   output: {
