@@ -44,24 +44,41 @@ export const Header = observer(function _Header({
       )}
       <Actions variant={variant}>
         {sidebarStore.isVisible ? (
-          <>
-            <HideSidebarButton onClick={sidebarStore.hide} />
-            <HeaderButton
-              Icon={ArrowCollapseRightIcon as any}
-              tip={"Hide sidebar"}
-              onClick={sidebarStore.hide}
-            />
-          </>
+          <HeaderButton
+            tip={"Hide sidebar"}
+            Icon={ArrowCollapseRightIcon}
+            onClick={sidebarStore.hide}
+          />
         ) : (
-          <ShowSidebarButton onClick={() => sidebarStore.setVisible()} />
+          <HeaderButton
+            tip={"Show sidebar"}
+            Icon={ArrowExpandLeftIcon}
+            onClick={sidebarStore.setVisible}
+          />
         )}
-        <SettingsButton onClick={sidebarStore.toggleSettings} />
+        <HeaderButton
+          tip={"Customize look"}
+          Icon={FormatFontIcon}
+          onClick={sidebarStore.toggleSettings}
+        />
         {appStore.isFullScreen ? (
-          <FullScreenExitButton onClick={appStore.toggleFullScreen.bind(appStore)} />
+          <HeaderButton
+            tip={"Exit fullscreen mode"}
+            Icon={FullscreenExitIcon}
+            onClick={appStore.toggleFullScreen.bind(appStore)}
+          />
         ) : (
-          <FullScreenButton onClick={appStore.toggleFullScreen.bind(appStore)} />
+          <HeaderButton
+            tip={"Enter fullscreen mode"}
+            Icon={FullscreenIcon}
+            onClick={appStore.toggleFullScreen.bind(appStore)}
+          />
         )}
-        <CloseButton onClick={appStore.showLibraryScreen.bind(appStore)} />
+        <HeaderButton
+          tip={"Exit to library"}
+          Icon={CloseIcon}
+          onClick={appStore.showLibraryScreen.bind(appStore)}
+        />
       </Actions>
     </Root>
   )
@@ -129,30 +146,4 @@ const Actions = withProps<{ variant: UiColorVariant }>()(styled.div)`
   height: 100%;
   align-items: center;
   padding: 0 0.5rem;
-  .mdi-icon {
-    fill-opacity: 0.6;
-    fill: ${p => (p.variant === "Light" ? "#ffffffaa" : "#000000aa")};
-    transition: fill-opacity 0.2s ease;
-  }
-  .mdi-icon:hover {
-    fill-opacity: 0.85;
-  }
 `
-
-const ActionButton = withProps<{ onClick?: any }>()(styled.div)`
-  &:not(:last-child) {
-    margin-right: 0.6rem;
-  }
-`
-// @ts-ignore
-const HideSidebarButton = ActionButton.withComponent(ArrowCollapseRightIcon)
-// @ts-ignore
-const ShowSidebarButton = ActionButton.withComponent(ArrowExpandLeftIcon)
-// @ts-ignore
-const SettingsButton = ActionButton.withComponent(FormatFontIcon)
-// @ts-ignore
-const FullScreenButton = ActionButton.withComponent(FullscreenIcon)
-// @ts-ignore
-const FullScreenExitButton = ActionButton.withComponent(FullscreenExitIcon)
-// @ts-ignore
-const CloseButton = ActionButton.withComponent(CloseIcon)

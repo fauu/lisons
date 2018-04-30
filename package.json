@@ -12,12 +12,13 @@
   },
   "main": "out/main.bundle.js",
   "scripts": {
+    "postinstall": "rimraf .cache-loader",
     "clean-out": "rimraf out",
     "webpack:dev": "webpack --config webpack.dev.js",
     "webpack:prod": "webpack --config webpack.prod.js",
     "build:dev": "run-s clean-out webpack:dev",
     "build:prod": "run-s clean-out webpack:prod",
-    "dev-server": "webpack-dev-server --config webpack.dev.js",
+    "dev-server": "webpack-dev-server --config webpack.dev.js --progress",
     "electron:dev": "cross-env NODE_ENV=dev electron .",
     "dev-server-and-electron": "run-p dev-server electron:dev",
     "dev": "run-s build:dev dev-server-and-electron",
@@ -74,6 +75,7 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-webpack-plugin": "^0.1.1",
+    "cache-loader": "^1.2.2",
     "copy-webpack-plugin": "^4.5.1",
     "cross-env": "^5.1.4",
     "electron": "2.0.0-beta.7",
@@ -125,10 +127,6 @@
     "react-hot-loader": "^4.1.2",
     "styled-components": "^3.2.6",
     "tslib": "^1.9.0"
-  },
-  "babel": {
-    "presets": ["env"],
-    "plugins": ["react-hot-loader/babel"]
   },
   "private": true
 }

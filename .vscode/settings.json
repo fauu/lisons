@@ -1,9 +1,10 @@
 {
   "files.exclude": {
-    "dist": true
+    "dist": true,
+    ".cache-loader": true
   },
   "search.exclude": {
-    "dist": true
+    "src/res": true
   },
   "typescript.tsdk": "node_modules/typescript/lib"
 }

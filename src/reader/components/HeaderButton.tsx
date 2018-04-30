@@ -1,14 +1,16 @@
-// @ts-ignore
 import { debounce } from "lodash"
+import { MdiReactIconComponentType } from "mdi-react"
 import * as React from "react"
-// @ts-ignore
 import styled from "styled-components"
 
 import { withProps } from "~/util/StyleUtils"
 
+import { UiColorVariantContext } from "~/reader/components"
+import { UiColorVariant } from "~/reader/model"
+
 export interface IHeaderButtonProps {
-  readonly Icon: React.ComponentClass<any>
   readonly tip: string
+  readonly Icon: MdiReactIconComponentType
   readonly onClick: () => void
 }
 export interface IHeaderButtonState {
@@ -25,16 +27,21 @@ export class HeaderButton extends React.Component<IHeaderButtonProps, IHeaderBut
 
   public render(): JSX.Element {
     return (
-      <>
-        <Button
-          onClick={this.props.onClick}
-          onMouseOver={debounce(this.handleMouseOver, HeaderButton.tipDelayMs)}
-          onMouseOut={this.handleMouseOut}
-        >
-          <this.props.Icon />
-        </Button>
-        <Tip visible={this.state.isTipVisible}>{this.props.tip}</Tip>
-      </>
+      <UiColorVariantContext.Consumer>
+        {colorVariant => (
+          <>
+            <Button
+              onClick={this.props.onClick}
+              onMouseEnter={debounce(this.handleMouseEnter, HeaderButton.tipDelayMs)}
+              onMouseLeave={this.handleMouseLeave}
+              colorVariant={colorVariant}
+            >
+              <this.props.Icon />
+            </Button>
+            <Tip visible={this.state.isTipVisible}>{this.props.tip}</Tip>
+          </>
+        )}
+      </UiColorVariantContext.Consumer>
     )
   }
 
@@ -47,26 +54,26 @@ export class HeaderButton extends React.Component<IHeaderButtonProps, IHeaderBut
     return nextState.isTipVisible !== this.state.isTipVisible
   }
 
-  private handleMouseOver = () => {
-    console.log("mouse over")
-    if (!this.state.wasTipCancelled) {
-      this.setState({ isTipVisible: true })
-    }
-    this.setState({ wasTipCancelled: false })
+  private handleMouseEnter = () => {
+    this.setState({ isTipVisible: !this.state.wasTipCancelled, wasTipCancelled: false })
   }
 
-  private handleMouseOut = () => {
-    console.log("mouse out")
-    if (!this.state.isTipVisible) {
-      this.setState({ wasTipCancelled: true })
-    }
-    this.setState({ isTipVisible: false })
+  private handleMouseLeave = () => {
+    this.setState({ isTipVisible: false, wasTipCancelled: !this.state.isTipVisible })
   }
 }
 
-const Button = styled.span`
-  * {
-    pointer-events: none;
+const Button = withProps<{ colorVariant: UiColorVariant }>()(styled.span)`
+  &:not(:last-child) {
+    margin-right: 0.6rem;
+  }
+  .mdi-icon {
+    fill-opacity: 0.6;
+    fill: ${p => (p.colorVariant === "Light" ? "#ffffffaa" : "#000000aa")};
+    transition: fill-opacity 0.2s ease;
+  }
+  &:hover .mdi-icon {
+    fill-opacity: 0.85;
   }
 `
 
@@ -75,13 +82,13 @@ const Tip = withProps<{ visible: boolean }>()(styled.span)`
   background-color: #000;
   color: #fff;
   position: absolute;
-  margin-top: 1.3em;
+  margin-top: 2em;
   background: #22222288;
   border: 1px solid #22222244;
   border-radius: 3px;
-  -webkit-backdrop-filter: blur(15px);
   color: #fefefe;
   padding: 0.14em 0.3em;
   -webkit-transition: all 0.2s ease-out;
   display: ${p => (p.visible ? "initial" : "none")};
+  pointer-events: none;
 `

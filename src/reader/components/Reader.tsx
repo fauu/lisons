@@ -10,7 +10,7 @@ import { AppStore, SettingsStore } from "~/app/stores"
 import { formatPercentage } from "~/util/FormatUtils"
 import { hexToRgb, isColorDark, withProps } from "~/util/StyleUtils"
 
-import { Header, Sidebar, Toc } from "~/reader/components"
+import { Header, Sidebar, Toc, UiColorVariantContext } from "~/reader/components"
 import { UiColorVariant } from "~/reader/model"
 import { ReaderStore, SidebarStore } from "~/reader/stores"
 
@@ -85,34 +85,36 @@ export class Reader extends React.Component<IReaderProps> {
           isContentRtl={isRtl}
           areTranslationsRtl={text!.areTranslationsRtl}
         >
-          <Header appStore={this.appStore} variant={variant} />
-          {readingProgress && !isOnlyPage && this.renderTextProgress()}
-          <TextWithNavigation>
-            {isTocOpen && (
-              <Toc
-                sections={text!.structure!}
-                currentSection={currentSection!}
+          <UiColorVariantContext.Provider value={variant}>
+            <Header appStore={this.appStore} variant={variant} />
+            {readingProgress && !isOnlyPage && this.renderTextProgress()}
+            <TextWithNavigation>
+              {isTocOpen && (
+                <Toc
+                  sections={text!.structure!}
+                  currentSection={currentSection!}
+                  variant={variant}
+                  onAnyClick={this.handleTocAnyClick}
+                  onSectionLinkClick={this.handleTocSectionLinkClick}
+                />
+              )}
+              <PrevPageButton
+                visible={isRtl ? !isLastPage : !isFirstPage}
+                onClick={isRtl ? showNextPage : showPrevPage}
                 variant={variant}
-                onAnyClick={this.handleTocAnyClick}
-                onSectionLinkClick={this.handleTocSectionLinkClick}
-              />
-            )}
-            <PrevPageButton
-              visible={isRtl ? !isLastPage : !isFirstPage}
-              onClick={isRtl ? showNextPage : showPrevPage}
-              variant={variant}
-            >
-              <ChevronLeftIcon />
-            </PrevPageButton>
-            <div id="text-view" />
-            <NextPageButton
-              visible={isRtl ? !isFirstPage : !isLastPage}
-              onClick={isRtl ? showPrevPage : showNextPage}
-              variant={variant}
-            >
-              <ChevronRightIcon />
-            </NextPageButton>
-          </TextWithNavigation>
+              >
+                <ChevronLeftIcon />
+              </PrevPageButton>
+              <div id="text-view" />
+              <NextPageButton
+                visible={isRtl ? !isFirstPage : !isLastPage}
+                onClick={isRtl ? showPrevPage : showNextPage}
+                variant={variant}
+              >
+                <ChevronRightIcon />
+              </NextPageButton>
+            </TextWithNavigation>
+          </UiColorVariantContext.Provider>
         </Body>
         {this.sidebarStore.isVisible && (
           <Sidebar sidebarStore={this.sidebarStore} settingsStore={this.settingsStore} />
