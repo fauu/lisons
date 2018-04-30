@@ -1,6 +1,7 @@
 export * from "./ExampleSentenceList"
 export * from "./Dictionary"
 export * from "./Header"
+export * from "./HeaderButton"
 export * from "./Reader"
 export * from "./Settings"
 export * from "./Sidebar"

@@ -1,4 +1,4 @@
-import debounce = require("lodash/debounce")
+import { debounce } from "lodash"
 import { action, observable, reaction } from "mobx"
 import { observer } from "mobx-react"
 import * as React from "react"

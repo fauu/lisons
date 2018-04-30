@@ -1,3 +1,7 @@
+// TODO:
+//   - Migrate components away from componentWillMount:
+//     https://github.com/mobxjs/mobx-react/issues/447
+
 import { configure } from "mobx"
 import { observer } from "mobx-react"
 import * as React from "react"
@@ -136,9 +140,9 @@ const Wrapper = styled.div`
     opacity: 1;
     transition: opacity ${animations.stdTime} ease-in ${animations.stdTime};
   }
-  .fade-wait-height {
+  /* .fade-wait-height {
     transition: height ${animations.stdTime} ease-in-out;
-  }
+  } */
 
   :not(input):not(textarea),
   :not(input):not(textarea):hover,

@@ -15,6 +15,7 @@ import { animations } from "~/app/data/Style"
 import { AppStore } from "~/app/stores"
 import { withProps } from "~/util/StyleUtils"
 
+import { HeaderButton } from "~/reader/components"
 import { UiColorVariant } from "~/reader/model"
 
 export interface IHeaderProps {
@@ -43,7 +44,14 @@ export const Header = observer(function _Header({
       )}
       <Actions variant={variant}>
         {sidebarStore.isVisible ? (
-          <HideSidebarButton onClick={sidebarStore.hide} />
+          <>
+            <HideSidebarButton onClick={sidebarStore.hide} />
+            <HeaderButton
+              Icon={ArrowCollapseRightIcon as any}
+              tip={"Hide sidebar"}
+              onClick={sidebarStore.hide}
+            />
+          </>
         ) : (
           <ShowSidebarButton onClick={() => sidebarStore.setVisible()} />
         )}
