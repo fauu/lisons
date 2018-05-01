@@ -1,10 +1,12 @@
-import { Epub } from "@gxl/epub-parser/build/types/epubParser"
+// import { Epub } from "@gxl/epub-parser/build/types/epubParser"
 import { action, computed, observable, reaction } from "mobx"
 import { IPromiseBasedObservable } from "mobx-utils"
 
+import { IEpub } from "~/vendor/epub-parser/EpubParser"
+
 import { IParsedText } from "~/app/model"
 import { TextStore } from "~/app/stores"
-import { flowed} from "~/util/MobxUtils"
+import { flowed } from "~/util/MobxUtils"
 import { detectLanguage, getEpubOrPlainContent, isEpub, parseText } from "~/util/TextUtils"
 
 import { FileStatus, IAddTextFormData, IEpubInfo } from "~/library/model"
@@ -12,7 +14,7 @@ import { FileStatus, IAddTextFormData, IEpubInfo } from "~/library/model"
 export class AddTextDialogStore {
   private static readonly languageDetectionSampleLength = 5000
 
-  @observable.ref public fileContent?: Epub | string
+  @observable.ref public fileContent?: IEpub | string
   @observable public pastedContent?: string
   @observable public detectedLanguage?: string | undefined
   @observable public isProcessingFile: boolean = false
@@ -55,9 +57,9 @@ export class AddTextDialogStore {
   }
 
   @flowed
-  public *processFile(path: string): IterableIterator<Promise<string | Epub>> {
+  public *processFile(path: string): IterableIterator<Promise<string | IEpub>> {
     this.setProcessingFile(true)
-    const epubOrPlainContent: string | Epub = yield getEpubOrPlainContent(path)
+    const epubOrPlainContent: string | IEpub = yield getEpubOrPlainContent(path)
     this.fileContent = epubOrPlainContent
     this.parsedText = parseText(
       epubOrPlainContent,
@@ -101,8 +103,11 @@ export class AddTextDialogStore {
   public get loadedEpubInfo(): IEpubInfo | undefined {
     const maybeEpub = this.fileContent
     if (maybeEpub && isEpub(maybeEpub)) {
-      const epub = maybeEpub as Epub
-      return { author: epub.info.author, title: epub.info.title }
+      const epub = maybeEpub as IEpub
+      return {
+        author: epub.author ? epub.author : "",
+        title: epub.title ? epub.title : ""
+      }
     }
     return undefined
   }

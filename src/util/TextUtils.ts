@@ -1,16 +1,16 @@
 // import parser from "@gxl/epub-parser"
-import { Epub } from "@gxl/epub-parser/build/types/epubParser"
+// import { Epub } from "@gxl/epub-parser/build/types/epubParser"
 import * as franc from "franc-min"
 import * as iconv from "iconv-lite"
 
-import { EpubParser } from "~/vendor/epub-parser/EpubParser"
+import { EpubParser, IEpub } from "~/vendor/epub-parser/EpubParser"
 
 import jschardet = require("jschardet")
 
 import { IParsedText } from "~/app/model"
 import { fileSize, isText, readFile } from "~/util/FileUtils"
 
-export const isEpub = (maybeEpub: any): boolean => maybeEpub && maybeEpub.hasOwnProperty("info")
+export const isEpub = (maybeEpub: any): boolean => maybeEpub && maybeEpub.hasOwnProperty("content")
 
 export const detectLanguage = (input: string): string | undefined => {
   const lang = franc(input)
@@ -23,37 +23,46 @@ const stripHtml = (input: string): string => {
   return div.textContent || ""
 }
 
-export const parseText = (epubOrPlainContent: Epub | string, sampleLength: number): IParsedText => {
+export const parseText = (
+  epubOrPlainContent: IEpub | string,
+  sampleLength: number
+): IParsedText => {
   if (isEpub(epubOrPlainContent)) {
-    const epub = epubOrPlainContent as Epub
+    const epub = epubOrPlainContent as IEpub
 
-    let sample = ""
-    const sections = epub.sections.map(s => {
-      const structureEntry = (epub.structure as any[]).find(el => el.sectionId === s.id)
-      let name
-      if (structureEntry) {
-        name = structureEntry.name
-      }
-      const text = stripHtml(s.htmlString)
-      if (sample.length < sampleLength) {
-        sample += text
-      }
-      return { id: s.id, name, content: text }
-    })
+    // let sample = ""
+    // const sections = epub.sections.map(s => {
+    //   const structureEntry = (epub.structure as any[]).find(el => el.sectionId === s.id)
+    //   let name
+    //   if (structureEntry) {
+    //     name = structureEntry.name
+    //   }
+    //   const text = stripHtml(s.htmlString)
+    //   if (sample.length < sampleLength) {
+    //     sample += text
+    //   }
+    //   return { id: s.id, name, content: text }
+    // })
+    // return { sections, sample: sample.substr(0, sampleLength) }
 
-    return { sections, sample: sample.substr(0, sampleLength) }
+    return {
+      content: stripHtml(epub.content),
+      sample: epub.content.substr(0, sampleLength)
+    }
   }
   const content = epubOrPlainContent as string
-  return { content, sample: content.substr(0, sampleLength) }
+  return {
+    content,
+    sample: content.substr(0, sampleLength)
+  }
 }
 
-export const getEpubOrPlainContent = async (path: string): Promise<Epub | string> => {
+export const getEpubOrPlainContent = async (path: string): Promise<IEpub | string> => {
   let data: Buffer | undefined
   try {
     data = await readFile(path)
-    // return await parser(data!, { type: "buffer" })
-    await testEpubParser(data!)
-    data = undefined
+    const epub = await EpubParser.fromBuffer(data!)
+    return epub ? epub : ""
   } catch (e) {
     const isDataText = data && (await isText(data, await fileSize(path)))
     if (data && isDataText) {
@@ -63,9 +72,4 @@ export const getEpubOrPlainContent = async (path: string): Promise<Epub | string
     }
   }
   return ""
-}
-
-const testEpubParser = async (buffer: Buffer) => {
-  const epub = await EpubParser.fromBuffer(buffer)
-  console.log(epub)
 }
