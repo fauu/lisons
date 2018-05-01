@@ -8,7 +8,8 @@ import jschardet = require("jschardet")
 
 import { fileSize, isText, readFile } from "~/util/FileUtils"
 
-export const isEpub = (maybeEpub: any): boolean => maybeEpub && maybeEpub.hasOwnProperty("content")
+export const isEpub = (maybeEpub: any): boolean =>
+  maybeEpub && maybeEpub.hasOwnProperty("markedContent")
 
 export const detectLanguage = (input: string): string | undefined => {
   const lang = franc(input)
@@ -20,7 +21,7 @@ export const getEpubOrPlainContent = async (path: string): Promise<IEpub | strin
   try {
     data = await readFile(path)
     const epub = await epubFromBuffer(data!)
-    return epub ? "" : ""
+    return epub || ""
   } catch (e) {
     const isDataText = data && (await isText(data, await fileSize(path)))
     if (data && isDataText) {
@@ -35,6 +36,6 @@ export const getEpubOrPlainContent = async (path: string): Promise<IEpub | strin
   return ""
 }
 
-export const takeSample = (text: string, length: number) => {
-  return text.substr(0, length)
+export const takeSample = (rawTextContent: string, length: number) => {
+  return rawTextContent.substr(0, length)
 }

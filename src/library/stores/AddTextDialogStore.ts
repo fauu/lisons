@@ -61,11 +61,13 @@ export class AddTextDialogStore {
     this.setProcessingFile(true)
     const epubOrPlainContent: string | IEpub = yield getEpubOrPlainContent(path)
     this.fileContent = epubOrPlainContent
-    const content = isEpub(epubOrPlainContent)
-      ? (epubOrPlainContent as IEpub).content
+    const isEpubResult = isEpub(epubOrPlainContent)
+    const content = isEpubResult
+      ? (epubOrPlainContent as IEpub).markedContent
       : (epubOrPlainContent as string)
     this.parsedText = {
       content,
+      sectionNames: isEpubResult ? (epubOrPlainContent as IEpub).sectionNames : undefined,
       sample: takeSample(content, AddTextDialogStore.languageDetectionSampleLength)
     }
     this.detectedLanguage = detectLanguage(this.parsedText!.sample)

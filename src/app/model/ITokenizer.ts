@@ -1,5 +1,6 @@
 import { ITokenizedTextContent } from "~/app/model"
 
+// TODO: Move to app/tokenization?
 export interface ITokenizer {
-  tokenize: (text: string, options?: any) => Promise<ITokenizedTextContent>
+  tokenize: (rawTextContent: string, options?: any) => Promise<[ITokenizedTextContent, number[]]>
 }

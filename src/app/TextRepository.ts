@@ -1,3 +1,5 @@
+import { zip } from "lodash"
+
 import { languageFromCode6393 } from "~/util/LanguageUtils"
 import { firstNWords } from "~/util/StringUtils"
 
@@ -9,8 +11,7 @@ import {
   ITextProgress,
   ITextSectionInfo,
   ITokenizedTextContent,
-  Text,
-  TextTokenType
+  Text
 } from "~/app/model"
 import { tokenize } from "~/app/tokenization"
 
@@ -26,6 +27,7 @@ export class TextRepository {
       parsedText,
       languageFromCode6393(text.contentLanguage)!
     )
+    console.log(structure)
 
     return this.db.transaction("rw", this.db.texts, this.db.textContents, async () => {
       const textId = await this.db.texts.put(text)
@@ -105,25 +107,20 @@ export class TextRepository {
     parsedText: IParsedText,
     language: ILanguage
   ): Promise<[ITextSectionInfo[] | undefined, ITokenizedTextContent]> {
-    if (parsedText.sections) {
-      const types: TextTokenType[] = []
-      const values: string[] = []
-      const structure: ITextSectionInfo[] = []
-      let sectionFirstElementNo = 0
-      for (const section of parsedText.sections) {
-        if (section.name) {
-          structure.push({
-            name: section.name,
-            startElementNo: sectionFirstElementNo
+    const [tokenizedContent, sectionStartElementNos] = await tokenize(parsedText.content, language)
+    if (parsedText.sectionNames) {
+      if (parsedText.sectionNames.length !== sectionStartElementNos.length) {
+        console.warn("'sectionNames' and 'sectionStartIndices' length mismatch")
+      } else {
+        const textSectionInfos = zip(parsedText.sectionNames, sectionStartElementNos).map(
+          ([name, startElementNo]) => ({
+            name,
+            startElementNo
           })
-        }
-        const tokenizedContent = await tokenize(section.content, language)
-        types.push(...tokenizedContent.types)
-        values.push(...tokenizedContent.values)
-        sectionFirstElementNo += tokenizedContent.types.length
+        )
+        return [textSectionInfos as ITextSectionInfo[], tokenizedContent]
       }
-      return [structure, { types, values, startNo: 0 }]
     }
-    return [undefined, await tokenize(parsedText.content!, language)]
+    return [undefined, tokenizedContent]
   }
 }

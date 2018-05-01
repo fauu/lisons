@@ -61,18 +61,16 @@ export const epubFromBuffer = async (buffer: Buffer): Promise<IEpub | undefined>
   console.log("TOC:", toc)
 
   const filesWithContent = await getFilesWithContent(archive, opfManifest, opfSpine, itemsDir)
-  const content = stripHtml(await getRawMarkedContent(filesWithContent, toc))
-
-  console.log(content.substr(0, 20000))
-  // if (content === "") {
-  //   throw new Error("EPUB has no text content")
-  // }
+  const markedContent = stripHtml(await getRawMarkedContent(filesWithContent, toc))
+  if (markedContent === "") {
+    throw new Error("Parsed EPUB has no text content")
+  }
 
   return {
     author: opfMetadata.creator,
     title: opfMetadata.title,
     sectionNames: toc ? toc.map(e => e.label) : undefined,
-    content
+    markedContent
   }
 }
 
@@ -265,14 +263,13 @@ const getRawMarkedContent = async (
   filesWithContent: IFileWithContent[],
   toc?: ITocEntry[]
 ): Promise<string> => {
-  let currentSectionMarkerId = 0
   return filesWithContent
     .map(file => {
       let fileContent = file.content
       if (toc) {
         const tocItems = toc.filter(item => item.contentFilePath === file.path)
         tocItems.forEach(tocItem => {
-          const marker = ` [####SEC${currentSectionMarkerId}] `
+          const marker = " {####SECTIONSTART} "
           if (!tocItem.contentFragmentId) {
             fileContent = marker + fileContent
           } else {
@@ -295,7 +292,6 @@ const getRawMarkedContent = async (
               marker +
               fileContent.substr(tagClosingIdx + 2)
           }
-          currentSectionMarkerId++
         })
       }
       return fileContent

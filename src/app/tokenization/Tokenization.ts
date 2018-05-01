@@ -43,8 +43,8 @@ const getTokenizer = (language: ILanguage): ITokenizer => {
 }
 
 export const tokenize = async (
-  text: string,
+  rawTextContent: string,
   language: ILanguage
-): Promise<ITokenizedTextContent> => {
-  return getTokenizer(language).tokenize(text, languageOpts.get(language.code6393))
+): Promise<[ITokenizedTextContent, number[]]> => {
+  return getTokenizer(language).tokenize(rawTextContent, languageOpts.get(language.code6393))
 }
