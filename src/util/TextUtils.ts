@@ -1,11 +1,11 @@
-import parser from "@gxl/epub-parser"
+// import parser from "@gxl/epub-parser"
 import { Epub } from "@gxl/epub-parser/build/types/epubParser"
 import * as franc from "franc-min"
 import * as iconv from "iconv-lite"
 
-// TODO: no-var-require
-// tslint:disable-next-line:no-var-requires
-const jschardet = require("jschardet")
+import { EpubParser } from "~/vendor/epub-parser/EpubParser"
+
+import jschardet = require("jschardet")
 
 import { IParsedText } from "~/app/model"
 import { fileSize, isText, readFile } from "~/util/FileUtils"
@@ -51,7 +51,9 @@ export const getEpubOrPlainContent = async (path: string): Promise<Epub | string
   let data: Buffer | undefined
   try {
     data = await readFile(path)
-    return await parser(data!, { type: "buffer" })
+    // return await parser(data!, { type: "buffer" })
+    await testEpubParser(data!)
+    data = undefined
   } catch (e) {
     const isDataText = data && (await isText(data, await fileSize(path)))
     if (data && isDataText) {
@@ -61,4 +63,9 @@ export const getEpubOrPlainContent = async (path: string): Promise<Epub | string
     }
   }
   return ""
+}
+
+const testEpubParser = async (buffer: Buffer) => {
+  const epub = await EpubParser.fromBuffer(buffer)
+  console.log(epub)
 }

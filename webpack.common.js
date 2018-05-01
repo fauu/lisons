@@ -93,7 +93,7 @@ const rendererConfig = {
         }
       ]
     }),
-    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true, watch: ["./src"] }),
     new webpack.NoEmitOnErrorsPlugin()
   ]
 }
