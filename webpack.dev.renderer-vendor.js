@@ -13,8 +13,6 @@ module.exports = {
     library: [
       "core-js",
       "franc-min",
-      "iconv-lite",
-      "jschardet",
       "kuromoji",
       "lodash",
       "mdi-react",

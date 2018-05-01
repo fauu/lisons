@@ -1,13 +1,12 @@
-// import { Epub } from "@gxl/epub-parser/build/types/epubParser"
 import { action, computed, observable, reaction } from "mobx"
 import { IPromiseBasedObservable } from "mobx-utils"
 
-import { IEpub } from "~/vendor/epub-parser/EpubParser"
+import { IEpub } from "~/vendor/epub-parser"
 
 import { IParsedText } from "~/app/model"
 import { TextStore } from "~/app/stores"
 import { flowed } from "~/util/MobxUtils"
-import { detectLanguage, getEpubOrPlainContent, isEpub, parseText } from "~/util/TextUtils"
+import { detectLanguage, getEpubOrPlainContent, isEpub, takeSample } from "~/util/TextUtils"
 
 import { FileStatus, IAddTextFormData, IEpubInfo } from "~/library/model"
 
@@ -36,9 +35,10 @@ export class AddTextDialogStore {
       return
     }
     this.setSavingText(true)
-    const parsedText =
-      this.parsedText ||
-      parseText(this.pastedContent!, AddTextDialogStore.languageDetectionSampleLength)
+    const parsedText = this.parsedText || {
+      content: this.pastedContent!,
+      sample: takeSample(this.pastedContent!, AddTextDialogStore.languageDetectionSampleLength)
+    }
     yield this.textStore.add(
       {
         title: formData.title,
@@ -61,10 +61,13 @@ export class AddTextDialogStore {
     this.setProcessingFile(true)
     const epubOrPlainContent: string | IEpub = yield getEpubOrPlainContent(path)
     this.fileContent = epubOrPlainContent
-    this.parsedText = parseText(
-      epubOrPlainContent,
-      AddTextDialogStore.languageDetectionSampleLength
-    )
+    const content = isEpub(epubOrPlainContent)
+      ? (epubOrPlainContent as IEpub).content
+      : (epubOrPlainContent as string)
+    this.parsedText = {
+      content,
+      sample: takeSample(content, AddTextDialogStore.languageDetectionSampleLength)
+    }
     this.detectedLanguage = detectLanguage(this.parsedText!.sample)
     this.isProcessingFile = false
   }
@@ -145,7 +148,9 @@ export class AddTextDialogStore {
 
   private handlePastedContentChange = (content?: string): void => {
     this.setParsedText(
-      content ? parseText(content, AddTextDialogStore.languageDetectionSampleLength) : undefined
+      content
+        ? { content, sample: takeSample(content, AddTextDialogStore.languageDetectionSampleLength) }
+        : undefined
     )
   }
 
