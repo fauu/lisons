@@ -12,7 +12,7 @@ export const getUserDataPath = (): string => {
   return remote.app.getPath("userData")
 }
 
-export const readFile = (path: string): Promise<any> =>
+export const readFile = (path: string): Promise<Buffer> =>
   new Promise<any>((resolve, reject) => {
     fs.readFile(path, (err, data) => {
       if (err) {

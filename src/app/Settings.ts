@@ -11,7 +11,7 @@ export const loadSettings = async (): Promise<ISettings> => {
   const filePath = path.join(getUserDataPath(), fileName)
   let rawSettings
   try {
-    rawSettings = await readFile(filePath)
+    rawSettings = (await readFile(filePath)).toString()
     return JSON.parse(rawSettings)
   } catch (e) {
     saveSettings(defaultSettings)

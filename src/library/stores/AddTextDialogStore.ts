@@ -31,14 +31,10 @@ export class AddTextDialogStore {
 
   @flowed
   public *saveText(formData: IAddTextFormData): IterableIterator<Promise<void>> {
-    if (!this.fileContent && !this.pastedContent) {
+    if (!this.parsedText) {
       return
     }
     this.setSavingText(true)
-    const parsedText = this.parsedText || {
-      content: this.pastedContent!,
-      sample: takeSample(this.pastedContent!, AddTextDialogStore.languageDetectionSampleLength)
-    }
     yield this.textStore.add(
       {
         title: formData.title,
@@ -48,7 +44,7 @@ export class AddTextDialogStore {
         contentLanguage: formData.contentLanguage,
         translationLanguage: formData.translationLanguage
       },
-      parsedText
+      this.parsedText
     )
     this.pastedContent = undefined
     this.fileContent = undefined

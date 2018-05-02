@@ -68,12 +68,12 @@ app.on("ready", () => {
 app.on("browser-window-created", (_, win) => {
   if (isDev) {
     if (installDevExtensions) {
-      installExtension(REACT_DEVELOPER_TOOLS.id)
-        .then((name: any) => console.log(`Added Extension: ${name}`))
-        .catch((err: any) => console.log("An error occurred: ", err))
-      installExtension(MOBX_DEVTOOLS.id)
-        .then((name: any) => console.log(`Added Extension: ${name}`))
-        .catch((err: any) => console.log("An error occurred: ", err))
+      const extensionIds = [MOBX_DEVTOOLS.id, REACT_DEVELOPER_TOOLS.id]
+      Promise.all(extensionIds.map(id => installExtension(id)))
+        .then(extensionNames => console.log("Installed dev extensions:", extensionNames.join(", ")))
+        .catch(err =>
+          console.log("An error occured during the installation of dev extensions", err)
+        )
     }
     openDevTools(win)
   }

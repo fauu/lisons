@@ -43,6 +43,7 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
     this.addTextDialogStore = this.props.addTextDialogStore
   }
 
+  // TODO: See if disposers should be used for some of these and other reactions and autoruns
   public componentDidMount(): void {
     this.clearForm()
     reaction(
