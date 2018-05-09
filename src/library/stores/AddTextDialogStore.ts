@@ -1,6 +1,6 @@
 import * as iconv from "iconv-lite"
 import jschardet = require("jschardet")
-import { action, observable, reaction } from "mobx"
+import { action, computed, observable, reaction } from "mobx"
 import { IPromiseBasedObservable } from "mobx-utils"
 
 import { ILanguage } from "~/app/model"
@@ -8,7 +8,7 @@ import { fileSize, isBufferText, readFile } from "~/util/FileUtils"
 import { flowed } from "~/util/MobxUtils"
 import { detectLanguage } from "~/util/TextUtils"
 
-import { FileStatus, IAddTextFormData, IBookFileMetadata } from "~/library/model"
+import { IAddTextFormData, ITextFileMetadata, TextFileStatus } from "~/library/model"
 import { languageFromCodeGt } from "~/util/LanguageUtils"
 import { loadMetadata } from "~/vendor/epub-parser/EpubParser"
 import { isUtf8 } from "~/vendor/is-utf8"
@@ -16,82 +16,81 @@ import { isUtf8 } from "~/vendor/is-utf8"
 export class AddTextDialogStore {
   private static readonly languageDetectionSampleLength = 5000
 
-  @observable public plainContent?: string
-  @observable public detectedLanguage?: ILanguage
-  @observable public bookFileMetadata?: IBookFileMetadata
-  @observable public isLanguageConfigurationInvalid: boolean = false
+  @observable public detectedTextLanguage?: ILanguage
+  @observable public isLanguageConfigurationValid: boolean = true
   @observable public isSavingText: boolean = false
-  @observable public fileStatus: FileStatus = "NotSelected"
+  @observable public textFileMetadata?: ITextFileMetadata
+
   public tatoebaTranslationCount?: IPromiseBasedObservable<number>
 
+  @observable private isProcessingTextFile: boolean = false
+  @observable private pastedText?: string
+  @observable private textFileBuffer?: Buffer
+
+  private textFilePlaintext?: string
+
   public constructor() {
-    reaction(() => this.plainContent, content => this.handlePlainContentChange(content), {
+    reaction(() => this.pastedText, text => this.handlePastedTextChange(text), {
       delay: 1000
     })
-    reaction(() => this.bookFileMetadata, metadata => this.handleBookFileMetadataChange(metadata))
+    reaction(() => this.textFileMetadata, metadata => this.handleTextFileMetadataChange(metadata))
+  }
+
+  @computed
+  public get textFileStatus(): TextFileStatus {
+    if (this.isProcessingTextFile) {
+      return "Processing"
+    } else if (!this.textFileBuffer) {
+      return "NotSelected"
+    } else if (!this.textFileMetadata) {
+      return "Invalid"
+    } else {
+      return "Valid"
+    }
   }
 
   @flowed
-  // @ts-ignore
   public *saveText(formData: IAddTextFormData): IterableIterator<Promise<void>> {
-    this.setSavingText(true)
+    this.isSavingText = true
     console.log("saveText()", {
       title: formData.title,
       author: formData.author,
       contentLanguage: formData.contentLanguage,
       translationLanguage: formData.translationLanguage,
-      plainContent: this.plainContent
+      pastedContent: this.pastedText,
+      textFileBuffer: this.textFileBuffer,
+      textFilePlaintext: this.textFilePlaintext
     })
-    // yield this.textStore.add(
-    //   {
-    //     title: formData.title,
-    //     author: formData.author,
-    //     progressElementNo: 0,
-    //     progressPercentage: 0,
-    //     contentLanguage: formData.contentLanguage,
-    //     translationLanguage: formData.translationLanguage
-    //   },
-    //   this.parsedText
-    // )
-    this.discardTextToAdd()
+    this.discardText()
     this.isSavingText = false
   }
 
   @flowed
   public *processFile(path: string): IterableIterator<Promise<any>> {
-    this.setFileStatus("Processing")
-
-    let data: Buffer | undefined
+    this.isProcessingTextFile = true
     try {
-      data = yield readFile(path)
-      if (data) {
-        this.bookFileMetadata = yield loadMetadata(data)
-        this.setFileStatus("Valid")
-      } else {
-        this.setFileStatus("Invalid")
+      this.textFileBuffer = yield readFile(path)
+      if (this.textFileBuffer) {
+        this.textFileMetadata = yield loadMetadata(this.textFileBuffer)
       }
+      this.isProcessingTextFile = false
       return
     } catch (_) {
       // skip
     }
-    const isDataText = data ? yield isBufferText(data, yield fileSize(path)) : false
-    if (data && isDataText) {
-      this.plainContent = isUtf8(data)
-        ? data.toString()
-        : iconv.decode(data, jschardet.detect(data).encoding).toString()
-      this.setFileStatus("Valid")
-    } else {
-      this.setFileStatus("Invalid")
+    const isFilePlaintext = this.textFileBuffer
+      ? yield isBufferText(this.textFileBuffer, yield fileSize(path))
+      : false
+    if (this.textFileBuffer && isFilePlaintext) {
+      this.textFilePlaintext = isUtf8(this.textFileBuffer)
+        ? this.textFileBuffer.toString()
+        : iconv
+            .decode(this.textFileBuffer, jschardet.detect(this.textFileBuffer).encoding)
+            .toString()
+      this.textFileMetadata = {}
     }
+    this.isProcessingTextFile = false
     return
-  }
-
-  public handleSelectedFilePathChange(filePath: string): void {
-    if (filePath) {
-      this.processFile(filePath)
-    } else {
-      this.discardTextToAdd()
-    }
   }
 
   @action
@@ -99,45 +98,48 @@ export class AddTextDialogStore {
     ILanguage,
     ILanguage
   ]): void {
-    this.isLanguageConfigurationInvalid = contentLanguage === translationLanguage
-    // this.tatoebaTranslationCount = this.isLanguageConfigurationInvalid
-    //   ? undefined
-    //   : fromPromise(getSentenceCount(contentLanguage, translationLanguage))
+    this.isLanguageConfigurationValid = contentLanguage.code6393 !== translationLanguage.code6393
+    // this.tatoebaTranslationCount = this.isLanguageConfigurationValid
+    //   ? fromPromise(getSentenceCount(contentLanguage, translationLanguage))
+    //   : undefined
   }
 
   @action
-  public discardTextToAdd(): void {
-    this.plainContent = undefined
-    this.detectedLanguage = undefined
-    this.bookFileMetadata = undefined
-    this.fileStatus = "NotSelected"
+  public discardText(): void {
+    this.detectedTextLanguage = undefined
+    this.isProcessingTextFile = false
+    this.pastedText = undefined
+    this.textFileBuffer = undefined
+    this.textFileMetadata = undefined
   }
 
   @action
-  public setPlainContent(value?: string): void {
-    this.plainContent = value
+  public setPastedText(value?: string): void {
+    this.pastedText = value
   }
 
-  @action
-  private setFileStatus(value: FileStatus): void {
-    this.fileStatus = value
+  public handleSelectedFilePathChange(filePath: string): void {
+    if (filePath) {
+      this.processFile(filePath)
+    } else {
+      this.discardText()
+    }
   }
 
-  @action
-  private setSavingText(value: boolean): void {
-    this.isSavingText = value
-  }
-
-  private handlePlainContentChange = (content?: string): void => {
-    this.detectedLanguage =
+  private handlePastedTextChange = (content?: string): void => {
+    this.detectedTextLanguage =
       content && content !== ""
         ? detectLanguage(content.substr(0, AddTextDialogStore.languageDetectionSampleLength))
         : undefined
   }
 
-  private handleBookFileMetadataChange(metadata: IBookFileMetadata | undefined): void {
+  private handleTextFileMetadataChange(metadata: ITextFileMetadata | undefined): void {
     if (metadata && metadata.language) {
-      this.detectedLanguage = languageFromCodeGt(metadata.language.substr(0, 2))
+      this.detectedTextLanguage = languageFromCodeGt(metadata.language.substr(0, 2))
+    } else if (this.textFilePlaintext) {
+      this.detectedTextLanguage = detectLanguage(
+        this.textFilePlaintext.substr(0, AddTextDialogStore.languageDetectionSampleLength)
+      )
     }
   }
 }

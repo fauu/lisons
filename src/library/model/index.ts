@@ -1,3 +1,3 @@
-export * from "./FileStatus"
+export * from "./TextFileStatus"
 export * from "./IAddTextFormData"
-export * from "./IBookFileMetadata"
+export * from "./ITextFileMetadata"

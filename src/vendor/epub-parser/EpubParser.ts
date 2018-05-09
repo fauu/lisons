@@ -3,7 +3,7 @@
 import * as zip from "jszip"
 import * as path from "path"
 
-import { IBookFileMetadata } from "~/library/model"
+import { ITextFileMetadata } from "~/library/model"
 
 import { IEpub } from "~/vendor/epub-parser"
 
@@ -42,7 +42,7 @@ interface ITocEntry {
   contentFragmentId?: string
 }
 
-export const loadMetadata = async (buffer: Buffer): Promise<IBookFileMetadata> => {
+export const loadMetadata = async (buffer: Buffer): Promise<ITextFileMetadata> => {
   const archive = await zip.loadAsync(buffer)
 
   const opfPath = await getOpfPath(archive)
