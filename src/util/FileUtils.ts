@@ -42,7 +42,7 @@ export const fileSize = (path: string): Promise<number> =>
     })
   })
 
-export const isText = (data: Buffer, size: number): Promise<boolean> =>
+export const isBufferText = (data: Buffer, size: number): Promise<boolean> =>
   new Promise<boolean>((resolve, _) => {
     isBinaryFile(data, size, (err: Error, result: boolean) => {
       resolve(!err && !result)

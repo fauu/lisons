@@ -1,87 +1,103 @@
-import { action, computed, observable, reaction } from "mobx"
+import * as iconv from "iconv-lite"
+import jschardet = require("jschardet")
+import { action, observable, reaction } from "mobx"
 import { IPromiseBasedObservable } from "mobx-utils"
 
-import { IEpub } from "~/vendor/epub-parser"
-
-import { IParsedText } from "~/app/model"
-import { TextStore } from "~/app/stores"
+import { ILanguage } from "~/app/model"
+import { fileSize, isBufferText, readFile } from "~/util/FileUtils"
 import { flowed } from "~/util/MobxUtils"
-import { detectLanguage, getEpubOrPlainContent, isEpub, takeSample } from "~/util/TextUtils"
+import { detectLanguage } from "~/util/TextUtils"
 
-import { FileStatus, IAddTextFormData, IEpubInfo } from "~/library/model"
+import { FileStatus, IAddTextFormData, IBookFileMetadata } from "~/library/model"
+import { languageFromCodeGt } from "~/util/LanguageUtils"
+import { loadMetadata } from "~/vendor/epub-parser/EpubParser"
+import { isUtf8 } from "~/vendor/is-utf8"
 
 export class AddTextDialogStore {
   private static readonly languageDetectionSampleLength = 5000
 
-  @observable.ref public fileContent?: IEpub | string
-  @observable public pastedContent?: string
-  @observable public detectedLanguage?: string | undefined
-  @observable public isProcessingFile: boolean = false
+  @observable public plainContent?: string
+  @observable public detectedLanguage?: ILanguage
+  @observable public bookFileMetadata?: IBookFileMetadata
   @observable public isLanguageConfigurationInvalid: boolean = false
   @observable public isSavingText: boolean = false
+  @observable public fileStatus: FileStatus = "NotSelected"
   public tatoebaTranslationCount?: IPromiseBasedObservable<number>
-  @observable private parsedText?: IParsedText
 
-  public constructor(private textStore: TextStore) {
-    reaction(() => this.pastedContent, content => this.handlePastedContentChange(content), {
+  public constructor() {
+    reaction(() => this.plainContent, content => this.handlePlainContentChange(content), {
       delay: 1000
     })
-    reaction(() => this.parsedText, text => this.handleParsedTextChange(text))
+    reaction(() => this.bookFileMetadata, metadata => this.handleBookFileMetadataChange(metadata))
   }
 
   @flowed
+  // @ts-ignore
   public *saveText(formData: IAddTextFormData): IterableIterator<Promise<void>> {
-    if (!this.parsedText) {
-      return
-    }
     this.setSavingText(true)
-    yield this.textStore.add(
-      {
-        title: formData.title,
-        author: formData.author,
-        progressElementNo: 0,
-        progressPercentage: 0,
-        contentLanguage: formData.contentLanguage,
-        translationLanguage: formData.translationLanguage
-      },
-      this.parsedText
-    )
-    this.pastedContent = undefined
-    this.fileContent = undefined
-    this.parsedText = undefined
+    console.log("saveText()", {
+      title: formData.title,
+      author: formData.author,
+      contentLanguage: formData.contentLanguage,
+      translationLanguage: formData.translationLanguage,
+      plainContent: this.plainContent
+    })
+    // yield this.textStore.add(
+    //   {
+    //     title: formData.title,
+    //     author: formData.author,
+    //     progressElementNo: 0,
+    //     progressPercentage: 0,
+    //     contentLanguage: formData.contentLanguage,
+    //     translationLanguage: formData.translationLanguage
+    //   },
+    //   this.parsedText
+    // )
+    this.discardTextToAdd()
     this.isSavingText = false
   }
 
   @flowed
-  public *processFile(path: string): IterableIterator<Promise<string | IEpub>> {
-    this.setProcessingFile(true)
-    const epubOrPlainContent: string | IEpub = yield getEpubOrPlainContent(path)
-    this.fileContent = epubOrPlainContent
-    const isEpubResult = isEpub(epubOrPlainContent)
-    const content = isEpubResult
-      ? (epubOrPlainContent as IEpub).markedContent
-      : (epubOrPlainContent as string)
-    this.parsedText = {
-      content,
-      sectionNames: isEpubResult ? (epubOrPlainContent as IEpub).sectionNames : undefined,
-      sample: takeSample(content, AddTextDialogStore.languageDetectionSampleLength)
+  public *processFile(path: string): IterableIterator<Promise<any>> {
+    this.setFileStatus("Processing")
+
+    let data: Buffer | undefined
+    try {
+      data = yield readFile(path)
+      if (data) {
+        this.bookFileMetadata = yield loadMetadata(data)
+        this.setFileStatus("Valid")
+      } else {
+        this.setFileStatus("Invalid")
+      }
+      return
+    } catch (_) {
+      // skip
     }
-    this.detectedLanguage = detectLanguage(this.parsedText!.sample)
-    this.isProcessingFile = false
+    const isDataText = data ? yield isBufferText(data, yield fileSize(path)) : false
+    if (data && isDataText) {
+      this.plainContent = isUtf8(data)
+        ? data.toString()
+        : iconv.decode(data, jschardet.detect(data).encoding).toString()
+      this.setFileStatus("Valid")
+    } else {
+      this.setFileStatus("Invalid")
+    }
+    return
   }
 
   public handleSelectedFilePathChange(filePath: string): void {
     if (filePath) {
       this.processFile(filePath)
     } else {
-      this.discardLoadedFile()
+      this.discardTextToAdd()
     }
   }
 
   @action
   public handleSelectedLanguagesChange([contentLanguage, translationLanguage]: [
-    string,
-    string
+    ILanguage,
+    ILanguage
   ]): void {
     this.isLanguageConfigurationInvalid = contentLanguage === translationLanguage
     // this.tatoebaTranslationCount = this.isLanguageConfigurationInvalid
@@ -89,49 +105,22 @@ export class AddTextDialogStore {
     //   : fromPromise(getSentenceCount(contentLanguage, translationLanguage))
   }
 
-  @computed
-  public get textFileStatus(): FileStatus {
-    if (this.isProcessingFile) {
-      return "Processing"
-    }
-    if (this.fileContent !== undefined) {
-      return this.fileContent === "" ? "Invalid" : "Valid"
-    }
-    return "NotAdded"
-  }
-
-  @computed
-  public get loadedEpubInfo(): IEpubInfo | undefined {
-    const maybeEpub = this.fileContent
-    if (maybeEpub && isEpub(maybeEpub)) {
-      const epub = maybeEpub as IEpub
-      return {
-        author: epub.author ? epub.author : "",
-        title: epub.title ? epub.title : ""
-      }
-    }
-    return undefined
+  @action
+  public discardTextToAdd(): void {
+    this.plainContent = undefined
+    this.detectedLanguage = undefined
+    this.bookFileMetadata = undefined
+    this.fileStatus = "NotSelected"
   }
 
   @action
-  public discardLoadedFile(): void {
-    this.fileContent = undefined
-    this.parsedText = undefined
+  public setPlainContent(value?: string): void {
+    this.plainContent = value
   }
 
   @action
-  public setPastedContent(value?: string): void {
-    this.pastedContent = value
-  }
-
-  @action
-  private setDetectedLanguage(value?: string): void {
-    this.detectedLanguage = value
-  }
-
-  @action
-  private setProcessingFile(value: boolean): void {
-    this.isProcessingFile = value
+  private setFileStatus(value: FileStatus): void {
+    this.fileStatus = value
   }
 
   @action
@@ -139,20 +128,16 @@ export class AddTextDialogStore {
     this.isSavingText = value
   }
 
-  @action
-  private setParsedText(value?: IParsedText): void {
-    this.parsedText = value
-  }
-
-  private handlePastedContentChange = (content?: string): void => {
-    this.setParsedText(
-      content
-        ? { content, sample: takeSample(content, AddTextDialogStore.languageDetectionSampleLength) }
+  private handlePlainContentChange = (content?: string): void => {
+    this.detectedLanguage =
+      content && content !== ""
+        ? detectLanguage(content.substr(0, AddTextDialogStore.languageDetectionSampleLength))
         : undefined
-    )
   }
 
-  private handleParsedTextChange = (text?: IParsedText): void => {
-    this.setDetectedLanguage(text ? detectLanguage(text.sample) : undefined)
+  private handleBookFileMetadataChange(metadata: IBookFileMetadata | undefined): void {
+    if (metadata && metadata.language) {
+      this.detectedLanguage = languageFromCodeGt(metadata.language.substr(0, 2))
+    }
   }
 }

@@ -42,12 +42,11 @@
     },
     "linux": {
       "description": "Desktop e-book reader for language learners.",
-      "synopsis": "A desktop e-book reader for language learners, which facilitates learning from reading by providing machine translations (DeepL, Google) as well as human-translated example sentences (Tatoeba, Reverso Context).",
+      "synopsis":
+        "A desktop e-book reader for language learners, which facilitates learning from reading by providing machine translations (DeepL, Google) as well as human-translated example sentences (Tatoeba, Reverso Context).",
       "maintainer": "Piotr Grabowski <fau999@gmail.com>",
       "vendor": "Piotr Grabowski <fau999@gmail.com>",
-      "target": [
-        "AppImage"
-      ],
+      "target": ["AppImage"],
       "depends": [],
       "category": "Education",
       "packageCategory": "education"
@@ -68,7 +67,7 @@
     "@types/electron-devtools-installer": "^2.0.3",
     "@types/kuromoji": "^0.1.0",
     "@types/lodash": "^4.14.108",
-    "@types/node": "^8.9.3",
+    "@types/node": "^10.0.3",
     "@types/react": "^16.3.13",
     "@types/react-css-transition-replace": "^2.1.2",
     "@types/react-dom": "^16.0.5",

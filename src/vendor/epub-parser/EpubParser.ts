@@ -3,6 +3,8 @@
 import * as zip from "jszip"
 import * as path from "path"
 
+import { IBookFileMetadata } from "~/library/model"
+
 import { IEpub } from "~/vendor/epub-parser"
 
 interface IOpfMetadata {
@@ -38,6 +40,17 @@ interface ITocEntry {
   label: string
   contentFilePath: string
   contentFragmentId?: string
+}
+
+export const loadMetadata = async (buffer: Buffer): Promise<IBookFileMetadata> => {
+  const archive = await zip.loadAsync(buffer)
+
+  const opfPath = await getOpfPath(archive)
+  const opfFragment = await getOpfFragment(archive, opfPath)
+  const opfMetadata = getOpfMetadata(opfFragment)
+  console.log("OPF Metadata:", opfMetadata)
+
+  return { author: opfMetadata.creator, title: opfMetadata.title, language: opfMetadata.language }
 }
 
 export const epubFromBuffer = async (buffer: Buffer): Promise<IEpub | undefined> => {

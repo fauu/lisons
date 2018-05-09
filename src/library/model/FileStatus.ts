@@ -1,1 +1,1 @@
-export type FileStatus = "NotAdded" | "Processing" | "Invalid" | "Valid"
+export type FileStatus = "NotSelected" | "Processing" | "Invalid" | "Valid"

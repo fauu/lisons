@@ -7,14 +7,15 @@ import * as React from "react"
 import styled from "styled-components"
 
 import { Spinner } from "~/app/components"
-import { languages } from "~/app/data/Languages"
 import { animations, colors, fonts } from "~/app/data/Style"
+import { ILanguage } from "~/app/model"
 import { SettingsStore } from "~/app/stores"
 import { withProps } from "~/util/StyleUtils"
 
 import { LanguageSelect } from "~/library/components"
-import { IAddTextFormData, IEpubInfo } from "~/library/model"
+import { IAddTextFormData, IBookFileMetadata } from "~/library/model"
 import { AddTextDialogStore } from "~/library/stores"
+import { languageFromCode6393 } from "~/util/LanguageUtils"
 
 export interface IAddTextDialogProps {
   readonly settingsStore: SettingsStore
@@ -22,8 +23,8 @@ export interface IAddTextDialogProps {
 }
 @observer
 export class AddTextDialog extends React.Component<IAddTextDialogProps> {
-  private static readonly defaultContentLanguage = "fra"
-  private static readonly defaultTranslationLanguage = "eng"
+  private static readonly defaultContentLanguage = languageFromCode6393("fra")!
+  private static readonly defaultTranslationLanguage = languageFromCode6393("eng")!
 
   @observable
   private formData: IAddTextFormData = {
@@ -31,8 +32,8 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
     pastedText: "",
     title: "",
     author: "",
-    contentLanguage: "",
-    translationLanguage: ""
+    contentLanguage: AddTextDialog.defaultContentLanguage,
+    translationLanguage: AddTextDialog.defaultTranslationLanguage
   }
   @observable private isPickingFile: boolean = false
   private settingsStore!: SettingsStore
@@ -50,14 +51,14 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
       () => this.formData.filePath,
       filePath => this.addTextDialogStore.handleSelectedFilePathChange(filePath)
     )
-    reaction(() => this.formData.pastedText, text => this.addTextDialogStore.setPastedContent(text))
+    reaction(() => this.formData.pastedText, text => this.addTextDialogStore.setPlainContent(text))
     reaction(
-      () => this.addTextDialogStore.loadedEpubInfo,
-      epubInfo => this.handleEpubInfoLoad(epubInfo)
+      () => this.addTextDialogStore.bookFileMetadata,
+      epubInfo => this.handleBookFileMetadataChange(epubInfo)
     )
     reaction(
       () => this.addTextDialogStore.detectedLanguage,
-      lang => this.handleLanguageDetectionFinish(lang)
+      language => this.handleBookFileLanguageChange(language)
     )
     autorun(() => {
       this.addTextDialogStore.handleSelectedLanguagesChange([
@@ -79,10 +80,10 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
       author: "",
       contentLanguage: AddTextDialog.defaultContentLanguage,
       translationLanguage:
-        this.settingsStore.settings.defaultTranslationLanguage ||
+        languageFromCode6393(this.settingsStore.settings.defaultTranslationLanguage) ||
         AddTextDialog.defaultTranslationLanguage
     })
-    this.addTextDialogStore.discardLoadedFile()
+    this.addTextDialogStore.discardTextToAdd()
   }
 
   @action
@@ -113,11 +114,11 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
   }
 
   private handleContentLanguageChange = (e: any) => {
-    this.updateFormData({ contentLanguage: e.target.value })
+    this.updateFormData({ contentLanguage: languageFromCode6393(e.target.value) })
   }
 
   private handleTranslationLanguageChange = (e: any) => {
-    this.updateFormData({ translationLanguage: e.target.value })
+    this.updateFormData({ translationLanguage: languageFromCode6393(e.target.value) })
   }
 
   private handleLoadFileButtonClick = (e: React.FormEvent<HTMLButtonElement>) => {
@@ -160,29 +161,27 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
     this.clearForm()
   }
 
-  private handleEpubInfoLoad(epubInfo?: IEpubInfo): void {
-    if (epubInfo) {
-      const { author, title } = epubInfo
-      if (author) {
-        this.updateFormData({ author })
-      }
-      if (title) {
-        this.updateFormData({ title })
-      }
+  private handleBookFileMetadataChange(bookFileMetadata?: IBookFileMetadata): void {
+    if (!bookFileMetadata) {
+      return
+    }
+    const { author, title } = bookFileMetadata
+    if (author) {
+      this.updateFormData({ author })
+    }
+    if (title) {
+      this.updateFormData({ title })
     }
   }
 
-  private handleLanguageDetectionFinish = (lang?: string): void => {
-    if (!languages.some(l => l.code6393 === lang)) {
-      lang = undefined
-    }
-    this.formData.contentLanguage = lang || AddTextDialog.defaultContentLanguage
+  private handleBookFileLanguageChange = (lang?: ILanguage): void => {
+    this.formData.contentLanguage = lang ? lang : AddTextDialog.defaultContentLanguage
   }
 
   public render(): JSX.Element {
-    const { pastedContent, isSavingText, textFileStatus } = this.addTextDialogStore
+    const { plainContent, isSavingText, fileStatus } = this.addTextDialogStore
     const filePath = this.formData.filePath
-    const showFinalFields = textFileStatus === "Valid" || pastedContent
+    const showFinalFields = fileStatus === "Valid" || plainContent
     return (
       <Form disabled={isSavingText}>
         {isSavingText && (
@@ -190,22 +189,20 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
             <Spinner color={"Dark"} />
           </SavingIndicatorOverlay>
         )}
-        {!pastedContent && this.renderFileField()}
+        {!this.formData.pastedText && this.renderFileField()}
         {!filePath && this.renderPasteField()}
         {showFinalFields && this.renderFinalFields()}
-        {textFileStatus === "Invalid" && (
-          <InvalidFileMsg>This file cannot be added.</InvalidFileMsg>
-        )}
+        {fileStatus === "Invalid" && <InvalidFileMsg>This file cannot be added.</InvalidFileMsg>}
       </Form>
     )
   }
 
   private renderFileField(): JSX.Element {
-    const status = this.addTextDialogStore.textFileStatus
+    const { fileStatus } = this.addTextDialogStore
     return (
       <FileField>
         <Button onClick={this.handleLoadFileButtonClick} disabled={this.isPickingFile}>
-          {status === "NotAdded" ? "Choose .epub or .txt file" : "Change my choice"}
+          {fileStatus === "NotSelected" ? "Choose .epub or .txt file" : "Change my choice"}
         </Button>
         {this.formData.filePath && (
           <SelectedFileGroup>
@@ -257,7 +254,7 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
             <LanguageSelect
               invalid={isLanguageConfigurationInvalid}
               onChange={this.handleContentLanguageChange}
-              value={this.formData.contentLanguage}
+              value={this.formData.contentLanguage.code6393}
             />
           </Field>
           <Field>
@@ -265,7 +262,7 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
             <LanguageSelect
               invalid={isLanguageConfigurationInvalid}
               onChange={this.handleTranslationLanguageChange}
-              value={this.formData.translationLanguage}
+              value={this.formData.translationLanguage.code6393}
             />
           </Field>
         </FieldGroup>
