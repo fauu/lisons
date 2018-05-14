@@ -58,6 +58,7 @@ const rendererConfig = merge(common.rendererConfig, {
     common.rendererEntry
   ],
   output: {
+    globalObject: "this", // Needed for worker-loader
     publicPath: common.devServerUrl
   },
   plugins: [

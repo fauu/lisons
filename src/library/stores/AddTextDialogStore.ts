@@ -3,15 +3,17 @@ import jschardet = require("jschardet")
 import { action, computed, observable, reaction } from "mobx"
 import { IPromiseBasedObservable } from "mobx-utils"
 
+import SaveFileWorker = require("worker-loader?name=dist/[name].js!../../app/SaveFileWorker")
 import { ILanguage } from "~/app/model"
 import { fileSize, isBufferText, readFile } from "~/util/FileUtils"
+import { languageFromCodeGt } from "~/util/LanguageUtils"
 import { flowed } from "~/util/MobxUtils"
 import { detectLanguage } from "~/util/TextUtils"
 
-import { IAddTextFormData, ITextFileMetadata, TextFileStatus } from "~/library/model"
-import { languageFromCodeGt } from "~/util/LanguageUtils"
 import { loadMetadata } from "~/vendor/epub-parser/EpubParser"
 import { isUtf8 } from "~/vendor/is-utf8"
+
+import { IAddTextFormData, ITextFileMetadata, TextFileStatus } from "~/library/model"
 
 export class AddTextDialogStore {
   private static readonly languageDetectionSampleLength = 5000
@@ -30,9 +32,7 @@ export class AddTextDialogStore {
   private textFilePlaintext?: string
 
   public constructor() {
-    reaction(() => this.pastedText, text => this.handlePastedTextChange(text), {
-      delay: 1000
-    })
+    reaction(() => this.pastedText, text => this.handlePastedTextChange(text), { delay: 1000 })
     reaction(() => this.textFileMetadata, metadata => this.handleTextFileMetadataChange(metadata))
   }
 
@@ -52,24 +52,29 @@ export class AddTextDialogStore {
   @flowed
   public *saveText(formData: IAddTextFormData): IterableIterator<Promise<void>> {
     this.isSavingText = true
-    console.log("saveText()", {
-      title: formData.title,
-      author: formData.author,
-      contentLanguage: formData.contentLanguage,
-      translationLanguage: formData.translationLanguage,
-      pastedContent: this.pastedText,
+
+    const worker = new SaveFileWorker()
+    worker.onmessage = (ev: MessageEvent) => {
+      console.log(ev.data)
+      worker.terminate()
+
+      this.discardText()
+      this.isSavingText = false
+    }
+    worker.postMessage({
+      formData,
+      pastedText: this.pastedText,
       textFileBuffer: this.textFileBuffer,
       textFilePlaintext: this.textFilePlaintext
     })
-    this.discardText()
-    this.isSavingText = false
   }
 
+  // TODO: Cleanup
   @flowed
-  public *processFile(path: string): IterableIterator<Promise<any>> {
+  public *processFile(filePath: string): IterableIterator<Promise<any>> {
     this.isProcessingTextFile = true
     try {
-      this.textFileBuffer = yield readFile(path)
+      this.textFileBuffer = yield readFile(filePath)
       if (this.textFileBuffer) {
         this.textFileMetadata = yield loadMetadata(this.textFileBuffer)
       }
@@ -79,7 +84,7 @@ export class AddTextDialogStore {
       // skip
     }
     const isFilePlaintext = this.textFileBuffer
-      ? yield isBufferText(this.textFileBuffer, yield fileSize(path))
+      ? yield isBufferText(this.textFileBuffer, yield fileSize(filePath))
       : false
     if (this.textFileBuffer && isFilePlaintext) {
       this.textFilePlaintext = isUtf8(this.textFileBuffer)

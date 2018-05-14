@@ -48,3 +48,20 @@ export const isBufferText = (data: Buffer, size: number): Promise<boolean> =>
       resolve(!err && !result)
     })
   })
+
+// https://stackoverflow.com/a/40177447
+const allRWEPermissions = parseInt("0777", 8)
+export const ensurePathExists = (path: string, mask: number = allRWEPermissions): Promise<void> =>
+  new Promise<void>((resolve, reject) => {
+    fs.mkdir(path, mask, err => {
+      if (err) {
+        if (err.code === "EEXIST") {
+          resolve()
+        } else {
+          reject(err)
+        }
+      } else {
+        resolve()
+      }
+    })
+  })

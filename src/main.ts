@@ -14,7 +14,11 @@ let mainWindow: Electron.BrowserWindow | null
 
 const createWindow = (): Electron.BrowserWindow => {
   mainWindow = new BrowserWindow({
-    webPreferences: { experimentalFeatures: true, webSecurity: !isDev },
+    webPreferences: {
+      experimentalFeatures: true,
+      nodeIntegrationInWorker: true,
+      webSecurity: !isDev
+    },
     minWidth: 1200,
     minHeight: 600,
     backgroundColor: colors.primary,
