@@ -5,6 +5,7 @@ import * as path from "path"
 
 import { ITextFileMetadata } from "~/library/model"
 
+import { punctuationLikeChars } from "~/app/data/PunctuationLikeChars"
 import { ensurePathExists, writeFile } from "~/util/FileUtils"
 import { IEpub } from "~/vendor/epub-parser"
 
@@ -83,47 +84,37 @@ export const convertEpubToLisonsText = async (textPath: string, buffer: Buffer):
 
     if (item.mediaType === "application/xhtml+xml") {
       const itemHtmlContent = await itemFile.async("text")
-      const doc = parser.parseFromString(itemHtmlContent, "application/xml")
-      if (item.href.includes("part10.html")) {
-        const treeWalker = document.createTreeWalker(
-          doc.body,
-          NodeFilter.SHOW_TEXT,
-          { acceptNode: _ => NodeFilter.FILTER_ACCEPT },
-          false
-        )
+      const itemHtmlDocument = parser.parseFromString(itemHtmlContent, "application/xml")
 
-        while (treeWalker.nextNode()) {
-          const node = treeWalker.currentNode
-          if (node.textContent && node.textContent.trim() !== "") {
-            node.textContent = node.textContent.split(" ").join("|")
-          }
+      const treeWalker = document.createTreeWalker(
+        itemHtmlDocument.body,
+        NodeFilter.SHOW_TEXT,
+        { acceptNode: _ => NodeFilter.FILTER_ACCEPT },
+        false
+      )
+      while (treeWalker.nextNode()) {
+        const node = treeWalker.currentNode
+        if (node.textContent && node.textContent.trim() !== "") {
+          node.textContent = wrapWordsInTags(node.textContent)
         }
-        console.log(doc)
       }
 
-      await writeFile<string>(itemPath, serializer.serializeToString(doc))
+      let newItemHtmlContent = serializer.serializeToString(itemHtmlDocument)
+      newItemHtmlContent = newItemHtmlContent.replace(/&gt;/g, ">")
+      newItemHtmlContent = newItemHtmlContent.replace(/&lt;/g, "<")
+
+      await writeFile<string>(itemPath, newItemHtmlContent)
     } else {
       await writeFile<Buffer>(itemPath, await itemFile.async("nodebuffer"))
     }
   })
 
-  // opfSpine.itemRefs.forEach(async ({ idRef }) => {
-  //   const item = opfManifest.items.find(_item => _item.id === idRef)
-  //   if (!item) {
-  //     console.warn(`Item with idRef '${idRef}' not present in the manifest`)
-  //     return
-  //   }
-  //   const itemPath = path.join(itemsDir, item.href)
-  //   const itemFile = archive.file(itemPath)
-  //   if (!itemFile) {
-  //     console.warn(`File for item with path '${itemPath}' not found`)
-  //     return
-  //   }
-  //   console.log(itemPath)
-  //   // return { path: itemPath, content: await itemFile.async("text") }
-  // })
-
   return
+}
+
+const wordRegexp = new RegExp(`([^${punctuationLikeChars}\r\n]+)`, "g")
+const wrapWordsInTags = (s: string): string => {
+  return s.replace(wordRegexp, "<w>$1</w>")
 }
 
 export const epubFromBuffer = async (buffer: Buffer): Promise<IEpub | undefined> => {
