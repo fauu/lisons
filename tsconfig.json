@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "lib": ["dom", "es7", "scripthost", "webworker"],
+    "lib": ["dom", "dom.iterable", "es7"],
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",

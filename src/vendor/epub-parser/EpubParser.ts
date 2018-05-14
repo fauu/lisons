@@ -5,6 +5,7 @@ import * as path from "path"
 
 import { ITextFileMetadata } from "~/library/model"
 
+import { ensurePathExists, writeFile } from "~/util/FileUtils"
 import { IEpub } from "~/vendor/epub-parser"
 
 interface IOpfMetadata {
@@ -19,6 +20,7 @@ interface IOpfManifest {
 
 interface IOpfItem {
   id: string
+  mediaType: string
   href: string
 }
 
@@ -53,6 +55,77 @@ export const loadMetadata = async (buffer: Buffer): Promise<ITextFileMetadata> =
   return { author: opfMetadata.creator, title: opfMetadata.title, language: opfMetadata.language }
 }
 
+// @ts-ignore
+export const convertEpubToLisonsText = async (textPath: string, buffer: Buffer): Promise<void> => {
+  const archive = await zip.loadAsync(buffer)
+
+  const opfPath = await getOpfPath(archive)
+  const opfFragment = await getOpfFragment(archive, opfPath)
+  const opfManifest = getOpfManifest(opfFragment, [
+    "application/xhtml+xml",
+    "application/x-dtbncx+xml"
+  ])
+  const opfSpine = getOpfSpine(opfFragment)
+  const itemsDir = path.dirname(opfPath)
+
+  let toc = opfSpine.toc ? await getToc(archive, opfManifest, opfSpine.toc, itemsDir) : undefined
+  if (toc && toc.length <= 1) {
+    toc = undefined
+  }
+
+  const serializer = new XMLSerializer()
+  const parser = new DOMParser()
+
+  opfManifest.items.forEach(async item => {
+    const itemPath = path.join(textPath, item.href)
+    await ensurePathExists(path.dirname(itemPath))
+    const itemFile = archive.file(path.join(itemsDir, item.href))
+
+    if (item.mediaType === "application/xhtml+xml") {
+      const itemHtmlContent = await itemFile.async("text")
+      const doc = parser.parseFromString(itemHtmlContent, "application/xml")
+      if (item.href.includes("part10.html")) {
+        const treeWalker = document.createTreeWalker(
+          doc.body,
+          NodeFilter.SHOW_TEXT,
+          { acceptNode: _ => NodeFilter.FILTER_ACCEPT },
+          false
+        )
+
+        while (treeWalker.nextNode()) {
+          const node = treeWalker.currentNode
+          if (node.textContent && node.textContent.trim() !== "") {
+            node.textContent = node.textContent.split(" ").join("|")
+          }
+        }
+        console.log(doc)
+      }
+
+      await writeFile<string>(itemPath, serializer.serializeToString(doc))
+    } else {
+      await writeFile<Buffer>(itemPath, await itemFile.async("nodebuffer"))
+    }
+  })
+
+  // opfSpine.itemRefs.forEach(async ({ idRef }) => {
+  //   const item = opfManifest.items.find(_item => _item.id === idRef)
+  //   if (!item) {
+  //     console.warn(`Item with idRef '${idRef}' not present in the manifest`)
+  //     return
+  //   }
+  //   const itemPath = path.join(itemsDir, item.href)
+  //   const itemFile = archive.file(itemPath)
+  //   if (!itemFile) {
+  //     console.warn(`File for item with path '${itemPath}' not found`)
+  //     return
+  //   }
+  //   console.log(itemPath)
+  //   // return { path: itemPath, content: await itemFile.async("text") }
+  // })
+
+  return
+}
+
 export const epubFromBuffer = async (buffer: Buffer): Promise<IEpub | undefined> => {
   const archive = await zip.loadAsync(buffer)
 
@@ -60,7 +133,10 @@ export const epubFromBuffer = async (buffer: Buffer): Promise<IEpub | undefined>
   const opfFragment = await getOpfFragment(archive, opfPath)
   const opfMetadata = getOpfMetadata(opfFragment)
   console.log("OPF Metadata:", opfMetadata)
-  const opfManifest = getOpfManifest(opfFragment)
+  const opfManifest = getOpfManifest(opfFragment, [
+    "application/xhtml+xml",
+    "application/x-dtbncx+xml"
+  ])
   console.log("OPF Manifest:", opfManifest)
   const opfSpine = getOpfSpine(opfFragment)
   console.log("OPF Spine:", opfSpine)
@@ -125,15 +201,14 @@ const getOpfMetadata = (fragment: DocumentFragment): IOpfMetadata => {
   return opfMetadata
 }
 
-const getOpfManifest = (fragment: DocumentFragment): IOpfManifest => {
+const getOpfManifest = (fragment: DocumentFragment, acceptedMediaTypes: string[]): IOpfManifest => {
   const items = Array.from(fragment.querySelectorAll("manifest item"))
     .map(itemElement => {
       const mediaType = itemElement.getAttribute("media-type") || ""
       const id = itemElement.getAttribute("id")
-      const acceptedMediaTypes = ["application/xhtml+xml", "application/x-dtbncx+xml"]
       if (acceptedMediaTypes.includes(mediaType) || id === "ncx") {
         const href = itemElement.getAttribute("href")
-        return id !== null && href !== null ? { id, href } : undefined
+        return id !== null && href !== null ? { id, mediaType, href } : undefined
       }
       return undefined
     })

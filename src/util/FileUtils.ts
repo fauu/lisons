@@ -22,9 +22,20 @@ export const readFile = (path: string): Promise<Buffer> =>
     })
   })
 
+// TODO: Remove and replace all usages with writeFile
 export const writeStringToFile = (path: string, s: string): Promise<void> =>
   new Promise<void>((resolve, reject) => {
     fs.writeFile(path, s, err => {
+      if (err) {
+        reject(err)
+      }
+      resolve()
+    })
+  })
+
+export const writeFile = <T>(path: string, data: T): Promise<void> =>
+  new Promise<void>((resolve, reject) => {
+    fs.writeFile(path, data, err => {
       if (err) {
         reject(err)
       }
@@ -50,6 +61,7 @@ export const isBufferText = (data: Buffer, size: number): Promise<boolean> =>
   })
 
 // https://stackoverflow.com/a/40177447
+// TODO: Support multi-level paths
 const allRWEPermissions = parseInt("0777", 8)
 export const ensurePathExists = (path: string, mask: number = allRWEPermissions): Promise<void> =>
   new Promise<void>((resolve, reject) => {

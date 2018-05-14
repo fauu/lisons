@@ -1,16 +1,24 @@
+import * as crypto from "crypto"
 import * as iconv from "iconv-lite"
 import jschardet = require("jschardet")
 import { action, computed, observable, reaction } from "mobx"
 import { IPromiseBasedObservable } from "mobx-utils"
+import * as path from "path"
 
-import SaveFileWorker = require("worker-loader?name=dist/[name].js!../../app/SaveFileWorker")
 import { ILanguage } from "~/app/model"
-import { fileSize, isBufferText, readFile } from "~/util/FileUtils"
+import {
+  ensurePathExists,
+  fileSize,
+  getUserDataPath,
+  isBufferText,
+  readFile,
+  writeStringToFile
+} from "~/util/FileUtils"
 import { languageFromCodeGt } from "~/util/LanguageUtils"
 import { flowed } from "~/util/MobxUtils"
 import { detectLanguage } from "~/util/TextUtils"
 
-import { loadMetadata } from "~/vendor/epub-parser/EpubParser"
+import { convertEpubToLisonsText, loadMetadata } from "~/vendor/epub-parser/EpubParser"
 import { isUtf8 } from "~/vendor/is-utf8"
 
 import { IAddTextFormData, ITextFileMetadata, TextFileStatus } from "~/library/model"
@@ -53,20 +61,37 @@ export class AddTextDialogStore {
   public *saveText(formData: IAddTextFormData): IterableIterator<Promise<void>> {
     this.isSavingText = true
 
-    const worker = new SaveFileWorker()
-    worker.onmessage = (ev: MessageEvent) => {
-      console.log(ev.data)
-      worker.terminate()
-
-      this.discardText()
-      this.isSavingText = false
-    }
-    worker.postMessage({
-      formData,
-      pastedText: this.pastedText,
+    console.log("saveText()", {
+      title: formData.title,
+      author: formData.author,
+      contentLanguage: formData.contentLanguage,
+      translationLanguage: formData.translationLanguage,
+      pastedContent: this.pastedText,
       textFileBuffer: this.textFileBuffer,
       textFilePlaintext: this.textFilePlaintext
     })
+    const id = crypto.randomBytes(16).toString("hex")
+    console.log(id)
+    const userDataPath = getUserDataPath()
+    const textsDirName = "texts"
+    const textsPath = path.join(userDataPath, textsDirName)
+    yield ensurePathExists(textsPath)
+    const newTextPath = path.join(textsPath, id)
+    yield ensurePathExists(newTextPath)
+    const indexFileName = "index.json"
+    const indexFilePath = path.join(newTextPath, indexFileName)
+    const indexContent = {
+      title: formData.title,
+      author: formData.author,
+      contentLanguage: formData.contentLanguage.code6393,
+      translationLanguage: formData.translationLanguage.code6393
+    }
+    yield writeStringToFile(indexFilePath, JSON.stringify(indexContent))
+
+    convertEpubToLisonsText(newTextPath, this.textFileBuffer!)
+
+    this.discardText()
+    this.isSavingText = false
   }
 
   // TODO: Cleanup
