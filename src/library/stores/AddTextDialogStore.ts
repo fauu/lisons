@@ -58,7 +58,7 @@ export class AddTextDialogStore {
   }
 
   @flowed
-  public *saveText(formData: IAddTextFormData): IterableIterator<Promise<void>> {
+  public *saveText(formData: IAddTextFormData): IterableIterator<Promise<any>> {
     this.isSavingText = true
 
     console.log("saveText()", {
@@ -78,18 +78,23 @@ export class AddTextDialogStore {
     yield ensurePathExists(textsPath)
     const newTextPath = path.join(textsPath, id)
     yield ensurePathExists(newTextPath)
+
+    const textChunkMap = yield convertEpubToLisonsText(
+      newTextPath,
+      this.textFileBuffer!,
+      formData.contentLanguage
+    )
+
     const indexFileName = "index.json"
     const indexFilePath = path.join(newTextPath, indexFileName)
     const indexContent = {
       title: formData.title,
       author: formData.author,
       contentLanguage: formData.contentLanguage.code6393,
-      translationLanguage: formData.translationLanguage.code6393
+      translationLanguage: formData.translationLanguage.code6393,
+      chunkMap: textChunkMap
     }
     yield writeStringToFile(indexFilePath, JSON.stringify(indexContent))
-
-    convertEpubToLisonsText(newTextPath, this.textFileBuffer!, formData.contentLanguage)
-
     this.discardText()
     this.isSavingText = false
   }

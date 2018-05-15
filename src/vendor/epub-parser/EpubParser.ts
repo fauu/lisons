@@ -6,7 +6,7 @@ import * as path from "path"
 import { ITextFileMetadata } from "~/library/model"
 
 import { punctuationLikeChars } from "~/app/data/PunctuationLikeChars"
-import { ILanguage, ChineseCharactersType } from "~/app/model"
+import { ILanguage } from "~/app/model"
 import { ensurePathExists, writeFile } from "~/util/FileUtils"
 import { IEpub } from "~/vendor/epub-parser"
 
@@ -57,12 +57,20 @@ export const loadMetadata = async (buffer: Buffer): Promise<ITextFileMetadata> =
   return { author: opfMetadata.creator, title: opfMetadata.title, language: opfMetadata.language }
 }
 
-// @ts-ignore
+export type TextChunkMap = ITextChunkMapElement[]
+
+interface ITextChunkMapElement {
+  id: string
+  href: string
+  wordCount: number
+  startWordNo: number
+}
+
 export const convertEpubToLisonsText = async (
   textPath: string,
   buffer: Buffer,
   contentLanguage: ILanguage
-): Promise<void> => {
+): Promise<TextChunkMap> => {
   const archive = await zip.loadAsync(buffer)
 
   const opfPath = await getOpfPath(archive)
@@ -81,13 +89,19 @@ export const convertEpubToLisonsText = async (
 
   const serializer = new XMLSerializer()
   const parser = new DOMParser()
+  const wrapWordsInTags = getWrapWordsInTagsFn(contentLanguage)
 
-  opfManifest.items.forEach(async item => {
+  const textChunkMap: TextChunkMap = []
+
+  for (const item of opfManifest.items) {
     const itemPath = path.join(textPath, item.href)
     await ensurePathExists(path.dirname(itemPath))
     const itemFile = archive.file(path.join(itemsDir, item.href))
 
-    if (item.mediaType === "application/xhtml+xml") {
+    if (item.mediaType !== "application/xhtml+xml") {
+      writeFile<Buffer>(itemPath, await itemFile.async("nodebuffer"))
+    } else {
+      let chunkWordCount = 0
       const itemHtmlContent = await itemFile.async("text")
       const itemHtmlDocument = parser.parseFromString(itemHtmlContent, "application/xml")
 
@@ -101,43 +115,71 @@ export const convertEpubToLisonsText = async (
       )
       while (treeWalker.nextNode()) {
         const node = treeWalker.currentNode
-        if (node.textContent && node.textContent.trim() !== "") {
-          // tslint:disable-next-line
-          if (contentLanguage.code6393 === "jpn") {
-            node.textContent = await wrapWordsInTagsJpn(node.textContent)
-          } else if (contentLanguage.code6393 === "cmn") {
-            node.textContent = await wrapWordsInTagsCn(node.textContent, "simplified")
-          } else if (contentLanguage.code6393 === "lzh") {
-            node.textContent = await wrapWordsInTagsCn(node.textContent, "traditional")
-          } else {
-            node.textContent = wrapWordsInTags(node.textContent)
-          }
+        if (!node.textContent || node.textContent.trim() === "") {
+          continue
         }
+        const [newTextContent, wordCount] = await wrapWordsInTags(node.textContent)
+        node.textContent = newTextContent
+        chunkWordCount += wordCount
       }
 
       let newItemHtmlContent = serializer.serializeToString(itemHtmlDocument)
       newItemHtmlContent = newItemHtmlContent.replace(/&gt;/g, ">")
       newItemHtmlContent = newItemHtmlContent.replace(/&lt;/g, "<")
 
-      await writeFile<string>(itemPath, newItemHtmlContent)
-    } else {
-      await writeFile<Buffer>(itemPath, await itemFile.async("nodebuffer"))
+      textChunkMap.push({
+        id: item.id,
+        href: item.href,
+        wordCount: chunkWordCount,
+        startWordNo: -1
+      })
+      writeFile<string>(itemPath, newItemHtmlContent)
     }
+  }
+
+  textChunkMap.sort(
+    (a, b) =>
+      opfSpine.itemRefs.findIndex(ref => ref.idRef === a.id) -
+      opfSpine.itemRefs.findIndex(ref => ref.idRef === b.id)
+  )
+
+  let currentWordCount = 0
+  textChunkMap.forEach(chunk => {
+    chunk.startWordNo = currentWordCount
+    currentWordCount += chunk.wordCount
   })
 
-  return
+  return textChunkMap
+}
+
+const getWrapWordsInTagsFn = (contentLanguage: ILanguage) => {
+  switch (contentLanguage.code6393) {
+    case "jpn":
+      return wrapWordsInTagsJpn
+    case "cmn":
+      return wrapWordsInTagsCn("simplified")
+    case "lzh":
+      return wrapWordsInTagsCn("traditional")
+    default:
+      return wrapWordsInTagsStd
+  }
 }
 
 const wordRegexp = new RegExp(`([^${punctuationLikeChars}\r\n]+)`, "g")
 
-const wrapWordsInTags = (s: string): string => {
-  return s.replace(wordRegexp, "<w>$1</w>")
+const wrapWordsInTagsStd = (s: string): Promise<[string, number]> => {
+  let wordCount = 0
+  const sWithWordsWrapped = s.replace(wordRegexp, substring => {
+    wordCount++
+    return `<w>${substring}</w>`
+  })
+  return new Promise((resolve, _reject) => resolve([sWithWordsWrapped, wordCount]))
 }
 
 // tslint:disable-next-line:no-var-requires
 const kuromoji = require("kuromoji")
 let kuromojiInstance: any
-const wrapWordsInTagsJpn = async (s: string): Promise<string> => {
+const wrapWordsInTagsJpn = async (s: string): Promise<[string, number]> => {
   if (!kuromojiInstance) {
     kuromojiInstance = await new Promise((resolve, reject) => {
       kuromoji
@@ -152,21 +194,31 @@ const wrapWordsInTagsJpn = async (s: string): Promise<string> => {
         })
     })
   }
-  return kuromojiInstance.tokenize(s).reduce((acc: string, val: any) => {
-    const element = val.surface_form
-    return acc + (wordRegexp.test(element) ? `<w>${element}</w>` : element)
-  }, "")
+  return kuromojiInstance.tokenize(s).reduce(
+    ([acc, wordCount]: [string, number], val: any) => {
+      const element = val.surface_form
+      const isAWord = wordRegexp.test(element)
+      return isAWord ? [acc + `<w>${element}</w>`, wordCount + 1] : [acc + element, wordCount]
+    },
+    ["", 0]
+  )
 }
 
 let chineseTokenizerInstance: any
-const wrapWordsInTagsCn = async (s: string, t: ChineseCharactersType): Promise<string> => {
+const wrapWordsInTagsCn = (charactersType: string) => async (
+  s: string
+): Promise<[string, number]> => {
   if (!chineseTokenizerInstance) {
     chineseTokenizerInstance = require("chinese-tokenizer").loadFile("out/cedict_ts.u8")
   }
-  return chineseTokenizerInstance(s).reduce((acc: string, val: any) => {
-    const element = val[t]
-    return acc + (val.matches.length > 0 ? `<w>${element}</w>` : element)
-  }, "")
+  return chineseTokenizerInstance(s).reduce(
+    ([acc, wordCount]: [string, number], val: any) => {
+      const element = val[charactersType]
+      const isAWord = val.matches.length > 0
+      return isAWord ? [acc + `<w>${element}</w>`, wordCount + 1] : [acc + element, wordCount]
+    },
+    ["", 0]
+  )
 }
 
 export const epubFromBuffer = async (buffer: Buffer): Promise<IEpub | undefined> => {
