@@ -1578,10 +1578,6 @@ caseless@~0.12.0:
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/caseless/-/caseless-0.12.0.tgz#1b681c21ff84033c826543090689420d187151dc"
 
-cedict-lookup@0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/cedict-lookup/-/cedict-lookup-0.0.2.tgz#197e8ecaa04936a9499f73d99496a98b110e814b"
-
 center-align@^0.1.1:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/center-align/-/center-align-0.1.3.tgz#aa0d32629b6ee972200411cbd4461c907bc2b7ad"
@@ -1635,12 +1631,10 @@ check-types@^7.3.0:
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/check-types/-/check-types-7.3.0.tgz#468f571a4435c24248f5fd0cb0e8d87c3c341e7d"
 
-chinese-tokenizer@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/chinese-tokenizer/-/chinese-tokenizer-0.1.2.tgz#cb871f492f78cc7829984c4f662a473f1dbbfd4d"
+chinese-tokenizer@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/chinese-tokenizer/-/chinese-tokenizer-2.0.0.tgz#5167fd8a44ccf5588186f0db48a52c64ae75f8d2"
   dependencies:
-    cedict-lookup "0.0.2"
-    dedupe "^2.0.3"
     prettify-pinyin "^0.1.5"
 
 chokidar@^1.7.0:
@@ -2233,12 +2227,6 @@ decompress-response@^3.2.0, decompress-response@^3.3.0:
   resolved "https://registry.yarnpkg.com/decompress-response/-/decompress-response-3.3.0.tgz#80a4dd323748384bfa248083622aedec982adff3"
   dependencies:
     mimic-response "^1.0.0"
-
-dedupe@^2.0.3:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/dedupe/-/dedupe-2.1.0.tgz#7f201d0142ca38e48762cfc33ff79816818bc347"
-  dependencies:
-    sigmund "1.0.1"
 
 deep-equal@^1.0.1, deep-equal@~1.0.1:
   version "1.0.1"
@@ -6674,10 +6662,6 @@ shelljs@^0.8.0:
     glob "^7.0.0"
     interpret "^1.0.0"
     rechoir "^0.6.2"
-
-sigmund@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/sigmund/-/sigmund-1.0.1.tgz#3ff21f198cad2175f9f3b781853fd94d0d19b590"
 
 signal-exit@^3.0.0, signal-exit@^3.0.2:
   version "3.0.2"

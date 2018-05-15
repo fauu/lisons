@@ -6,6 +6,7 @@ import * as path from "path"
 import { ITextFileMetadata } from "~/library/model"
 
 import { punctuationLikeChars } from "~/app/data/PunctuationLikeChars"
+import { ILanguage, ChineseCharactersType } from "~/app/model"
 import { ensurePathExists, writeFile } from "~/util/FileUtils"
 import { IEpub } from "~/vendor/epub-parser"
 
@@ -57,7 +58,11 @@ export const loadMetadata = async (buffer: Buffer): Promise<ITextFileMetadata> =
 }
 
 // @ts-ignore
-export const convertEpubToLisonsText = async (textPath: string, buffer: Buffer): Promise<void> => {
+export const convertEpubToLisonsText = async (
+  textPath: string,
+  buffer: Buffer,
+  contentLanguage: ILanguage
+): Promise<void> => {
   const archive = await zip.loadAsync(buffer)
 
   const opfPath = await getOpfPath(archive)
@@ -86,6 +91,8 @@ export const convertEpubToLisonsText = async (textPath: string, buffer: Buffer):
       const itemHtmlContent = await itemFile.async("text")
       const itemHtmlDocument = parser.parseFromString(itemHtmlContent, "application/xml")
 
+      itemHtmlDocument.head.innerHTML = "<meta charset='utf-8' />" + itemHtmlDocument.head.innerHTML
+
       const treeWalker = document.createTreeWalker(
         itemHtmlDocument.body,
         NodeFilter.SHOW_TEXT,
@@ -95,7 +102,16 @@ export const convertEpubToLisonsText = async (textPath: string, buffer: Buffer):
       while (treeWalker.nextNode()) {
         const node = treeWalker.currentNode
         if (node.textContent && node.textContent.trim() !== "") {
-          node.textContent = wrapWordsInTags(node.textContent)
+          // tslint:disable-next-line
+          if (contentLanguage.code6393 === "jpn") {
+            node.textContent = await wrapWordsInTagsJpn(node.textContent)
+          } else if (contentLanguage.code6393 === "cmn") {
+            node.textContent = await wrapWordsInTagsCn(node.textContent, "simplified")
+          } else if (contentLanguage.code6393 === "lzh") {
+            node.textContent = await wrapWordsInTagsCn(node.textContent, "traditional")
+          } else {
+            node.textContent = wrapWordsInTags(node.textContent)
+          }
         }
       }
 
@@ -113,8 +129,44 @@ export const convertEpubToLisonsText = async (textPath: string, buffer: Buffer):
 }
 
 const wordRegexp = new RegExp(`([^${punctuationLikeChars}\r\n]+)`, "g")
+
 const wrapWordsInTags = (s: string): string => {
   return s.replace(wordRegexp, "<w>$1</w>")
+}
+
+// tslint:disable-next-line:no-var-requires
+const kuromoji = require("kuromoji")
+let kuromojiInstance: any
+const wrapWordsInTagsJpn = async (s: string): Promise<string> => {
+  if (!kuromojiInstance) {
+    kuromojiInstance = await new Promise((resolve, reject) => {
+      kuromoji
+        .builder({
+          dicPath: ""
+        })
+        .build((err: any, tokenizer: any) => {
+          if (err) {
+            reject(err)
+          }
+          resolve(tokenizer)
+        })
+    })
+  }
+  return kuromojiInstance.tokenize(s).reduce((acc: string, val: any) => {
+    const element = val.surface_form
+    return acc + (wordRegexp.test(element) ? `<w>${element}</w>` : element)
+  }, "")
+}
+
+let chineseTokenizerInstance: any
+const wrapWordsInTagsCn = async (s: string, t: ChineseCharactersType): Promise<string> => {
+  if (!chineseTokenizerInstance) {
+    chineseTokenizerInstance = require("chinese-tokenizer").loadFile("out/cedict_ts.u8")
+  }
+  return chineseTokenizerInstance(s).reduce((acc: string, val: any) => {
+    const element = val[t]
+    return acc + (val.matches.length > 0 ? `<w>${element}</w>` : element)
+  }, "")
 }
 
 export const epubFromBuffer = async (buffer: Buffer): Promise<IEpub | undefined> => {

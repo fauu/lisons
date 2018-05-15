@@ -88,7 +88,7 @@ export class AddTextDialogStore {
     }
     yield writeStringToFile(indexFilePath, JSON.stringify(indexContent))
 
-    convertEpubToLisonsText(newTextPath, this.textFileBuffer!)
+    convertEpubToLisonsText(newTextPath, this.textFileBuffer!, formData.contentLanguage)
 
     this.discardText()
     this.isSavingText = false
