@@ -1,8 +1,8 @@
 import * as zip from "jszip"
 import * as path from "path"
 
-import { punctuationLikeChars } from "~/app/data/PunctuationLikeChars"
 import { ILanguage, ITextSectionTree, ITextSectionTreeNode, TextChunkMap } from "~/app/model"
+import { getWrapWordsInTagsFn } from "~/app/Tokenization"
 
 import { ITextFileMetadata } from "~/library/model"
 import { ensurePathExists, writeFile } from "~/util/FileUtils"
@@ -32,13 +32,15 @@ interface IOpfItemRef {
   idRef: string
 }
 
-let _domParserInstance: DOMParser
-const parseXml = (s: string, mimetype: string) => {
-  if (!_domParserInstance) {
-    _domParserInstance = new DOMParser()
+const { parseXml } = new class {
+  private parser?: DOMParser
+  public parseXml = (s: string, mimetype: string) => {
+    if (!this.parser) {
+      this.parser = new DOMParser()
+    }
+    return this.parser.parseFromString(s, mimetype)
   }
-  return _domParserInstance.parseFromString(s, mimetype)
-}
+}()
 
 export const loadMetadata = async (buffer: Buffer): Promise<ITextFileMetadata> => {
   const archive = await zip.loadAsync(buffer)
@@ -130,75 +132,6 @@ export const convertEpubToLisonsText = async (
   const sectionTree = await getSectionTree(archive, opfManifest, opfSpine, itemsDir)
 
   return [textChunkMap, sectionTree]
-}
-
-const getWrapWordsInTagsFn = (contentLanguage: ILanguage) => {
-  switch (contentLanguage.code6393) {
-    case "jpn":
-      return wrapWordsInTagsJpn
-    case "cmn":
-      return wrapWordsInTagsCn("simplified")
-    case "lzh":
-      return wrapWordsInTagsCn("traditional")
-    default:
-      return wrapWordsInTagsStd
-  }
-}
-
-const wordRegexp = new RegExp(`([^${punctuationLikeChars}\r\n]+)`, "g")
-
-const wrapWordsInTagsStd = (s: string): Promise<[string, number]> => {
-  let wordCount = 0
-  const sWithWordsWrapped = s.replace(wordRegexp, substring => {
-    wordCount++
-    return `<w>${substring}</w>`
-  })
-  return new Promise((resolve, _reject) => resolve([sWithWordsWrapped, wordCount]))
-}
-
-// tslint:disable-next-line:no-var-requires
-const kuromoji = require("kuromoji")
-let kuromojiInstance: any
-const wrapWordsInTagsJpn = async (s: string): Promise<[string, number]> => {
-  if (!kuromojiInstance) {
-    kuromojiInstance = await new Promise((resolve, reject) => {
-      kuromoji
-        .builder({
-          dicPath: ""
-        })
-        .build((err: any, tokenizer: any) => {
-          if (err) {
-            reject(err)
-          }
-          resolve(tokenizer)
-        })
-    })
-  }
-  return kuromojiInstance.tokenize(s).reduce(
-    ([acc, wordCount]: [string, number], val: any) => {
-      const element = val.surface_form
-      const isAWord = wordRegexp.test(element)
-      return isAWord ? [acc + `<w>${element}</w>`, wordCount + 1] : [acc + element, wordCount]
-    },
-    ["", 0]
-  )
-}
-
-let chineseTokenizerInstance: any
-const wrapWordsInTagsCn = (charactersType: string) => async (
-  s: string
-): Promise<[string, number]> => {
-  if (!chineseTokenizerInstance) {
-    chineseTokenizerInstance = require("chinese-tokenizer").loadFile("out/cedict_ts.u8")
-  }
-  return chineseTokenizerInstance(s).reduce(
-    ([acc, wordCount]: [string, number], val: any) => {
-      const element = val[charactersType]
-      const isAWord = val.matches.length > 0
-      return isAWord ? [acc + `<w>${element}</w>`, wordCount + 1] : [acc + element, wordCount]
-    },
-    ["", 0]
-  )
 }
 
 const getOpfPath = async (archive: zip): Promise<string> => {

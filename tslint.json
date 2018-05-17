@@ -6,6 +6,7 @@
   "rules": {
     "jsx-boolean-value": [true, "never"],
     "jsx-no-lambda": false,
+    "max-classes-per-file": [true, 1, "exclude-class-expressions"],
     "member-ordering": [false],
     "no-bitwise": false,
     "no-console": false,
