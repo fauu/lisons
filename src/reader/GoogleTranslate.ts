@@ -1,14 +1,14 @@
-import { ILanguage } from "~/app/model"
+import { Language } from "~/app/model"
 import { xhr } from "~/app/Xhr"
 
-import { IDictionaryEntry, IGoogleResponse, ITranslation } from "~/reader/model"
+import { DictionaryEntry, GoogleResponse, Translation } from "~/reader/model"
 
 export const googleTranslate = async (
   s: string,
-  from: ILanguage,
-  to: ILanguage
-): Promise<ITranslation | undefined> =>
-  xhr<IGoogleResponse>(
+  from: Language,
+  to: Language
+): Promise<Translation | undefined> =>
+  xhr<GoogleResponse>(
     `
 https://translate.googleapis.com\
 /translate_a/single?client=gtx&dt=t&dt=bd&dj=1&source=icon\
@@ -23,7 +23,7 @@ https://translate.googleapis.com\
     if (!res.sentences) {
       return
     }
-    let dictionaryEntries: IDictionaryEntry[] | undefined
+    let dictionaryEntries: DictionaryEntry[] | undefined
     if (res.dict) {
       dictionaryEntries = res.dict.map(e => ({
         word: e.base_form,

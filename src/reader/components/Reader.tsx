@@ -5,7 +5,7 @@ import * as React from "react"
 import styled from "styled-components"
 
 import { animations } from "~/app/data/Style"
-import { IReaderStyleSettings } from "~/app/model"
+import { ReaderStyleSettings } from "~/app/model"
 import { AppStore, SettingsStore } from "~/app/stores"
 import { formatPercentage } from "~/util/FormatUtils"
 import { hexToRgb, isColorDark, withProps } from "~/util/StyleUtils"
@@ -16,11 +16,11 @@ import { ReaderStore, SidebarStore } from "~/reader/stores"
 
 import * as noiseTexture from "~/res/images/noise-texture.png"
 
-export interface IReaderProps {
+export interface ReaderProps {
   readonly appStore: AppStore
 }
 @observer
-export class Reader extends React.Component<IReaderProps> {
+export class Reader extends React.Component<ReaderProps> {
   private appStore!: AppStore
   private settingsStore!: SettingsStore
   private readerStore!: ReaderStore
@@ -164,13 +164,13 @@ const Root = styled.div`
   display: flex;
 `
 
-interface ITextAreaProps {
-  readonly userStyle: IReaderStyleSettings
+interface TextAreaProps {
+  readonly userStyle: ReaderStyleSettings
   readonly animateSelection: boolean
   readonly isContentRtl: boolean
   readonly areTranslationsRtl: boolean
 }
-const Body = withProps<ITextAreaProps>()(styled.div)`
+const Body = withProps<TextAreaProps>()(styled.div)`
   position: relative;
   flex: 1;
   z-index: 2;
@@ -224,11 +224,11 @@ const TextWithNavigation = styled.div`
   position: relative;
 `
 
-interface ITextNavButtonProps {
+interface TextNavButtonProps {
   readonly visible: boolean
   readonly variant: UiColorVariant
 }
-const TextNavButton = withProps<ITextNavButtonProps>()(styled.div)`
+const TextNavButton = withProps<TextNavButtonProps>()(styled.div)`
   visibility: ${p => (p.visible ? "visible" : "hidden")};
   min-width: 3rem;
   flex: 1;

@@ -1,4 +1,4 @@
-export interface ITextFileMetadata {
+export interface TextFileMetadata {
   author?: string
   title?: string
   language?: string

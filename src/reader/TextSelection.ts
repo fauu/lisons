@@ -2,7 +2,7 @@ import { getElementNo } from "~/util/DomUtils"
 
 type SelectionEnd = "Start" | "End"
 
-interface ISelectionElement {
+interface SelectionElement {
   no: number
   el: Element
 }
@@ -12,9 +12,9 @@ export class TextSelection {
   private static readonly selectedClassName = "selected"
   private static readonly multiParagraph = false
 
-  private _initialElement: ISelectionElement | undefined
-  private _firstElement: ISelectionElement | undefined
-  private _lastElement: ISelectionElement | undefined
+  private _initialElement: SelectionElement | undefined
+  private _firstElement: SelectionElement | undefined
+  private _lastElement: SelectionElement | undefined
 
   public get text(): string {
     let text = ""
@@ -71,7 +71,7 @@ export class TextSelection {
     return
   }
 
-  private trim(from: SelectionEnd, to: ISelectionElement): void {
+  private trim(from: SelectionEnd, to: SelectionElement): void {
     let currentElement = from === "Start" ? this._firstElement!.el : this._lastElement!.el
     while (getElementNo(currentElement) !== to.no) {
       this.setSelectedClass(currentElement, false)

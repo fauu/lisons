@@ -1,18 +1,18 @@
 import { zip } from "lodash"
 import { action, observable } from "mobx"
 
-import { IExampleSentences, ILanguage } from "~/app/model"
+import { ExampleSentences, Language } from "~/app/model"
 import { emphasizePhrase } from "~/util/ExampleSentenceUtils"
 import { flowed } from "~/util/MobxUtils"
 import { hasSpace } from "~/util/StringUtils"
 
 import { deeplTranslate, isLanguageConfigurationSupportedByDeepl } from "~/reader/DeeplTranslate"
 import { googleTranslate } from "~/reader/GoogleTranslate"
-import { IDictionaryEntry, ISources, ITranslation, ResourceState } from "~/reader/model"
+import { DictionaryEntry, ResourceState, Sources, Translation } from "~/reader/model"
 import { ReversoContextSource } from "~/reader/ReversoContextSource"
 import { TatoebaSource } from "~/reader/TatoebaSource"
 
-type TranslationPair = [ITranslation | undefined, ITranslation | undefined]
+type TranslationPair = [Translation | undefined, Translation | undefined]
 
 export class SidebarStore {
   private static readonly sources = {
@@ -24,20 +24,20 @@ export class SidebarStore {
 
   @observable public isVisible: boolean = true
   @observable public isMainTranslationLoading: boolean = false
-  @observable.ref public exampleSentences?: IExampleSentences
+  @observable.ref public exampleSentences?: ExampleSentences
   @observable public exampleSentencesState: ResourceState = "NotLoading"
-  @observable.ref public dictionaryEntries: IDictionaryEntry[] = []
+  @observable.ref public dictionaryEntries: DictionaryEntry[] = []
   @observable public dictionaryEntriesState: ResourceState = "NotLoading"
   @observable public isSettingsTabActive: boolean = false
   @observable
-  public sources: ISources = {
+  public sources: Sources = {
     mainTranslationSource: SidebarStore.sources.google,
     dictionarySource: SidebarStore.sources.google,
     sentencesSource: SidebarStore.sources.tatoeba
   }
 
   @action
-  public updateSources(contentLanguage: ILanguage, translationLanguage: ILanguage): void {
+  public updateSources(contentLanguage: Language, translationLanguage: Language): void {
     const canDoDeeplTranslation = isLanguageConfigurationSupportedByDeepl(
       contentLanguage,
       translationLanguage
@@ -58,10 +58,10 @@ export class SidebarStore {
   @flowed
   public *update(
     selectedText: string,
-    contentLanguage: ILanguage,
-    translationLanguage: ILanguage,
+    contentLanguage: Language,
+    translationLanguage: Language,
     translationCallback: (translation: string) => void
-  ): IterableIterator<Promise<[ITranslation | undefined, ITranslation | undefined]>> {
+  ): IterableIterator<Promise<[Translation | undefined, Translation | undefined]>> {
     if (!selectedText) {
       this.setResourcesNotLoading()
       return
@@ -75,8 +75,8 @@ export class SidebarStore {
     }
 
     const [googleTranslation, deeplTranslation]: [
-      ITranslation | undefined,
-      ITranslation | undefined
+      Translation | undefined,
+      Translation | undefined
     ] = yield this.fetchTranslations(selectedText, contentLanguage, translationLanguage)
     const mainTranslation = deeplTranslation || googleTranslation
     if (mainTranslation) {
@@ -138,11 +138,11 @@ export class SidebarStore {
   @flowed
   private *fetchExampleSentences(
     phrase: string,
-    contentLanguage: ILanguage,
-    translationLanguage: ILanguage
-  ): IterableIterator<Promise<IExampleSentences>> {
+    contentLanguage: Language,
+    translationLanguage: Language
+  ): IterableIterator<Promise<ExampleSentences>> {
     this.setExampleSentencesState("Loading")
-    const exampleSentences: IExampleSentences = yield this.sources.sentencesSource.fetchSentences(
+    const exampleSentences: ExampleSentences = yield this.sources.sentencesSource.fetchSentences(
       phrase,
       contentLanguage,
       translationLanguage
@@ -156,8 +156,8 @@ export class SidebarStore {
 
   private async fetchTranslations(
     phrase: string,
-    contentLanguage: ILanguage,
-    translationLanguage: ILanguage
+    contentLanguage: Language,
+    translationLanguage: Language
   ): Promise<TranslationPair> {
     const isSingleWord = !hasSpace(phrase)
     const canDoDeeplTranslation = this.sources.mainTranslationSource.name === "DeepL"

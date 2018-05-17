@@ -1,10 +1,10 @@
 import * as React from "react"
 import * as ReactCSSTransitionReplace from "react-css-transition-replace"
 
-export interface IFadeTransitionProps {
+export interface FadeTransitionProps {
   readonly children: JSX.Element
 }
-export function FadeTransition({ children }: IFadeTransitionProps): JSX.Element {
+export function FadeTransition({ children }: FadeTransitionProps): JSX.Element {
   return (
     <ReactCSSTransitionReplace
       transitionName="fade-wait"

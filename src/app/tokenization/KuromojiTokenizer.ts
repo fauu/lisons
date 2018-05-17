@@ -3,9 +3,9 @@
 const kuromoji = require("kuromoji")
 
 import { punctuationLikeChars } from "~/app/data/PunctuationLikeChars"
-import { ITokenizedTextContent, ITokenizer, TextTokenType } from "~/app/model"
+import { TextTokenType, TokenizedTextContent, Tokenizer } from "~/app/model"
 
-export class KuromojiTokenizer implements ITokenizer {
+export class KuromojiTokenizer implements Tokenizer {
   private static readonly punctuationRegexp = new RegExp(`[${punctuationLikeChars}]+`, "g")
   private static readonly paragraphBreakRegexp = /[\r\n]/g
   private static readonly sectionMarkerRegexp = /\[####SECTIONSTART\]/g
@@ -13,7 +13,7 @@ export class KuromojiTokenizer implements ITokenizer {
 
   private _vendorTokenizer: any
 
-  public async tokenize(rawTextContent: string): Promise<[ITokenizedTextContent, number[]]> {
+  public async tokenize(rawTextContent: string): Promise<[TokenizedTextContent, number[]]> {
     const vendorTokenizer = await this.getVendorTokenizer()
     const kuromojiTokens = vendorTokenizer.tokenize(rawTextContent)
     const types = []
@@ -33,7 +33,7 @@ export class KuromojiTokenizer implements ITokenizer {
       types.push(type)
       values.push(element)
     }
-    return [{ types, values, startNo: 0 }, [-1]] as [ITokenizedTextContent, number[]]
+    return [{ types, values, startNo: 0 }, [-1]] as [TokenizedTextContent, number[]]
   }
 
   private getVendorTokenizer(): Promise<any> {

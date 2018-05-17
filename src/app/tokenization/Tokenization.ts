@@ -1,19 +1,19 @@
-import { ILanguage, ITokenizedTextContent, ITokenizer } from "~/app/model"
+import { Language, TokenizedTextContent, Tokenizer } from "~/app/model"
 import { ChineseTokenizer } from "~/app/tokenization/ChineseTokenizer"
 import { KuromojiTokenizer } from "~/app/tokenization/KuromojiTokenizer"
 import { StandardTokenizer } from "~/app/tokenization/StandardTokenizer"
 
-interface ITokenizerConstructor {
-  new (): ITokenizer
+interface TokenizerConstructor {
+  new (): Tokenizer
 }
 
-const tokenizerConstructors: { [name: string]: ITokenizerConstructor } = {
+const tokenizerConstructors: { [name: string]: TokenizerConstructor } = {
   chinese: ChineseTokenizer,
   kuromoji: KuromojiTokenizer,
   standard: StandardTokenizer
 }
 
-const tokenizerInstances: Map<string, ITokenizer | undefined> = new Map([
+const tokenizerInstances: Map<string, Tokenizer | undefined> = new Map([
   ["standard", undefined],
   ["chinese", undefined],
   ["kuromoji", undefined]
@@ -32,7 +32,7 @@ const languageOpts = new Map([
 
 const defaultTokenizerName = "standard"
 
-const getTokenizer = (language: ILanguage): ITokenizer => {
+const getTokenizer = (language: Language): Tokenizer => {
   const tokenizerName = languageCodeToTokenizerName.get(language.code6393) || defaultTokenizerName
   let tokenizerInstance = tokenizerInstances.get(tokenizerName)
   if (!tokenizerInstance) {
@@ -44,7 +44,7 @@ const getTokenizer = (language: ILanguage): ITokenizer => {
 
 export const tokenize = async (
   rawTextContent: string,
-  language: ILanguage
-): Promise<[ITokenizedTextContent, number[]]> => {
+  language: Language
+): Promise<[TokenizedTextContent, number[]]> => {
   return getTokenizer(language).tokenize(rawTextContent, languageOpts.get(language.code6393))
 }

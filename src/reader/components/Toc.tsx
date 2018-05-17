@@ -2,16 +2,16 @@ import * as React from "react"
 import styled from "styled-components"
 
 import { animations } from "~/app/data/Style"
-import { ITextSectionInfo } from "~/app/model"
+import { TextSectionInfo } from "~/app/model"
 import { withProps } from "~/util/StyleUtils"
 
 import { UiColorVariant } from "~/reader/model"
 
 import * as noiseTexture from "~/res/images/noise-texture.png"
 
-export interface ITocProps {
-  readonly sections: ITextSectionInfo[]
-  readonly currentSection: ITextSectionInfo
+export interface TocProps {
+  readonly sections: TextSectionInfo[]
+  readonly currentSection: TextSectionInfo
   readonly variant: UiColorVariant
   readonly onAnyClick: () => void
   readonly onSectionLinkClick: (startElementNo: number) => void
@@ -22,7 +22,7 @@ export function Toc({
   variant,
   onAnyClick,
   onSectionLinkClick
-}: ITocProps): JSX.Element {
+}: TocProps): JSX.Element {
   return (
     <Root onClick={onAnyClick}>
       <Wrapper variant={variant}>

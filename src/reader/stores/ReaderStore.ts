@@ -1,6 +1,6 @@
 import { action, computed, observable, reaction } from "mobx"
 
-import { ITextSectionInfo, Text } from "~/app/model"
+import { Text, TextSectionInfo } from "~/app/model"
 import { TextStore } from "~/app/stores"
 
 import { SidebarStore } from "~/reader/stores"
@@ -14,7 +14,7 @@ export class ReaderStore {
   @observable public isTocOpen: boolean = false
   @observable.ref public text?: Text
   @observable public readingProgress?: [number, number] | number
-  @observable.ref public currentSection?: ITextSectionInfo
+  @observable.ref public currentSection?: TextSectionInfo
   @observable private _selectedText: string = ""
   @observable.ref private _textView?: TextView
   private _sidebarStore: SidebarStore
@@ -186,7 +186,7 @@ export class ReaderStore {
   }
 
   @action
-  private setCurrentSection(value?: ITextSectionInfo): void {
+  private setCurrentSection(value?: TextSectionInfo): void {
     this.currentSection = value
   }
 

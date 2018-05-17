@@ -8,11 +8,11 @@ import { AppStore } from "~/app/stores"
 import { formatPercentage } from "~/util/FormatUtils"
 import { withProps } from "~/util/StyleUtils"
 
-export interface ITextListElementProps {
+export interface TextListElementProps {
   readonly appStore: AppStore
   readonly text: Text
 }
-export function TextListElement({ appStore, text }: ITextListElementProps): JSX.Element {
+export function TextListElement({ appStore, text }: TextListElementProps): JSX.Element {
   const progress = text.progress && text.progress.percentage > 0 && text.progress.percentage
   return (
     <Root key={text.id}>

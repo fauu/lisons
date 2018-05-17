@@ -1,9 +1,9 @@
-import { IExampleSentences, ILanguage } from "~/app/model"
+import { ExampleSentences, Language } from "~/app/model"
 import { xhr } from "~/app/Xhr"
 
-import { ISentenceSource } from "~/reader/model"
+import { SentenceSource } from "~/reader/model"
 
-export class TatoebaSource implements ISentenceSource {
+export class TatoebaSource implements SentenceSource {
   public get name(): string {
     return "Tatoeba"
   }
@@ -17,9 +17,9 @@ export class TatoebaSource implements ISentenceSource {
 
   public async fetchSentences(
     phrase: string,
-    from: ILanguage,
-    to: ILanguage
-  ): Promise<IExampleSentences> {
+    from: Language,
+    to: Language
+  ): Promise<ExampleSentences> {
     const sourceUrl = this.getSentencesDocumentUrl(encodeURI(phrase), from.code6393, to.code6393)
     const doc = await this.fetchSentencesDocument(sourceUrl)
 

@@ -1,4 +1,4 @@
-export interface ITextChunkMapElement {
+export interface TextChunkMapElement {
   id: string
   href: string
   wordCount: number

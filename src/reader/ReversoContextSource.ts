@@ -1,9 +1,9 @@
-import { IExampleSentences, ILanguage } from "~/app/model"
+import { ExampleSentences, Language } from "~/app/model"
 import { xhr } from "~/app/Xhr"
 
-import { ISentenceSource } from "~/reader/model"
+import { SentenceSource } from "~/reader/model"
 
-export class ReversoContextSource implements ISentenceSource {
+export class ReversoContextSource implements SentenceSource {
   private static languageMap = new Map([
     ["ara", ["eng", "spa", "fra", "heb"]],
     ["deu", ["eng", "spa", "fra", "heb", "ita", "jpn", "nld", "pol", "por", "ron"]],
@@ -31,7 +31,7 @@ export class ReversoContextSource implements ISentenceSource {
   }
   private parser = new DOMParser()
 
-  public hasSentences(from: ILanguage, to: ILanguage): boolean {
+  public hasSentences(from: Language, to: Language): boolean {
     const toCodes = ReversoContextSource.languageMap.get(from.code6393)
     if (!toCodes) {
       return false
@@ -41,9 +41,9 @@ export class ReversoContextSource implements ISentenceSource {
 
   public async fetchSentences(
     phrase: string,
-    from: ILanguage,
-    to: ILanguage
-  ): Promise<IExampleSentences> {
+    from: Language,
+    to: Language
+  ): Promise<ExampleSentences> {
     const sourceUrl = this.getSentencesDocumentUrl(
       encodeURI(phrase),
       this.getLanguageString(from),
@@ -65,7 +65,7 @@ export class ReversoContextSource implements ISentenceSource {
     }
   }
 
-  private getLanguageString(lang: ILanguage): string {
+  private getLanguageString(lang: Language): string {
     return lang.name.toLowerCase()
   }
 

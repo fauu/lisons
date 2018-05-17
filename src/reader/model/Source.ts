@@ -1,4 +1,4 @@
-export interface ISource {
+export interface Source {
   name: string
   url: string
 }

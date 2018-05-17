@@ -1,4 +1,4 @@
-export interface ILanguage {
+export interface Language {
   name: string
   localName: string
   codeGt: string

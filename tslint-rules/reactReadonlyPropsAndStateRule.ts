@@ -10,59 +10,65 @@
  * get compiler support for that fact.
  */
 
-import * as Lint from "tslint";
-import * as ts from "typescript";
+import * as Lint from "tslint"
+import * as ts from "typescript"
 
 export class Rule extends Lint.Rules.AbstractRule {
-    public apply(sourceFile: ts.SourceFile): Lint.RuleFailure[] {
-      if (sourceFile.languageVariant === ts.LanguageVariant.JSX) {
-        return this.applyWithWalker(new ReactReadonlyPropsAndStateWalker(sourceFile, this.getOptions()));
-      } else {
-          return [];
-      }
+  public apply(sourceFile: ts.SourceFile): Lint.RuleFailure[] {
+    if (sourceFile.languageVariant === ts.LanguageVariant.JSX) {
+      return this.applyWithWalker(
+        new ReactReadonlyPropsAndStateWalker(sourceFile, this.getOptions())
+      )
+    } else {
+      return []
     }
+  }
 }
 
 // The walker takes care of all the work.
 // tslint:disable-next-line:max-classes-per-file
 class ReactReadonlyPropsAndStateWalker extends Lint.RuleWalker {
   protected visitInterfaceDeclaration(node: ts.InterfaceDeclaration): void {
-      if (node.name.text.endsWith("Props")) {
-        this.ensureReadOnly(node.members);
-      }
+    if (node.name.text.endsWith("Props")) {
+      this.ensureReadOnly(node.members)
+    }
 
-      if (node.name.text.endsWith("State")) {
-        this.ensureReadOnly(node.members);
-      }
+    if (node.name.text.endsWith("State")) {
+      this.ensureReadOnly(node.members)
+    }
 
-      super.visitInterfaceDeclaration(node);
+    super.visitInterfaceDeclaration(node)
   }
 
   private ensureReadOnly(members: ts.NodeArray<ts.TypeElement>) {
-    members.forEach((member) => {
-      if (member.kind !== ts.SyntaxKind.PropertySignature) { return; }
+    members.forEach(member => {
+      if (member.kind !== ts.SyntaxKind.PropertySignature) {
+        return
+      }
 
-      const propertySignature = member as ts.PropertySignature;
+      const propertySignature = member as ts.PropertySignature
 
       if (!this.isReadOnly(propertySignature)) {
-        const start = propertySignature.getStart();
-        const width = propertySignature.getWidth();
-        const error = `Property and state signatures should be read-only`;
+        const start = propertySignature.getStart()
+        const width = propertySignature.getWidth()
+        const error = `Property and state signatures should be read-only`
 
-        this.addFailure(this.createFailure(start, width, error));
+        this.addFailure(this.createFailure(start, width, error))
       }
-    });
+    })
   }
 
   private isReadOnly(propertySignature: ts.PropertySignature): boolean {
-    const modifiers = propertySignature.modifiers;
+    const modifiers = propertySignature.modifiers
 
-    if (!modifiers) { return false; }
-
-    if (modifiers.find((m) => m.kind === ts.SyntaxKind.ReadonlyKeyword)) {
-      return true;
+    if (!modifiers) {
+      return false
     }
 
-    return false;
+    if (modifiers.find(m => m.kind === ts.SyntaxKind.ReadonlyKeyword)) {
+      return true
+    }
+
+    return false
   }
 }

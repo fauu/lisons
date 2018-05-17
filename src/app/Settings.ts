@@ -3,11 +3,11 @@ import * as path from "path"
 import { getUserDataPath, readFile, writeStringToFile } from "~/util/FileUtils"
 
 import { defaultSettings } from "~/app/data/DefaultSettings"
-import { ISettings } from "~/app/model"
+import { Settings } from "~/app/model"
 
 const fileName = "settings.json"
 
-export const loadSettings = async (): Promise<ISettings> => {
+export const loadSettings = async (): Promise<Settings> => {
   const filePath = path.join(getUserDataPath(), fileName)
   let rawSettings
   try {
@@ -19,7 +19,7 @@ export const loadSettings = async (): Promise<ISettings> => {
   }
 }
 
-export const saveSettings = async (settings: ISettings): Promise<void> => {
+export const saveSettings = async (settings: Settings): Promise<void> => {
   const filePath = path.join(getUserDataPath(), fileName)
   writeStringToFile(filePath, JSON.stringify(settings))
 }

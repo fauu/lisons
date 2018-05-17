@@ -9,10 +9,10 @@ import { AppStore } from "~/app/stores"
 
 import { AddTextDialog, TextList } from "~/library/components"
 
-export interface ILibraryProps {
+export interface LibraryProps {
   readonly appStore: AppStore
 }
-export const Library = observer(function _Library({ appStore }: ILibraryProps): JSX.Element {
+export const Library = observer(function _Library({ appStore }: LibraryProps): JSX.Element {
   const isEmpty = appStore.textStore.texts.size === 0
   const addTextDialogStore = appStore.libraryStore.addTextDialogStore
   const { settingsStore, isNewVersionAvailable } = appStore

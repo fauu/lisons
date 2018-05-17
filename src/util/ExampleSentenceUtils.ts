@@ -1,8 +1,8 @@
 import levenshteinDistance = require("~/vendor/natural/LevenshteinDistance")
 
-import { ISentenceWithTranslations, LanguageFlag } from "~/app/model"
+import { LanguageFlag, SentenceWithTranslations } from "~/app/model"
 
-export const emphasizePhrase = (phrase: string, swt: ISentenceWithTranslations) => {
+export const emphasizePhrase = (phrase: string, swt: SentenceWithTranslations) => {
   const searchResult = levenshteinDistance(phrase, swt.sentence, {
     search: true
   }) as any

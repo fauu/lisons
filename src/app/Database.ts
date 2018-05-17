@@ -1,10 +1,10 @@
 import Dexie from "dexie"
 
-import { ITextContent, ITextInfo } from "~/app/model"
+import { TextContent, TextInfo } from "~/app/model"
 
 export class Database extends Dexie {
-  public texts!: Dexie.Table<ITextInfo, number>
-  public textContents!: Dexie.Table<ITextContent, number>
+  public texts!: Dexie.Table<TextInfo, number>
+  public textContents!: Dexie.Table<TextContent, number>
 
   public constructor() {
     super("Database")

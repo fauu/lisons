@@ -1,6 +1,6 @@
-import { ISettings } from "~/app/model"
+import { Settings } from "~/app/model"
 
-export const defaultSettings: ISettings = {
+export const defaultSettings: Settings = {
   defaultTranslationLanguage: "eng",
   readerStyle: {
     width: 50,

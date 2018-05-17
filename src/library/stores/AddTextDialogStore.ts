@@ -6,7 +6,7 @@ import { IPromiseBasedObservable } from "mobx-utils"
 import * as path from "path"
 
 import { convertEpubToLisonsText, loadMetadata } from "~/app/Epub"
-import { ILanguage } from "~/app/model"
+import { Language } from "~/app/model"
 
 import {
   ensurePathExists,
@@ -22,15 +22,15 @@ import { detectLanguage } from "~/util/TextUtils"
 
 import { isUtf8 } from "~/vendor/is-utf8"
 
-import { IAddTextFormData, ITextFileMetadata, TextFileStatus } from "~/library/model"
+import { AddTextFormData, TextFileMetadata, TextFileStatus } from "~/library/model"
 
 export class AddTextDialogStore {
   private static readonly languageDetectionSampleLength = 5000
 
-  @observable public detectedTextLanguage?: ILanguage
+  @observable public detectedTextLanguage?: Language
   @observable public isLanguageConfigurationValid: boolean = true
   @observable public isSavingText: boolean = false
-  @observable public textFileMetadata?: ITextFileMetadata
+  @observable public textFileMetadata?: TextFileMetadata
 
   public tatoebaTranslationCount?: IPromiseBasedObservable<number>
 
@@ -59,7 +59,7 @@ export class AddTextDialogStore {
   }
 
   @flowed
-  public *saveText(formData: IAddTextFormData): IterableIterator<Promise<any>> {
+  public *saveText(formData: AddTextFormData): IterableIterator<Promise<any>> {
     this.isSavingText = true
 
     console.log("saveText()", {
@@ -131,8 +131,8 @@ export class AddTextDialogStore {
 
   @action
   public handleSelectedLanguagesChange([contentLanguage, translationLanguage]: [
-    ILanguage,
-    ILanguage
+    Language,
+    Language
   ]): void {
     this.isLanguageConfigurationValid = contentLanguage.code6393 !== translationLanguage.code6393
     // this.tatoebaTranslationCount = this.isLanguageConfigurationValid
@@ -169,7 +169,7 @@ export class AddTextDialogStore {
         : undefined
   }
 
-  private handleTextFileMetadataChange(metadata: ITextFileMetadata | undefined): void {
+  private handleTextFileMetadataChange(metadata: TextFileMetadata | undefined): void {
     if (metadata && metadata.language) {
       this.detectedTextLanguage = languageFromCodeGt(metadata.language.substr(0, 2))
     } else if (this.textFilePlaintext) {

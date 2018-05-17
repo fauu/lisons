@@ -1,34 +1,34 @@
 import * as zip from "jszip"
 import * as path from "path"
 
-import { ILanguage, ITextSectionTree, ITextSectionTreeNode, TextChunkMap } from "~/app/model"
+import { Language, TextChunkMap, TextSectionTree, TextSectionTreeNode } from "~/app/model"
 import { getWrapWordsInTagsFn } from "~/app/Tokenization"
 
-import { ITextFileMetadata } from "~/library/model"
+import { TextFileMetadata } from "~/library/model"
 import { ensurePathExists, writeFile } from "~/util/FileUtils"
 
-interface IOpfMetadata {
+interface OpfMetadata {
   title?: string
   creator?: string
   language?: string
 }
 
-interface IOpfManifest {
-  items: IOpfItem[]
+interface OpfManifest {
+  items: OpfItem[]
 }
 
-interface IOpfItem {
+interface OpfItem {
   id: string
   mediaType: string
   href: string
 }
 
-interface IOpfSpine {
+interface OpfSpine {
   toc?: string
-  itemRefs: IOpfItemRef[]
+  itemRefs: OpfItemRef[]
 }
 
-interface IOpfItemRef {
+interface OpfItemRef {
   idRef: string
 }
 
@@ -42,7 +42,7 @@ const { parseXml } = new class {
   }
 }()
 
-export const loadMetadata = async (buffer: Buffer): Promise<ITextFileMetadata> => {
+export const loadMetadata = async (buffer: Buffer): Promise<TextFileMetadata> => {
   const archive = await zip.loadAsync(buffer)
 
   const opfPath = await getOpfPath(archive)
@@ -55,8 +55,8 @@ export const loadMetadata = async (buffer: Buffer): Promise<ITextFileMetadata> =
 export const convertEpubToLisonsText = async (
   textPath: string,
   buffer: Buffer,
-  contentLanguage: ILanguage
-): Promise<[TextChunkMap, ITextSectionTree | undefined]> => {
+  contentLanguage: Language
+): Promise<[TextChunkMap, TextSectionTree | undefined]> => {
   const archive = await zip.loadAsync(buffer)
 
   const opfPath = await getOpfPath(archive)
@@ -159,7 +159,7 @@ const getOpfFragment = async (archive: zip, opfPath: string): Promise<DocumentFr
   return document.createRange().createContextualFragment(await opfFile.async("text"))
 }
 
-const getOpfMetadata = (fragment: DocumentFragment): IOpfMetadata => {
+const getOpfMetadata = (fragment: DocumentFragment): OpfMetadata => {
   const opfMetadata = {}
   const fieldNames = ["title", "creator", "language"]
   fieldNames.forEach(fieldName => {
@@ -171,7 +171,7 @@ const getOpfMetadata = (fragment: DocumentFragment): IOpfMetadata => {
   return opfMetadata
 }
 
-const getOpfManifest = (fragment: DocumentFragment, acceptedMediaTypes: string[]): IOpfManifest => {
+const getOpfManifest = (fragment: DocumentFragment, acceptedMediaTypes: string[]): OpfManifest => {
   const items = Array.from(fragment.querySelectorAll("manifest item"))
     .map(itemElement => {
       const mediaType = itemElement.getAttribute("media-type") || ""
@@ -183,10 +183,10 @@ const getOpfManifest = (fragment: DocumentFragment, acceptedMediaTypes: string[]
       return undefined
     })
     .filter(item => item !== undefined)
-  return { items: items as IOpfItem[] }
+  return { items: items as OpfItem[] }
 }
 
-const getOpfSpine = (fragment: DocumentFragment): IOpfSpine => {
+const getOpfSpine = (fragment: DocumentFragment): OpfSpine => {
   const spineElement = fragment.querySelector("spine")
   if (!spineElement) {
     throw new Error("The OPF file is spineless")
@@ -202,7 +202,7 @@ const getOpfSpine = (fragment: DocumentFragment): IOpfSpine => {
     .filter(itemRef => itemRef.idRef !== null)
   return {
     toc: tocValue,
-    itemRefs: itemRefs as IOpfItemRef[]
+    itemRefs: itemRefs as OpfItemRef[]
   }
 }
 
@@ -228,7 +228,7 @@ const parseTocContent = (content: Element): string | undefined => {
   return src
 }
 
-const parseTocNavPoint = (navPoint: Element): ITextSectionTreeNode | undefined => {
+const parseTocNavPoint = (navPoint: Element): TextSectionTreeNode | undefined => {
   let label
   let contentFilePath
   let contentFragmentId
@@ -273,7 +273,7 @@ const parseTocNavPoint = (navPoint: Element): ITextSectionTreeNode | undefined =
   return { label, contentFilePath, contentFragmentId, children }
 }
 
-const parseTocNavMap = async (navMap: Element): Promise<ITextSectionTree> => {
+const parseTocNavMap = async (navMap: Element): Promise<TextSectionTree> => {
   const topLevelNodes = []
   for (const childEl of navMap.children) {
     if (childEl.tagName.toLowerCase() !== "navpoint") {
@@ -290,10 +290,10 @@ const parseTocNavMap = async (navMap: Element): Promise<ITextSectionTree> => {
 
 const getSectionTree = async (
   archive: zip,
-  manifest: IOpfManifest,
-  spine: IOpfSpine,
+  manifest: OpfManifest,
+  spine: OpfSpine,
   itemsDir: string
-): Promise<ITextSectionTree | undefined> => {
+): Promise<TextSectionTree | undefined> => {
   if (!spine.toc) {
     return
   }

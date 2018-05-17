@@ -1,12 +1,7 @@
 import { punctuationLikeChars } from "~/app/data/PunctuationLikeChars"
-import {
-  ChineseCharactersType,
-  ITokenizedTextContent,
-  ITokenizer,
-  TextTokenType
-} from "~/app/model"
+import { ChineseCharactersType, TextTokenType, TokenizedTextContent, Tokenizer } from "~/app/model"
 
-export class ChineseTokenizer implements ITokenizer {
+export class ChineseTokenizer implements Tokenizer {
   private static readonly punctuationRegexp = new RegExp(`[${punctuationLikeChars}]+`, "g")
   private static readonly paragraphBreakRegexp = /[\r\n]/g
   private static readonly sectionMarkerRegexp = /\[####SECTIONSTART\]/g
@@ -20,7 +15,7 @@ export class ChineseTokenizer implements ITokenizer {
   public async tokenize(
     rawTextContent: string,
     { charactersType }: { charactersType: ChineseCharactersType }
-  ): Promise<[ITokenizedTextContent, number[]]> {
+  ): Promise<[TokenizedTextContent, number[]]> {
     const vendorTokenizer = await this.getVendorTokenizer(charactersType)
     const vendorTokens = vendorTokenizer.tokenize(rawTextContent)
     const types = []
@@ -40,7 +35,7 @@ export class ChineseTokenizer implements ITokenizer {
       types.push(type)
       values.push(element)
     }
-    return [{ types, values, startNo: 0 }, [-1]] as [ITokenizedTextContent, number[]]
+    return [{ types, values, startNo: 0 }, [-1]] as [TokenizedTextContent, number[]]
   }
 
   private getVendorTokenizer(type: ChineseCharactersType): Promise<any> {

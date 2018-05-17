@@ -1,4 +1,4 @@
-export interface IReaderStyleSettings {
+export interface ReaderStyleSettings {
   width: number
   fontSize: number
   letterSpacing: number

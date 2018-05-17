@@ -1,6 +1,6 @@
 import { action, observable, ObservableMap } from "mobx"
 
-import { IParsedText, ITextInfo, ITextProgress, Text } from "~/app/model"
+import { ParsedText, Text, TextInfo, TextProgress } from "~/app/model"
 import { TextRepository } from "~/app/TextRepository"
 import { flowed } from "~/util/MobxUtils"
 
@@ -17,7 +17,7 @@ export class TextStore {
     texts.forEach(t => this.texts.set(t.id, t))
   }
 
-  public async add(info: ITextInfo, parsed: IParsedText): Promise<void> {
+  public async add(info: TextInfo, parsed: ParsedText): Promise<void> {
     const newText = await this._textRepository.save(info, parsed)
     this.setText(newText)
   }
@@ -29,7 +29,7 @@ export class TextStore {
   }
 
   // TODO: Make progress observable and sync automatically?
-  public async setTextProgress(id: number, progress: ITextProgress): Promise<void> {
+  public async setTextProgress(id: number, progress: TextProgress): Promise<void> {
     const updatedText = this._textRepository.updateProgress(id, progress)
     this.setText(await updatedText)
   }

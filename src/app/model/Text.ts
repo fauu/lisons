@@ -1,16 +1,16 @@
 import { languageFromCode6393 } from "~/util/LanguageUtils"
 
 import {
-  ILanguage,
-  ITextInfo,
-  ITextProgress,
-  ITextSectionInfo,
-  ITokenizedTextContent,
-  LanguageFlag
+  Language,
+  LanguageFlag,
+  TextInfo,
+  TextProgress,
+  TextSectionInfo,
+  TokenizedTextContent
 } from "~/app/model"
 
 export class Text {
-  public static fromPersisted(data: ITextInfo): Text {
+  public static fromPersisted(data: TextInfo): Text {
     return new Text(
       data.id!,
       data.title,
@@ -28,15 +28,15 @@ export class Text {
     private _id: number,
     private _title: string,
     private _author: string,
-    private _contentLanguage: ILanguage,
-    private _translationLanguage: ILanguage,
-    private _progress: ITextProgress,
+    private _contentLanguage: Language,
+    private _translationLanguage: Language,
+    private _progress: TextProgress,
     private _elementCount: number = 0,
-    private _tokenizedContent?: ITokenizedTextContent,
-    private _structure?: ITextSectionInfo[]
+    private _tokenizedContent?: TokenizedTextContent,
+    private _structure?: TextSectionInfo[]
   ) {}
 
-  public getTokenizedContentSlice(from: number, count: number): ITokenizedTextContent | undefined {
+  public getTokenizedContentSlice(from: number, count: number): TokenizedTextContent | undefined {
     if (!this.tokenizedContent) {
       return undefined
     }
@@ -60,19 +60,19 @@ export class Text {
     return this._author
   }
 
-  public get contentLanguage(): ILanguage {
+  public get contentLanguage(): Language {
     return this._contentLanguage
   }
 
-  public get translationLanguage(): ILanguage {
+  public get translationLanguage(): Language {
     return this._translationLanguage
   }
 
-  public get tokenizedContent(): ITokenizedTextContent | undefined {
+  public get tokenizedContent(): TokenizedTextContent | undefined {
     return this._tokenizedContent
   }
 
-  public set tokenizedContent(value: ITokenizedTextContent | undefined) {
+  public set tokenizedContent(value: TokenizedTextContent | undefined) {
     if (value) {
       this._elementCount = value.types.length
     }
@@ -83,15 +83,15 @@ export class Text {
     return this._elementCount
   }
 
-  public get structure(): ITextSectionInfo[] | undefined {
+  public get structure(): TextSectionInfo[] | undefined {
     return this._structure
   }
 
-  public set structure(value: ITextSectionInfo[] | undefined) {
+  public set structure(value: TextSectionInfo[] | undefined) {
     this._structure = value
   }
 
-  public get progress(): ITextProgress | undefined {
+  public get progress(): TextProgress | undefined {
     return this._progress
   }
 

@@ -1,4 +1,4 @@
-export interface ITextProgress {
+export interface TextProgress {
   elementNo: number
   percentage: number
 }

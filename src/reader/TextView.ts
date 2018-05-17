@@ -1,6 +1,6 @@
 import { action, observable, reaction } from "mobx"
 
-import { ITokenizedTextContent, TextTokenType } from "~/app/model"
+import { TextTokenType, TokenizedTextContent } from "~/app/model"
 import { appendElement, getElementNo, prependElement } from "~/util/DomUtils"
 
 import { TextSelection } from "~/reader/TextSelection"
@@ -85,7 +85,7 @@ export class TextView {
     return getElementNo(this.lastVisibleElement)
   }
 
-  public renderPage(content: ITokenizedTextContent): Promise<void> {
+  public renderPage(content: TokenizedTextContent): Promise<void> {
     this.fadeOutRoot()
     const startTime = window.performance.now()
     const newRoot = this.createNewRoot()
@@ -120,7 +120,7 @@ export class TextView {
     })
   }
 
-  public renderPrevPage(content: ITokenizedTextContent): Promise<void> {
+  public renderPrevPage(content: TokenizedTextContent): Promise<void> {
     this.fadeOutRoot()
 
     // TODO: Don't wait, do the work while fading out previous root if possible
@@ -134,7 +134,7 @@ export class TextView {
     })
   }
 
-  private doRenderPrevPage(content: ITokenizedTextContent): void {
+  private doRenderPrevPage(content: TokenizedTextContent): void {
     this.replaceRoot(this.root.cloneNode(false))
 
     const { types, values, startNo } = content

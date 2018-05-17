@@ -8,19 +8,19 @@ import { withProps } from "~/util/StyleUtils"
 import { UiColorVariantContext } from "~/reader/components"
 import { UiColorVariant } from "~/reader/model"
 
-export interface IHeaderButtonProps {
+export interface HeaderButtonProps {
   readonly tip: string
   readonly Icon: MdiReactIconComponentType
   readonly onClick: () => void
 }
-export interface IHeaderButtonState {
+export interface HeaderButtonState {
   readonly isTipVisible: boolean
   readonly wasTipCancelled: boolean
 }
-export class HeaderButton extends React.Component<IHeaderButtonProps, IHeaderButtonState> {
+export class HeaderButton extends React.Component<HeaderButtonProps, HeaderButtonState> {
   private static readonly tipDelayMs = 500
 
-  public constructor(props: IHeaderButtonProps) {
+  public constructor(props: HeaderButtonProps) {
     super(props)
     this.state = { isTipVisible: false, wasTipCancelled: false }
   }
@@ -48,8 +48,8 @@ export class HeaderButton extends React.Component<IHeaderButtonProps, IHeaderBut
   public shouldComponentUpdate(
     // TODO: update the rule to accept leading underscores?
     // tslint:disable-next-line
-    _nextProps: IHeaderButtonProps,
-    nextState: IHeaderButtonState
+    _nextProps: HeaderButtonProps,
+    nextState: HeaderButtonState
   ): boolean {
     return nextState.isTipVisible !== this.state.isTipVisible
   }

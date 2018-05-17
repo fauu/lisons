@@ -18,14 +18,14 @@ import { withProps } from "~/util/StyleUtils"
 import { HeaderButton } from "~/reader/components"
 import { UiColorVariant } from "~/reader/model"
 
-export interface IHeaderProps {
+export interface HeaderProps {
   readonly appStore: AppStore
   readonly variant: UiColorVariant
 }
 export const Header = observer(function _Header({
   appStore,
   variant
-}: IHeaderProps): JSX.Element | null {
+}: HeaderProps): JSX.Element | null {
   const readerStore = appStore.readerStore
   const sidebarStore = readerStore.sidebarStore
   const text = readerStore.text

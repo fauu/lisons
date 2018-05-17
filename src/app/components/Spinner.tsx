@@ -4,10 +4,10 @@ import styled, { keyframes } from "styled-components"
 import { withProps } from "~/util/StyleUtils"
 
 // http://tobiasahlin.com/spinkit/
-export interface ISpinnerProps {
+export interface SpinnerProps {
   readonly color: string | "Light" | "Dark"
 }
-export function Spinner({ color }: ISpinnerProps): JSX.Element {
+export function Spinner({ color }: SpinnerProps): JSX.Element {
   return (
     <SkCubeGrid color={color} className="spinner">
       <div className="sk-cube sk-cube1" />

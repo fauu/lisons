@@ -1,7 +1,7 @@
-import { ILanguage } from "~/app/model"
+import { Language } from "~/app/model"
 import { xhr } from "~/app/Xhr"
 
-import { IDeeplResponse, ITranslation } from "~/reader/model"
+import { DeeplResponse, Translation } from "~/reader/model"
 
 const supportedLanguages = ["en", "de", "pl", "es", "nl", "it", "fr"]
 
@@ -21,18 +21,18 @@ const getRequestObject = (s: string, from: string, to: string) => ({
   }
 })
 
-export const isLanguageConfigurationSupportedByDeepl = (from: ILanguage, to: ILanguage) =>
+export const isLanguageConfigurationSupportedByDeepl = (from: Language, to: Language) =>
   supportedLanguages.includes(from.codeGt) && supportedLanguages.includes(to.codeGt)
 
 export const deeplTranslate = async (
   s: string,
-  from: ILanguage,
-  to: ILanguage
-): Promise<ITranslation | undefined> => {
+  from: Language,
+  to: Language
+): Promise<Translation | undefined> => {
   if (!isLanguageConfigurationSupportedByDeepl(from, to)) {
     return
   }
-  return xhr<IDeeplResponse>(
+  return xhr<DeeplResponse>(
     "https://www.deepl.com/jsonrpc",
     getRequestObject(s, from.codeGt, to.codeGt),
     true

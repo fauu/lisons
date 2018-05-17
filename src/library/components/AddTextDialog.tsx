@@ -8,26 +8,26 @@ import styled from "styled-components"
 
 import { Spinner } from "~/app/components"
 import { animations, colors, fonts } from "~/app/data/Style"
-import { ILanguage } from "~/app/model"
+import { Language } from "~/app/model"
 import { SettingsStore } from "~/app/stores"
 import { withProps } from "~/util/StyleUtils"
 
 import { LanguageSelect } from "~/library/components"
-import { IAddTextFormData, ITextFileMetadata } from "~/library/model"
+import { AddTextFormData, TextFileMetadata } from "~/library/model"
 import { AddTextDialogStore } from "~/library/stores"
 import { languageFromCode6393 } from "~/util/LanguageUtils"
 
-export interface IAddTextDialogProps {
+export interface AddTextDialogProps {
   readonly settingsStore: SettingsStore
   readonly addTextDialogStore: AddTextDialogStore
 }
 @observer
-export class AddTextDialog extends React.Component<IAddTextDialogProps> {
+export class AddTextDialog extends React.Component<AddTextDialogProps> {
   private static readonly defaultContentLanguage = languageFromCode6393("fra")!
   private static readonly defaultTranslationLanguage = languageFromCode6393("eng")!
 
   @observable
-  private formData: IAddTextFormData = {
+  private formData: AddTextFormData = {
     filePath: "",
     pastedText: "",
     title: "",
@@ -161,7 +161,7 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
     this.clearForm()
   }
 
-  private handleTextFileMetadataChange(metadata?: ITextFileMetadata): void {
+  private handleTextFileMetadataChange(metadata?: TextFileMetadata): void {
     if (!metadata) {
       return
     }
@@ -174,7 +174,7 @@ export class AddTextDialog extends React.Component<IAddTextDialogProps> {
     }
   }
 
-  private handleDetectedTextLanguageChange = (lang?: ILanguage): void => {
+  private handleDetectedTextLanguageChange = (lang?: Language): void => {
     this.formData.contentLanguage = lang ? lang : AddTextDialog.defaultContentLanguage
   }
 

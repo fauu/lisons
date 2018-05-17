@@ -8,19 +8,19 @@ import { animations, colors } from "~/app/data/Style"
 import { SettingsStore } from "~/app/stores"
 
 import { Dictionary, ExampleSentenceList, Settings } from "~/reader/components"
-import { ISource } from "~/reader/model"
+import { Source } from "~/reader/model"
 import { SidebarStore } from "~/reader/stores"
 
 import * as noiseTexture from "~/res/images/noise-texture.png"
 
-export interface ISidebarProps {
+export interface SidebarProps {
   readonly sidebarStore: SidebarStore
   readonly settingsStore: SettingsStore
 }
 export const Sidebar = observer(function _Sidebar({
   sidebarStore,
   settingsStore
-}: ISidebarProps): JSX.Element {
+}: SidebarProps): JSX.Element {
   const {
     dictionaryEntries,
     dictionaryEntriesState,
@@ -35,7 +35,7 @@ export const Sidebar = observer(function _Sidebar({
   const sentencesLoading = exampleSentencesState === "Loading"
   const sentencesLoaded = exampleSentencesState === "Loaded"
   const hasSentences = exampleSentences && exampleSentences.data.length > 0
-  const sources: Array<[string, ISource]> = [
+  const sources: Array<[string, Source]> = [
     ["Main translation", sidebarStore.sources.mainTranslationSource],
     ["Dictionary", sidebarStore.sources.dictionarySource],
     ["Example sentences", sidebarStore.sources.sentencesSource]

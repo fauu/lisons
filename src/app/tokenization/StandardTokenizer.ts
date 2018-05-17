@@ -1,14 +1,14 @@
 import { punctuationLikeChars } from "~/app/data/PunctuationLikeChars"
-import { ITokenizedTextContent, ITokenizer } from "~/app/model"
+import { TokenizedTextContent, Tokenizer } from "~/app/model"
 import { TextTokenType } from "~/app/model/TextTokenType"
 
-export class StandardTokenizer implements ITokenizer {
+export class StandardTokenizer implements Tokenizer {
   private static readonly regexp = new RegExp(
     `( {####SECTIONSTART} )|([\r\n]+)|([^${punctuationLikeChars}\r\n]+)|([${punctuationLikeChars}]+)`,
     "g"
   )
 
-  public tokenize(rawTextContent: string): Promise<[ITokenizedTextContent, number[]]> {
+  public tokenize(rawTextContent: string): Promise<[TokenizedTextContent, number[]]> {
     const types = []
     const values = []
     const sectionStartElementNos = []
@@ -39,7 +39,7 @@ export class StandardTokenizer implements ITokenizer {
       currentElementNo++
     }
     return Promise.resolve([{ types, values, startNo: 0 }, sectionStartElementNos] as [
-      ITokenizedTextContent,
+      TokenizedTextContent,
       number[]
     ])
   }

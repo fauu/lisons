@@ -3,14 +3,14 @@ import styled from "styled-components"
 
 import { animations, colors, fonts } from "~/app/data/Style"
 
-import { IDictionaryEntry } from "~/reader/model"
+import { DictionaryEntry } from "~/reader/model"
 
 const variantCountLimit = 5
 
-export interface IDictionaryProps {
-  readonly entries: IDictionaryEntry[]
+export interface DictionaryProps {
+  readonly entries: DictionaryEntry[]
 }
-export function Dictionary({ entries }: IDictionaryProps): JSX.Element {
+export function Dictionary({ entries }: DictionaryProps): JSX.Element {
   return (
     <Root>
       {entries.map((e, idx) => {

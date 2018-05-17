@@ -5,20 +5,20 @@ import { firstNWords } from "~/util/StringUtils"
 
 import { Database } from "~/app/Database"
 import {
-  ILanguage,
-  IParsedText,
-  ITextInfo,
-  ITextProgress,
-  ITextSectionInfo,
-  ITokenizedTextContent,
-  Text
+  Language,
+  ParsedText,
+  Text,
+  TextInfo,
+  TextProgress,
+  TextSectionInfo,
+  TokenizedTextContent
 } from "~/app/model"
 import { tokenize } from "~/app/tokenization"
 
 export class TextRepository {
   public constructor(private db: Database) {}
 
-  public async save(text: ITextInfo, parsedText: IParsedText): Promise<Text> {
+  public async save(text: TextInfo, parsedText: ParsedText): Promise<Text> {
     if (!text.title) {
       text.title = firstNWords(parsedText.sample, 5, 60, true)
     }
@@ -76,7 +76,7 @@ export class TextRepository {
     return text
   }
 
-  public updateProgress(id: number, progress: ITextProgress): Promise<Text> {
+  public updateProgress(id: number, progress: TextProgress): Promise<Text> {
     return this.db.transaction("rw", this.db.texts, async () => {
       await this.db.texts.update(id, {
         progressElementNo: progress.elementNo,
@@ -104,9 +104,9 @@ export class TextRepository {
   }
 
   private async processContent(
-    parsedText: IParsedText,
-    language: ILanguage
-  ): Promise<[ITextSectionInfo[] | undefined, ITokenizedTextContent]> {
+    parsedText: ParsedText,
+    language: Language
+  ): Promise<[TextSectionInfo[] | undefined, TokenizedTextContent]> {
     const [tokenizedContent, sectionStartElementNos] = await tokenize(parsedText.content, language)
     if (parsedText.sectionNames) {
       if (parsedText.sectionNames.length !== sectionStartElementNos.length) {
@@ -118,7 +118,7 @@ export class TextRepository {
             startElementNo
           })
         )
-        return [textSectionInfos as ITextSectionInfo[], tokenizedContent]
+        return [textSectionInfos as TextSectionInfo[], tokenizedContent]
       }
     }
     return [undefined, tokenizedContent]

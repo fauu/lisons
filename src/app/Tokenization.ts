@@ -1,9 +1,9 @@
 import * as kuromoji from "kuromoji"
 
 import { punctuationLikeChars } from "~/app/data/PunctuationLikeChars"
-import { ILanguage } from "~/app/model"
+import { Language } from "~/app/model"
 
-export const getWrapWordsInTagsFn = (contentLanguage: ILanguage) => {
+export const getWrapWordsInTagsFn = (contentLanguage: Language) => {
   switch (contentLanguage.code6393) {
     case "jpn":
       return wrapWordsInTagsJpn
@@ -27,13 +27,13 @@ const wrapWordsInTagsStd = (s: string): Promise<[string, number]> => {
   return new Promise((resolve, _reject) => resolve([sWithWordsWrapped, wordCount]))
 }
 
-type kuromojiTokenizer = kuromoji.Tokenizer<kuromoji.IpadicFeatures>
+type kuromojTokenizer = kuromoji.Tokenizer<kuromoji.IpadicFeatures>
 const { wrapWordsInTagsJpn } = new class {
-  private tokenizer?: kuromojiTokenizer
+  private tokenizer?: kuromojTokenizer
 
   public wrapWordsInTagsJpn = async (s: string): Promise<[string, number]> => {
     if (!this.tokenizer) {
-      this.tokenizer = await new Promise<kuromojiTokenizer>((resolve, reject) => {
+      this.tokenizer = await new Promise<kuromojTokenizer>((resolve, reject) => {
         kuromoji
           .builder({
             dicPath: ""

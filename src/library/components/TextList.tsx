@@ -6,10 +6,10 @@ import { AppStore } from "~/app/stores"
 
 import { TextListElement } from "~/library/components"
 
-export interface ITextListProps {
+export interface TextListProps {
   readonly appStore: AppStore
 }
-export const TextList = observer(function _TextList({ appStore }: ITextListProps): JSX.Element {
+export const TextList = observer(function _TextList({ appStore }: TextListProps): JSX.Element {
   const texts = appStore.textStore.texts.values()
   return (
     <Root>

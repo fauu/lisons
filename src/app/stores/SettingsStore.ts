@@ -2,15 +2,15 @@ import isEqual = require("lodash/isEqual")
 import { action, computed, observable } from "mobx"
 
 import { defaultSettings } from "~/app/data/DefaultSettings"
-import { ISettings } from "~/app/model"
+import { Settings } from "~/app/model"
 import { loadSettings, saveSettings } from "~/app/Settings"
-import { flowed} from "~/util/MobxUtils"
+import { flowed } from "~/util/MobxUtils"
 
 export class SettingsStore {
-  @observable.deep private _settings: ISettings = defaultSettings;
+  @observable.deep private _settings: Settings = defaultSettings;
 
   @flowed
-  public *init(): IterableIterator<Promise<ISettings>> {
+  public *init(): IterableIterator<Promise<Settings>> {
     const loadedSettings = yield loadSettings()
     this._settings = loadedSettings
   }
@@ -22,7 +22,7 @@ export class SettingsStore {
   }
 
   @computed
-  public get settings(): ISettings {
+  public get settings(): Settings {
     return this._settings
   }
 

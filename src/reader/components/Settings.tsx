@@ -6,19 +6,19 @@ import styled from "styled-components"
 
 import { defaultSettings } from "~/app/data/DefaultSettings"
 import { colors } from "~/app/data/Style"
-import { IReaderStyleSettings } from "~/app/model"
+import { ReaderStyleSettings } from "~/app/model"
 import { SettingsStore } from "~/app/stores"
 import { withProps } from "~/util/StyleUtils"
 
 import { SidebarStore } from "~/reader/stores"
 
-interface IRangeInputProps {
+interface RangeInputProps {
   readonly min: number
   readonly max: number
   readonly step: number
 }
 type SelectInputOptions = Array<[string, string]>
-type FormModelElementOptions = IRangeInputProps | SelectInputOptions | {}
+type FormModelElementOptions = RangeInputProps | SelectInputOptions | {}
 type FormModelElement = [string, string, string, FormModelElementOptions]
 const formModel: FormModelElement[] = [
   ["Background color", "background", "color", {}],
@@ -40,15 +40,15 @@ const formModel: FormModelElement[] = [
 ]
 
 // TODO: Rename to 'StyleCustomizer' or sth?
-export interface ISettingsProps {
+export interface SettingsProps {
   readonly sidebarStore: SidebarStore
   readonly settingsStore: SettingsStore
 }
 @observer
-export class Settings extends React.Component<ISettingsProps> {
+export class Settings extends React.Component<SettingsProps> {
   private static readonly commitDebounceMs = 200
 
-  @observable private formData: IReaderStyleSettings = defaultSettings.readerStyle
+  @observable private formData: ReaderStyleSettings = defaultSettings.readerStyle
 
   private settingsStore!: SettingsStore
   private sidebarStore!: SidebarStore
@@ -69,7 +69,7 @@ export class Settings extends React.Component<ISettingsProps> {
   }
 
   // tslint:disable-next-line:member-ordering
-  private commit = debounce((readerStyle: IReaderStyleSettings) => {
+  private commit = debounce((readerStyle: ReaderStyleSettings) => {
     this.settingsStore.set({ readerStyle })
   }, Settings.commitDebounceMs)
 

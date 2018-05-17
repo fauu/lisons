@@ -3,13 +3,13 @@ import * as React from "react"
 import styled from "styled-components"
 
 import { animations, colors } from "~/app/data/Style"
-import { IExampleSentences, LanguageFlag } from "~/app/model"
+import { ExampleSentences, LanguageFlag } from "~/app/model"
 import { withProps } from "~/util/StyleUtils"
 
-export interface IExampleSentenceListProps {
-  readonly sentences: IExampleSentences
+export interface ExampleSentenceListProps {
+  readonly sentences: ExampleSentences
 }
-export function ExampleSentenceList({ sentences }: IExampleSentenceListProps): JSX.Element {
+export function ExampleSentenceList({ sentences }: ExampleSentenceListProps): JSX.Element {
   const sentencesRtl = (sentences.data[0].sentenceLanguage.flags & LanguageFlag.Rtl) > 0
   const translationsRtl = (sentences.data[0].translationsLanguage.flags & LanguageFlag.Rtl) > 0
   return (
