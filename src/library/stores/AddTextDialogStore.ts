@@ -71,7 +71,6 @@ export class AddTextDialogStore {
       textFilePlaintext: this.textFilePlaintext
     })
     const id = crypto.randomBytes(16).toString("hex")
-    console.log(id)
     const userDataPath = getUserDataPath()
     const textsDirName = "texts"
     const textsPath = path.join(userDataPath, textsDirName)
@@ -79,7 +78,7 @@ export class AddTextDialogStore {
     const newTextPath = path.join(textsPath, id)
     yield ensurePathExists(newTextPath)
 
-    const textChunkMap = yield convertEpubToLisonsText(
+    const [textChunkMap, textSectionTree] = yield convertEpubToLisonsText(
       newTextPath,
       this.textFileBuffer!,
       formData.contentLanguage
@@ -92,7 +91,8 @@ export class AddTextDialogStore {
       author: formData.author,
       contentLanguage: formData.contentLanguage.code6393,
       translationLanguage: formData.translationLanguage.code6393,
-      chunkMap: textChunkMap
+      chunkMap: textChunkMap,
+      sectionTree: textSectionTree
     }
     yield writeStringToFile(indexFilePath, JSON.stringify(indexContent))
     this.discardText()

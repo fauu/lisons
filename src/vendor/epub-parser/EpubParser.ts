@@ -1,5 +1,3 @@
-// TODO: Support TOC structure beyond depth of 1
-
 import * as zip from "jszip"
 import * as path from "path"
 
@@ -8,7 +6,6 @@ import { ITextFileMetadata } from "~/library/model"
 import { punctuationLikeChars } from "~/app/data/PunctuationLikeChars"
 import { ILanguage } from "~/app/model"
 import { ensurePathExists, writeFile } from "~/util/FileUtils"
-import { IEpub } from "~/vendor/epub-parser"
 
 interface IOpfMetadata {
   title?: string
@@ -35,28 +32,6 @@ interface IOpfItemRef {
   idRef: string
 }
 
-interface IFileWithContent {
-  path: string
-  content: string
-}
-
-interface ITocEntry {
-  label: string
-  contentFilePath: string
-  contentFragmentId?: string
-}
-
-export const loadMetadata = async (buffer: Buffer): Promise<ITextFileMetadata> => {
-  const archive = await zip.loadAsync(buffer)
-
-  const opfPath = await getOpfPath(archive)
-  const opfFragment = await getOpfFragment(archive, opfPath)
-  const opfMetadata = getOpfMetadata(opfFragment)
-  console.log("OPF Metadata:", opfMetadata)
-
-  return { author: opfMetadata.creator, title: opfMetadata.title, language: opfMetadata.language }
-}
-
 export type TextChunkMap = ITextChunkMapElement[]
 
 interface ITextChunkMapElement {
@@ -66,11 +41,33 @@ interface ITextChunkMapElement {
   startWordNo: number
 }
 
+interface ISectionTree {
+  root: ISectionTreeNode
+}
+
+interface ISectionTreeNode {
+  label: string
+  contentFilePath: string
+  contentFragmentId?: string
+  children: ISectionTreeNode[]
+}
+
+export const loadMetadata = async (buffer: Buffer): Promise<ITextFileMetadata> => {
+  const archive = await zip.loadAsync(buffer)
+
+  const opfPath = await getOpfPath(archive)
+  const opfFragment = await getOpfFragment(archive, opfPath)
+  const opfMetadata = getOpfMetadata(opfFragment)
+
+  return { author: opfMetadata.creator, title: opfMetadata.title, language: opfMetadata.language }
+}
+
+// TODO: Return empty section tree even if TOC is absent?
 export const convertEpubToLisonsText = async (
   textPath: string,
   buffer: Buffer,
   contentLanguage: ILanguage
-): Promise<TextChunkMap> => {
+): Promise<[TextChunkMap, ISectionTree | undefined]> => {
   const archive = await zip.loadAsync(buffer)
 
   const opfPath = await getOpfPath(archive)
@@ -82,12 +79,8 @@ export const convertEpubToLisonsText = async (
   const opfSpine = getOpfSpine(opfFragment)
   const itemsDir = path.dirname(opfPath)
 
-  let toc = opfSpine.toc ? await getToc(archive, opfManifest, opfSpine.toc, itemsDir) : undefined
-  if (toc && toc.length <= 1) {
-    toc = undefined
-  }
-
   const serializer = new XMLSerializer()
+  // TODO: Global instance?
   const parser = new DOMParser()
   const wrapWordsInTags = getWrapWordsInTagsFn(contentLanguage)
 
@@ -149,7 +142,9 @@ export const convertEpubToLisonsText = async (
     currentWordCount += chunk.wordCount
   })
 
-  return textChunkMap
+  const sectionTree = await getSectionTree(archive, opfManifest, opfSpine, itemsDir)
+
+  return [textChunkMap, sectionTree]
 }
 
 const getWrapWordsInTagsFn = (contentLanguage: ILanguage) => {
@@ -219,43 +214,6 @@ const wrapWordsInTagsCn = (charactersType: string) => async (
     },
     ["", 0]
   )
-}
-
-export const epubFromBuffer = async (buffer: Buffer): Promise<IEpub | undefined> => {
-  const archive = await zip.loadAsync(buffer)
-
-  const opfPath = await getOpfPath(archive)
-  const opfFragment = await getOpfFragment(archive, opfPath)
-  const opfMetadata = getOpfMetadata(opfFragment)
-  console.log("OPF Metadata:", opfMetadata)
-  const opfManifest = getOpfManifest(opfFragment, [
-    "application/xhtml+xml",
-    "application/x-dtbncx+xml"
-  ])
-  console.log("OPF Manifest:", opfManifest)
-  const opfSpine = getOpfSpine(opfFragment)
-  console.log("OPF Spine:", opfSpine)
-  const itemsDir = path.dirname(opfPath)
-  console.log("Items directory:", itemsDir)
-
-  let toc = opfSpine.toc ? await getToc(archive, opfManifest, opfSpine.toc, itemsDir) : undefined
-  if (toc && toc.length <= 1) {
-    toc = undefined
-  }
-  console.log("TOC:", toc)
-
-  const filesWithContent = await getFilesWithContent(archive, opfManifest, opfSpine, itemsDir)
-  const markedContent = stripHtml(await getRawMarkedContent(filesWithContent, toc))
-  if (markedContent === "") {
-    throw new Error("Parsed EPUB has no text content")
-  }
-
-  return {
-    author: opfMetadata.creator,
-    title: opfMetadata.title,
-    sectionNames: toc ? toc.map(e => e.label) : undefined,
-    markedContent
-  }
 }
 
 const getOpfPath = async (archive: zip): Promise<string> => {
@@ -331,182 +289,116 @@ const getOpfSpine = (fragment: DocumentFragment): IOpfSpine => {
   }
 }
 
-const getFilesWithContent = async (
+const parseTocNavLabel = (navLabel: Element): string | undefined => {
+  if (navLabel.children.length !== 1) {
+    console.warn(`Expected 1 element inside <navLabel>, got ${navLabel.children.length}`)
+    return
+  }
+  const onlyChild = navLabel.children[0]
+  if (onlyChild.tagName.toLowerCase() !== "text" || onlyChild.textContent === null) {
+    console.warn("<navLabel> has no <text> or its content is empty")
+    return
+  }
+  return onlyChild.textContent
+}
+
+const parseTocContent = (content: Element): string | undefined => {
+  const src = content.getAttribute("src")
+  if (!src) {
+    console.warn("<content> has no 'src' attribute")
+    return
+  }
+  return src
+}
+
+const parseTocNavPoint = (navPoint: Element): ISectionTreeNode | undefined => {
+  let label
+  let contentFilePath
+  let contentFragmentId
+  const children = []
+  for (const childEl of navPoint.children) {
+    switch (childEl.tagName.toLowerCase()) {
+      case "navlabel":
+        label = parseTocNavLabel(childEl)
+        break
+      case "content":
+        const src = parseTocContent(childEl)
+        if (src) {
+          // XXX: Prettier plugin messes this up, '// prettier-ignore' doesn't help
+          // [contentFilePath, contentFragmentId] = src.split("#")
+          const splitSrc = src.split("#")
+          contentFilePath = splitSrc[0]
+          if (splitSrc.length === 2) {
+            contentFragmentId = splitSrc[1]
+          } else if (splitSrc.length > 2) {
+            console.warn(`Encountered more than one '#' in <content> src: '${src}'`)
+          }
+        }
+        break
+      case "navpoint":
+        const childNavPoint = parseTocNavPoint(childEl)
+        if (childNavPoint) {
+          children.push(childNavPoint)
+        }
+        break
+      default:
+        console.warn(`Encountered unexpected element '${childEl.tagName}' inside <navPoint>`)
+    }
+  }
+  if (!label) {
+    console.warn("<navLabel> missing in <navPoint>")
+    return
+  }
+  if (!contentFilePath) {
+    console.warn("<content> src missing in <navPoint>")
+    return
+  }
+  return { label, contentFilePath, contentFragmentId, children }
+}
+
+const parseTocNavMap = async (navMap: Element): Promise<ISectionTree> => {
+  const topLevelNodes = []
+  for (const childEl of navMap.children) {
+    if (childEl.tagName.toLowerCase() !== "navpoint") {
+      console.warn(`Encountered unexpected element '${childEl.tagName}' inside <navMap>`)
+      continue
+    }
+    const navPoint = parseTocNavPoint(childEl)
+    if (navPoint) {
+      topLevelNodes.push(navPoint)
+    }
+  }
+  return { root: { label: "root", contentFilePath: "/", children: topLevelNodes } }
+}
+
+const getSectionTree = async (
   archive: zip,
   manifest: IOpfManifest,
   spine: IOpfSpine,
   itemsDir: string
-): Promise<IFileWithContent[]> => {
-  const arrayOfPromises = spine.itemRefs.map(async ({ idRef }) => {
-    const item = manifest.items.find(_item => _item.id === idRef)
-    if (!item) {
-      console.warn(`Item with idRef '${idRef}' not present in the manifest`)
-      return
-    }
-    const itemPath = path.join(itemsDir, item.href)
-    const itemFile = archive.file(itemPath)
-    if (!itemFile) {
-      console.warn(`File for item with path '${itemPath}' not found`)
-      return
-    }
-    return { path: itemPath, content: await itemFile.async("text") }
-  })
-  const promiseOfArrayWithUndefineds = await Promise.all(arrayOfPromises)
-  return (await promiseOfArrayWithUndefineds.filter(el => el)) as IFileWithContent[]
-}
-
-// TODO: Break down
-const getToc = async (
-  archive: zip,
-  manifest: IOpfManifest,
-  tocId: string,
-  itemsDir: string
-): Promise<ITocEntry[] | undefined> => {
-  const tocItem = manifest.items.find(item => item.id === tocId)
+): Promise<ISectionTree | undefined> => {
+  if (!spine.toc) {
+    return
+  }
+  const tocItem = manifest.items.find(item => item.id === spine.toc)
   if (!tocItem) {
     console.warn("Manifest has no TOC item despite the spine having TOC reference")
-  } else {
-    const tocPath = path.join(itemsDir, tocItem.href)
-    const tocFile = archive.file(tocPath)
-    if (!tocFile) {
-      console.warn("Referenced TOC file not found")
-    } else {
-      const tocFileContent = await tocFile.async("text")
-      const tocFragment = document.createRange().createContextualFragment(tocFileContent)
-      const navMapElement = tocFragment.querySelector("navMap")
-      if (!navMapElement) {
-        console.warn("TOC has no 'navMap' element")
-      } else {
-        return Array.from(navMapElement.children)
-          .map(navPointElement => {
-            if (navPointElement.tagName.toLowerCase() !== "navpoint") {
-              console.warn(
-                `Expected just 'navPoint' elements inside 'navMap', got '${
-                  navPointElement.tagName
-                }'`
-              )
-              return
-            }
-            let label
-            let contentSrc
-            Array.from(navPointElement.children).forEach(child => {
-              switch (child.tagName.toLowerCase()) {
-                case "navlabel":
-                  const textElement = child.firstElementChild
-                  if (!textElement) {
-                    console.warn("'navLabel' empty")
-                    return
-                  }
-                  if (textElement.tagName.toLowerCase() !== "text") {
-                    console.warn(
-                      `Expected 'Text' element as a first child of 'navLabel', got ${
-                        textElement.tagName
-                      }`
-                    )
-                    return
-                  }
-                  label = textElement.textContent
-                  break
-                case "content":
-                  contentSrc = child.getAttribute("src")
-                  break
-                case "navPoint":
-                  // nested navPoint, do nothing
-                  break
-                default:
-                  console.warn(
-                    `Encountered unexpected '${child.tagName}' element inside 'navPoint'`
-                  )
-              }
-            })
-            if (!label || label === "") {
-              console.warn("'navPoint' label empty")
-              return
-            }
-            if (!contentSrc || contentSrc === "") {
-              console.warn("'content' element 'src' attribute empty")
-              contentSrc = ""
-            }
-            const [contentFilePath, contentFragmentId] = contentSrc.split("#")
-            return {
-              label,
-              contentFilePath: path.join(itemsDir, contentFilePath),
-              contentFragmentId
-            }
-          })
-          .filter(el => el) as ITocEntry[]
-      }
-    }
+    return
   }
-  return
-}
-
-// TODO: Break down
-const getRawMarkedContent = async (
-  filesWithContent: IFileWithContent[],
-  toc?: ITocEntry[]
-): Promise<string> => {
-  return filesWithContent
-    .map(file => {
-      let fileContent = file.content
-      if (toc) {
-        const tocItems = toc.filter(item => item.contentFilePath === file.path)
-        tocItems.forEach(tocItem => {
-          const marker = " {####SECTIONSTART} "
-          if (!tocItem.contentFragmentId) {
-            fileContent = marker + fileContent
-          } else {
-            const fragmentIdStartIdx = fileContent.indexOf(tocItem.contentFragmentId)
-            if (fragmentIdStartIdx === -1) {
-              console.warn(
-                `TOC entry fragment ID '${file.path}#${tocItem.contentFragmentId}' not found`
-              )
-              return
-            }
-            const tagClosingIdx = fileContent.indexOf(">", fragmentIdStartIdx)
-            if (tagClosingIdx === -1) {
-              console.warn(
-                `Tag closing for fragment ID '${file.path}#${tocItem.contentFragmentId}' not found`
-              )
-              return
-            }
-            fileContent =
-              fileContent.substr(0, tagClosingIdx + 1) +
-              marker +
-              fileContent.substr(tagClosingIdx + 2)
-          }
-        })
-      }
-      return fileContent
-    })
-    .join("")
-}
-
-// const getContent = async (
-//   archive: zip,
-//   manifest: IOpfManifest,
-//   spine: IOpfSpine,
-//   itemsDir: string
-// ): Promise<string> => {
-//   const itemContentPromises = spine.itemRefs.map(async ({ idRef }) => {
-//     const item = manifest.items.find(_item => _item.id === idRef)
-//     if (!item) {
-//       console.warn(`Item with idRef '${idRef}' not present in the manifest`)
-//       return
-//     }
-//     const itemPath = path.join(itemsDir, item.href)
-//     const itemFile = archive.file(itemPath)
-//     if (!itemFile) {
-//       console.warn(`File for item with path '${itemPath}' not found`)
-//       return
-//     }
-//     return stripHtml(await itemFile.async("text"))
-//   })
-//   return (await Promise.all(itemContentPromises)).join("")
-// }
-
-const div = document.createElement("div")
-const stripHtml = (input: string): string => {
-  div.innerHTML = input
-  return div.textContent || ""
+  const tocPath = path.join(itemsDir, tocItem.href)
+  const tocFile = archive.file(tocPath)
+  if (!tocFile) {
+    console.warn("Referenced TOC file not found")
+    return
+  }
+  // TODO: Global instance?
+  const parser = new DOMParser()
+  const tocContent = await tocFile.async("text")
+  const tocDocument = parser.parseFromString(tocContent, "application/xml")
+  const navMapElement = tocDocument.querySelector("navMap")
+  if (!navMapElement) {
+    console.warn("TOC has no 'navMap' element")
+    return
+  }
+  return parseTocNavMap(navMapElement)
 }
