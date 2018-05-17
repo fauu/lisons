@@ -5,7 +5,9 @@ import { action, computed, observable, reaction } from "mobx"
 import { IPromiseBasedObservable } from "mobx-utils"
 import * as path from "path"
 
+import { convertEpubToLisonsText, loadMetadata } from "~/app/Epub"
 import { ILanguage } from "~/app/model"
+
 import {
   ensurePathExists,
   fileSize,
@@ -18,7 +20,6 @@ import { languageFromCodeGt } from "~/util/LanguageUtils"
 import { flowed } from "~/util/MobxUtils"
 import { detectLanguage } from "~/util/TextUtils"
 
-import { convertEpubToLisonsText, loadMetadata } from "~/vendor/epub-parser/EpubParser"
 import { isUtf8 } from "~/vendor/is-utf8"
 
 import { IAddTextFormData, ITextFileMetadata, TextFileStatus } from "~/library/model"

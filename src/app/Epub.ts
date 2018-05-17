@@ -1,10 +1,10 @@
 import * as zip from "jszip"
 import * as path from "path"
 
-import { ITextFileMetadata } from "~/library/model"
-
 import { punctuationLikeChars } from "~/app/data/PunctuationLikeChars"
-import { ILanguage } from "~/app/model"
+import { ILanguage, ITextSectionTree, ITextSectionTreeNode, TextChunkMap } from "~/app/model"
+
+import { ITextFileMetadata } from "~/library/model"
 import { ensurePathExists, writeFile } from "~/util/FileUtils"
 
 interface IOpfMetadata {
@@ -32,24 +32,12 @@ interface IOpfItemRef {
   idRef: string
 }
 
-export type TextChunkMap = ITextChunkMapElement[]
-
-interface ITextChunkMapElement {
-  id: string
-  href: string
-  wordCount: number
-  startWordNo: number
-}
-
-interface ISectionTree {
-  root: ISectionTreeNode
-}
-
-interface ISectionTreeNode {
-  label: string
-  contentFilePath: string
-  contentFragmentId?: string
-  children: ISectionTreeNode[]
+let _domParserInstance: DOMParser
+const parseXml = (s: string, mimetype: string) => {
+  if (!_domParserInstance) {
+    _domParserInstance = new DOMParser()
+  }
+  return _domParserInstance.parseFromString(s, mimetype)
 }
 
 export const loadMetadata = async (buffer: Buffer): Promise<ITextFileMetadata> => {
@@ -62,12 +50,11 @@ export const loadMetadata = async (buffer: Buffer): Promise<ITextFileMetadata> =
   return { author: opfMetadata.creator, title: opfMetadata.title, language: opfMetadata.language }
 }
 
-// TODO: Return empty section tree even if TOC is absent?
 export const convertEpubToLisonsText = async (
   textPath: string,
   buffer: Buffer,
   contentLanguage: ILanguage
-): Promise<[TextChunkMap, ISectionTree | undefined]> => {
+): Promise<[TextChunkMap, ITextSectionTree | undefined]> => {
   const archive = await zip.loadAsync(buffer)
 
   const opfPath = await getOpfPath(archive)
@@ -80,8 +67,6 @@ export const convertEpubToLisonsText = async (
   const itemsDir = path.dirname(opfPath)
 
   const serializer = new XMLSerializer()
-  // TODO: Global instance?
-  const parser = new DOMParser()
   const wrapWordsInTags = getWrapWordsInTagsFn(contentLanguage)
 
   const textChunkMap: TextChunkMap = []
@@ -96,7 +81,7 @@ export const convertEpubToLisonsText = async (
     } else {
       let chunkWordCount = 0
       const itemHtmlContent = await itemFile.async("text")
-      const itemHtmlDocument = parser.parseFromString(itemHtmlContent, "application/xml")
+      const itemHtmlDocument = parseXml(itemHtmlContent, "text/xml")
 
       itemHtmlDocument.head.innerHTML = "<meta charset='utf-8' />" + itemHtmlDocument.head.innerHTML
 
@@ -221,9 +206,8 @@ const getOpfPath = async (archive: zip): Promise<string> => {
   if (!containerFile) {
     throw new Error("'container.xml' not found")
   }
-  const containerFileContent = await containerFile.async("text")
-  const containerFragment = document.createRange().createContextualFragment(containerFileContent)
-  const rootfileElement = containerFragment.querySelector("rootfile")
+  const containerDocument = parseXml(await containerFile.async("text"), "text/xml")
+  const rootfileElement = containerDocument.querySelector("rootfile")
   if (!rootfileElement) {
     throw new Error("'rootfile' element not found")
   }
@@ -311,7 +295,7 @@ const parseTocContent = (content: Element): string | undefined => {
   return src
 }
 
-const parseTocNavPoint = (navPoint: Element): ISectionTreeNode | undefined => {
+const parseTocNavPoint = (navPoint: Element): ITextSectionTreeNode | undefined => {
   let label
   let contentFilePath
   let contentFragmentId
@@ -356,7 +340,7 @@ const parseTocNavPoint = (navPoint: Element): ISectionTreeNode | undefined => {
   return { label, contentFilePath, contentFragmentId, children }
 }
 
-const parseTocNavMap = async (navMap: Element): Promise<ISectionTree> => {
+const parseTocNavMap = async (navMap: Element): Promise<ITextSectionTree> => {
   const topLevelNodes = []
   for (const childEl of navMap.children) {
     if (childEl.tagName.toLowerCase() !== "navpoint") {
@@ -376,7 +360,7 @@ const getSectionTree = async (
   manifest: IOpfManifest,
   spine: IOpfSpine,
   itemsDir: string
-): Promise<ISectionTree | undefined> => {
+): Promise<ITextSectionTree | undefined> => {
   if (!spine.toc) {
     return
   }
@@ -391,10 +375,8 @@ const getSectionTree = async (
     console.warn("Referenced TOC file not found")
     return
   }
-  // TODO: Global instance?
-  const parser = new DOMParser()
   const tocContent = await tocFile.async("text")
-  const tocDocument = parser.parseFromString(tocContent, "application/xml")
+  const tocDocument = parseXml(tocContent, "text/xml")
   const navMapElement = tocDocument.querySelector("navMap")
   if (!navMapElement) {
     console.warn("TOC has no 'navMap' element")
