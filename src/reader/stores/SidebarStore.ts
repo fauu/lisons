@@ -1,18 +1,18 @@
-import { zip } from "lodash"
-import { action, observable } from "mobx"
+import { zip } from "lodash";
+import { action, observable } from "mobx";
 
-import { ExampleSentences, Language } from "~/app/model"
-import { emphasizePhrase } from "~/util/ExampleSentenceUtils"
-import { flowed } from "~/util/MobxUtils"
-import { hasSpace } from "~/util/StringUtils"
+import { ExampleSentences, Language } from "~/app/model";
+import { emphasizePhrase } from "~/util/ExampleSentenceUtils";
+import { flowed } from "~/util/MobxUtils";
+import { hasSpace } from "~/util/StringUtils";
 
-import { deeplTranslate, isLanguageConfigurationSupportedByDeepl } from "~/reader/DeeplTranslate"
-import { googleTranslate } from "~/reader/GoogleTranslate"
-import { DictionaryEntry, ResourceState, Sources, Translation } from "~/reader/model"
-import { ReversoContextSource } from "~/reader/ReversoContextSource"
-import { TatoebaSource } from "~/reader/TatoebaSource"
+import { deeplTranslate, isLanguageConfigurationSupportedByDeepl } from "~/reader/DeeplTranslate";
+import { googleTranslate } from "~/reader/GoogleTranslate";
+import { DictionaryEntry, ResourceState, Sources, Translation } from "~/reader/model";
+import { ReversoContextSource } from "~/reader/ReversoContextSource";
+import { TatoebaSource } from "~/reader/TatoebaSource";
 
-type TranslationPair = [Translation | undefined, Translation | undefined]
+type TranslationPair = [Translation | undefined, Translation | undefined];
 
 export class SidebarStore {
   private static readonly sources = {
@@ -20,39 +20,39 @@ export class SidebarStore {
     reversoContext: new ReversoContextSource(),
     deepl: { name: "DeepL", url: "https://www.deepl.com/translator" },
     google: { name: "Google", url: "https://translate.google.com" }
-  }
+  };
 
-  @observable public isVisible: boolean = true
-  @observable public isMainTranslationLoading: boolean = false
-  @observable.ref public exampleSentences?: ExampleSentences
-  @observable public exampleSentencesState: ResourceState = "NotLoading"
-  @observable.ref public dictionaryEntries: DictionaryEntry[] = []
-  @observable public dictionaryEntriesState: ResourceState = "NotLoading"
-  @observable public isSettingsTabActive: boolean = false
+  @observable public isVisible: boolean = true;
+  @observable public isMainTranslationLoading: boolean = false;
+  @observable.ref public exampleSentences?: ExampleSentences;
+  @observable public exampleSentencesState: ResourceState = "NotLoading";
+  @observable.ref public dictionaryEntries: DictionaryEntry[] = [];
+  @observable public dictionaryEntriesState: ResourceState = "NotLoading";
+  @observable public isSettingsTabActive: boolean = false;
   @observable
   public sources: Sources = {
     mainTranslationSource: SidebarStore.sources.google,
     dictionarySource: SidebarStore.sources.google,
     sentencesSource: SidebarStore.sources.tatoeba
-  }
+  };
 
   @action
   public updateSources(contentLanguage: Language, translationLanguage: Language): void {
     const canDoDeeplTranslation = isLanguageConfigurationSupportedByDeepl(
       contentLanguage,
       translationLanguage
-    )
+    );
     this.sources.mainTranslationSource = canDoDeeplTranslation
       ? SidebarStore.sources.deepl
-      : SidebarStore.sources.google
+      : SidebarStore.sources.google;
 
     const canGetRCSentences = SidebarStore.sources.reversoContext.hasSentences(
       contentLanguage,
       translationLanguage
-    )
+    );
     this.sources.sentencesSource = canGetRCSentences
       ? SidebarStore.sources.reversoContext
-      : SidebarStore.sources.tatoeba
+      : SidebarStore.sources.tatoeba;
   }
 
   @flowed
@@ -63,76 +63,76 @@ export class SidebarStore {
     translationCallback: (translation: string) => void
   ): IterableIterator<Promise<[Translation | undefined, Translation | undefined]>> {
     if (!selectedText) {
-      this.setResourcesNotLoading()
-      return
+      this.setResourcesNotLoading();
+      return;
     }
 
-    this.setMainTranslationLoading()
+    this.setMainTranslationLoading();
 
     if (this.isVisible) {
-      this.setDictionaryEntriesState("Loading")
-      this.fetchExampleSentences(selectedText, contentLanguage, translationLanguage)
+      this.setDictionaryEntriesState("Loading");
+      this.fetchExampleSentences(selectedText, contentLanguage, translationLanguage);
     }
 
     const [googleTranslation, deeplTranslation]: [
       Translation | undefined,
       Translation | undefined
-    ] = yield this.fetchTranslations(selectedText, contentLanguage, translationLanguage)
-    const mainTranslation = deeplTranslation || googleTranslation
+    ] = yield this.fetchTranslations(selectedText, contentLanguage, translationLanguage);
+    const mainTranslation = deeplTranslation || googleTranslation;
     if (mainTranslation) {
-      translationCallback(mainTranslation.full)
+      translationCallback(mainTranslation.full);
     }
-    this.setMainTranslationLoading(false)
+    this.setMainTranslationLoading(false);
 
     if (this.isVisible) {
-      this.dictionaryEntries = (googleTranslation && googleTranslation.dictionaryEntries) || []
-      this.dictionaryEntriesState = "Loaded"
+      this.dictionaryEntries = (googleTranslation && googleTranslation.dictionaryEntries) || [];
+      this.dictionaryEntriesState = "Loaded";
     }
   }
 
   @action.bound
   public hide(): void {
-    this.isVisible = false
-    this.isSettingsTabActive = false
+    this.isVisible = false;
+    this.isSettingsTabActive = false;
   }
 
   @action.bound
   public toggleSettings(): void {
-    this.isVisible = true
-    this.isSettingsTabActive = !this.isSettingsTabActive
+    this.isVisible = true;
+    this.isSettingsTabActive = !this.isSettingsTabActive;
   }
 
   @action
   public setVisible(value: boolean = true): void {
-    this.isVisible = value
+    this.isVisible = value;
   }
 
   @action
   public setMainTranslationLoading(value: boolean = true): void {
-    this.isMainTranslationLoading = value
+    this.isMainTranslationLoading = value;
   }
 
   @action
   public setSettingsTabActive(value: boolean = true): void {
-    this.isSettingsTabActive = value
+    this.isSettingsTabActive = value;
   }
 
   @action
   public setResourcesNotLoading(): void {
-    this.exampleSentences = undefined
-    this.exampleSentencesState = "NotLoading"
-    this.dictionaryEntries = []
-    this.dictionaryEntriesState = "NotLoading"
+    this.exampleSentences = undefined;
+    this.exampleSentencesState = "NotLoading";
+    this.dictionaryEntries = [];
+    this.dictionaryEntriesState = "NotLoading";
   }
 
   @action
   private setExampleSentencesState(value: ResourceState): void {
-    this.exampleSentencesState = value
+    this.exampleSentencesState = value;
   }
 
   @action
   private setDictionaryEntriesState(value: ResourceState): void {
-    this.dictionaryEntriesState = value
+    this.dictionaryEntriesState = value;
   }
 
   @flowed
@@ -141,17 +141,17 @@ export class SidebarStore {
     contentLanguage: Language,
     translationLanguage: Language
   ): IterableIterator<Promise<ExampleSentences>> {
-    this.setExampleSentencesState("Loading")
+    this.setExampleSentencesState("Loading");
     const exampleSentences: ExampleSentences = yield this.sources.sentencesSource.fetchSentences(
       phrase,
       contentLanguage,
       translationLanguage
-    )
+    );
     this.exampleSentences = {
       ...exampleSentences,
       data: exampleSentences.data.map(s => emphasizePhrase(phrase, s))
-    }
-    this.exampleSentencesState = "Loaded"
+    };
+    this.exampleSentencesState = "Loaded";
   }
 
   private async fetchTranslations(
@@ -159,12 +159,12 @@ export class SidebarStore {
     contentLanguage: Language,
     translationLanguage: Language
   ): Promise<TranslationPair> {
-    const isSingleWord = !hasSpace(phrase)
-    const canDoDeeplTranslation = this.sources.mainTranslationSource.name === "DeepL"
+    const isSingleWord = !hasSpace(phrase);
+    const canDoDeeplTranslation = this.sources.mainTranslationSource.name === "DeepL";
 
-    const willDoGoogleTranslation = !canDoDeeplTranslation || isSingleWord
+    const willDoGoogleTranslation = !canDoDeeplTranslation || isSingleWord;
     const willDoDeeplTranslation =
-      canDoDeeplTranslation && !(willDoGoogleTranslation && !this.isVisible)
+      canDoDeeplTranslation && !(willDoGoogleTranslation && !this.isVisible);
 
     const translationPromises = (zip<boolean | typeof googleTranslate>(
       [willDoGoogleTranslation, willDoDeeplTranslation],
@@ -172,12 +172,12 @@ export class SidebarStore {
     ) as Array<[boolean, typeof googleTranslate]>).map(
       ([condition, func]: [boolean, typeof googleTranslate]) => {
         if (condition) {
-          return func(phrase, contentLanguage, translationLanguage)
+          return func(phrase, contentLanguage, translationLanguage);
         }
-        return
+        return;
       }
-    )
+    );
 
-    return Promise.all(translationPromises) as Promise<TranslationPair>
+    return Promise.all(translationPromises) as Promise<TranslationPair>;
   }
 }

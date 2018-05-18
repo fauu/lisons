@@ -1,20 +1,20 @@
-import * as React from "react"
-import styled from "styled-components"
+import * as React from "react";
+import styled from "styled-components";
 
-import { animations } from "~/app/data/Style"
-import { TextSectionInfo } from "~/app/model"
-import { withProps } from "~/util/StyleUtils"
+import { animations } from "~/app/data/Style";
+import { TextSectionInfo } from "~/app/model";
+import { withProps } from "~/util/StyleUtils";
 
-import { UiColorVariant } from "~/reader/model"
+import { UiColorVariant } from "~/reader/model";
 
-import * as noiseTexture from "~/res/images/noise-texture.png"
+import * as noiseTexture from "~/res/images/noise-texture.png";
 
 export interface TocProps {
-  readonly sections: TextSectionInfo[]
-  readonly currentSection: TextSectionInfo
-  readonly variant: UiColorVariant
-  readonly onAnyClick: () => void
-  readonly onSectionLinkClick: (startElementNo: number) => void
+  readonly sections: TextSectionInfo[];
+  readonly currentSection: TextSectionInfo;
+  readonly variant: UiColorVariant;
+  readonly onAnyClick: () => void;
+  readonly onSectionLinkClick: (startElementNo: number) => void;
 }
 export function Toc({
   sections,
@@ -28,7 +28,7 @@ export function Toc({
       <Wrapper variant={variant}>
         <SectionList variant={variant}>
           {sections.map(s => {
-            const isActive = s.startElementNo === currentSection.startElementNo
+            const isActive = s.startElementNo === currentSection.startElementNo;
             return (
               <SectionLink
                 key={s.startElementNo}
@@ -38,12 +38,12 @@ export function Toc({
               >
                 {s.name}
               </SectionLink>
-            )
+            );
           })}
         </SectionList>
       </Wrapper>
     </Root>
-  )
+  );
 }
 
 const Root = styled.div`
@@ -55,7 +55,7 @@ const Root = styled.div`
   flex-direction: column;
   align-items: flex-end;
   letter-spacing: -0.03em;
-`
+`;
 
 const Wrapper = withProps<{ variant: UiColorVariant }>()(styled.div)`
   z-index: 9001;
@@ -73,7 +73,7 @@ const Wrapper = withProps<{ variant: UiColorVariant }>()(styled.div)`
   &::-webkit-scrollbar-thumb {
     background: ${p => (p.variant === "Light" ? "#cccccc55" : "#88888855")};
   }
-`
+`;
 
 const SectionList = withProps<{ variant: UiColorVariant }>()(styled.ul)`
   margin: 0;
@@ -84,7 +84,7 @@ const SectionList = withProps<{ variant: UiColorVariant }>()(styled.ul)`
   background: ${p => (p.variant === "Light" ? "#22222255" : "#ffffff55")};
   backdrop-filter: blur(15px);
   background-image: url('${noiseTexture}');
-`
+`;
 
 const SectionLink = withProps<{ isActive: boolean; variant: UiColorVariant; onClick: any }>()(
   styled.li
@@ -105,4 +105,4 @@ const SectionLink = withProps<{ isActive: boolean; variant: UiColorVariant; onCl
   &:not(:last-child) {
     border-bottom: 1px solid ${p => (p.variant === "Light" ? "#ffffff17" : "#00000017")};
   }
-`
+`;

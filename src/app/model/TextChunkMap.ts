@@ -1,3 +1,3 @@
-import { TextChunkMapElement } from "~/app/model"
+import { TextChunkMapElement } from "~/app/model";
 
-export type TextChunkMap = TextChunkMapElement[]
+export type TextChunkMap = TextChunkMapElement[];

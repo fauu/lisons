@@ -1,21 +1,21 @@
-import { shell } from "electron"
-import { observer } from "mobx-react"
-import * as React from "react"
-import styled from "styled-components"
+import { shell } from "electron";
+import { observer } from "mobx-react";
+import * as React from "react";
+import styled from "styled-components";
 
-import { FadeTransition, Spinner } from "~/app/components"
-import { animations, colors } from "~/app/data/Style"
-import { SettingsStore } from "~/app/stores"
+import { FadeTransition, Spinner } from "~/app/components";
+import { animations, colors } from "~/app/data/Style";
+import { SettingsStore } from "~/app/stores";
 
-import { Dictionary, ExampleSentenceList, Settings } from "~/reader/components"
-import { Source } from "~/reader/model"
-import { SidebarStore } from "~/reader/stores"
+import { Dictionary, ExampleSentenceList, Settings } from "~/reader/components";
+import { Source } from "~/reader/model";
+import { SidebarStore } from "~/reader/stores";
 
-import * as noiseTexture from "~/res/images/noise-texture.png"
+import * as noiseTexture from "~/res/images/noise-texture.png";
 
 export interface SidebarProps {
-  readonly sidebarStore: SidebarStore
-  readonly settingsStore: SettingsStore
+  readonly sidebarStore: SidebarStore;
+  readonly settingsStore: SettingsStore;
 }
 export const Sidebar = observer(function _Sidebar({
   sidebarStore,
@@ -27,19 +27,19 @@ export const Sidebar = observer(function _Sidebar({
     exampleSentences,
     exampleSentencesState,
     isSettingsTabActive
-  } = sidebarStore
+  } = sidebarStore;
   const notLoading =
-    dictionaryEntriesState === "NotLoading" && exampleSentencesState === "NotLoading"
-  const hasDictionaryEntries = dictionaryEntriesState === "Loaded" && dictionaryEntries.length > 0
-  const dictinaryLoading = dictionaryEntriesState === "Loading"
-  const sentencesLoading = exampleSentencesState === "Loading"
-  const sentencesLoaded = exampleSentencesState === "Loaded"
-  const hasSentences = exampleSentences && exampleSentences.data.length > 0
+    dictionaryEntriesState === "NotLoading" && exampleSentencesState === "NotLoading";
+  const hasDictionaryEntries = dictionaryEntriesState === "Loaded" && dictionaryEntries.length > 0;
+  const dictinaryLoading = dictionaryEntriesState === "Loading";
+  const sentencesLoading = exampleSentencesState === "Loading";
+  const sentencesLoaded = exampleSentencesState === "Loaded";
+  const hasSentences = exampleSentences && exampleSentences.data.length > 0;
   const sources: Array<[string, Source]> = [
     ["Main translation", sidebarStore.sources.mainTranslationSource],
     ["Dictionary", sidebarStore.sources.dictionarySource],
     ["Example sentences", sidebarStore.sources.sentencesSource]
-  ]
+  ];
   return (
     <Root>
       <FadeTransition>
@@ -81,8 +81,8 @@ export const Sidebar = observer(function _Sidebar({
         )}
       </FadeTransition>
     </Root>
-  )
-})
+  );
+});
 
 const Root = styled.div`
   width: 35vw;
@@ -99,13 +99,13 @@ const Root = styled.div`
       height: 100%;
     }
   }
-`
+`;
 
 const Translations = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-`
+`;
 
 const IdleContent = styled.div`
   height: 100%;
@@ -115,12 +115,12 @@ const IdleContent = styled.div`
   justify-content: center;
   align-items: center;
   animation: ${animations.fadeIn} ${animations.std};
-`
+`;
 
 const Message = styled.span`
   color: #888;
   margin: auto;
-`
+`;
 
 const Sources = styled.ul`
   position: absolute;
@@ -131,9 +131,9 @@ const Sources = styled.ul`
   list-style-type: none;
   font-size: 0.8em;
   color: #666;
-`
+`;
 
-const Source = styled.li``
+const Source = styled.li``;
 
 const SourceLink = styled.span`
   margin-left: 0.15rem;
@@ -143,7 +143,7 @@ const SourceLink = styled.span`
   &:hover {
     color: ${colors.secondaryFade};
   }
-`
+`;
 
 const ExampleSentencesWrapper = styled.div`
   display: flex;
@@ -152,4 +152,4 @@ const ExampleSentencesWrapper = styled.div`
   height: 100%;
   flex: 1;
   overflow: hidden;
-`
+`;

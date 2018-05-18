@@ -1,1 +1,1 @@
-export type ResourceState = "NotLoading" | "Loading" | "Loaded"
+export type ResourceState = "NotLoading" | "Loading" | "Loaded";

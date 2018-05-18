@@ -1,11 +1,11 @@
-import { injectGlobal } from "styled-components"
+import { injectGlobal } from "styled-components";
 
-import * as lato700 from "~/res/fonts/lato/lato-v13-latin-ext_latin-700.woff2"
-import * as lato400Italic from "~/res/fonts/lato/lato-v13-latin-ext_latin-italic.woff2"
-import * as lato400 from "~/res/fonts/lato/lato-v13-latin-ext_latin-regular.woff2"
-import * as ptSerif700 from "~/res/fonts/pt-serif/pt-serif-v8-cyrillic-ext_cyrillic_latin-ext_latin-700.woff2"
-import * as ptSerif700Italic from "~/res/fonts/pt-serif/pt-serif-v8-cyrillic-ext_cyrillic_latin-ext_latin-700italic.woff2"
-import * as ptSerif400 from "~/res/fonts/pt-serif/pt-serif-v8-cyrillic-ext_cyrillic_latin-ext_latin-regular.woff2"
+import * as lato700 from "~/res/fonts/lato/lato-v13-latin-ext_latin-700.woff2";
+import * as lato400Italic from "~/res/fonts/lato/lato-v13-latin-ext_latin-italic.woff2";
+import * as lato400 from "~/res/fonts/lato/lato-v13-latin-ext_latin-regular.woff2";
+import * as ptSerif700 from "~/res/fonts/pt-serif/pt-serif-v8-cyrillic-ext_cyrillic_latin-ext_latin-700.woff2";
+import * as ptSerif700Italic from "~/res/fonts/pt-serif/pt-serif-v8-cyrillic-ext_cyrillic_latin-ext_latin-700italic.woff2";
+import * as ptSerif400 from "~/res/fonts/pt-serif/pt-serif-v8-cyrillic-ext_cyrillic_latin-ext_latin-regular.woff2";
 
 // tslint:disable-next-line:no-unused-expression
 injectGlobal`
@@ -57,4 +57,4 @@ injectGlobal`
     font-weight: 700;
     src: url('${ptSerif700Italic}') format('woff2');
   }
-`
+`;

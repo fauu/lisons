@@ -1,9 +1,9 @@
-import { Language } from "~/app/model"
-import { xhr } from "~/app/Xhr"
+import { Language } from "~/app/model";
+import { xhr } from "~/app/Xhr";
 
-import { DeeplResponse, Translation } from "~/reader/model"
+import { DeeplResponse, Translation } from "~/reader/model";
 
-const supportedLanguages = ["en", "de", "pl", "es", "nl", "it", "fr"]
+const supportedLanguages = ["en", "de", "pl", "es", "nl", "it", "fr"];
 
 const getRequestObject = (s: string, from: string, to: string) => ({
   jsonrpc: 2.0,
@@ -19,10 +19,10 @@ const getRequestObject = (s: string, from: string, to: string) => ({
       target_lang: to.toUpperCase()
     }
   }
-})
+});
 
 export const isLanguageConfigurationSupportedByDeepl = (from: Language, to: Language) =>
-  supportedLanguages.includes(from.codeGt) && supportedLanguages.includes(to.codeGt)
+  supportedLanguages.includes(from.codeGt) && supportedLanguages.includes(to.codeGt);
 
 export const deeplTranslate = async (
   s: string,
@@ -30,7 +30,7 @@ export const deeplTranslate = async (
   to: Language
 ): Promise<Translation | undefined> => {
   if (!isLanguageConfigurationSupportedByDeepl(from, to)) {
-    return
+    return;
   }
   return xhr<DeeplResponse>(
     "https://www.deepl.com/jsonrpc",
@@ -38,5 +38,5 @@ export const deeplTranslate = async (
     true
   ).then(res => ({
     full: res.result.translations[0].beams[0].postprocessed_sentence
-  }))
-}
+  }));
+};

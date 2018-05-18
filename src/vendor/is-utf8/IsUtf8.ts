@@ -13,7 +13,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 export const isUtf8 = (bytes: Buffer): boolean => {
-  let i = 0
+  let i = 0;
   while (i < bytes.length) {
     if (
       // ASCII
@@ -22,8 +22,8 @@ export const isUtf8 = (bytes: Buffer): boolean => {
       bytes[i] === 0x0d ||
       (0x20 <= bytes[i] && bytes[i] <= 0x7e)
     ) {
-      i += 1
-      continue
+      i += 1;
+      continue;
     }
 
     if (
@@ -32,8 +32,8 @@ export const isUtf8 = (bytes: Buffer): boolean => {
       bytes[i] <= 0xdf &&
       (0x80 <= bytes[i + 1] && bytes[i + 1] <= 0xbf)
     ) {
-      i += 2
-      continue
+      i += 2;
+      continue;
     }
 
     if (
@@ -48,8 +48,8 @@ export const isUtf8 = (bytes: Buffer): boolean => {
         (0x80 <= bytes[i + 1] && bytes[i + 1] <= 0x9f) &&
         (0x80 <= bytes[i + 2] && bytes[i + 2] <= 0xbf))
     ) {
-      i += 3
-      continue
+      i += 3;
+      continue;
     }
 
     if (
@@ -68,12 +68,12 @@ export const isUtf8 = (bytes: Buffer): boolean => {
         (0x80 <= bytes[i + 2] && bytes[i + 2] <= 0xbf) &&
         (0x80 <= bytes[i + 3] && bytes[i + 3] <= 0xbf))
     ) {
-      i += 4
-      continue
+      i += 4;
+      continue;
     }
 
-    return false
+    return false;
   }
 
-  return true
-}
+  return true;
+};

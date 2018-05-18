@@ -1,7 +1,7 @@
-import { Language } from "~/app/model"
-import { xhr } from "~/app/Xhr"
+import { Language } from "~/app/model";
+import { xhr } from "~/app/Xhr";
 
-import { DictionaryEntry, GoogleResponse, Translation } from "~/reader/model"
+import { DictionaryEntry, GoogleResponse, Translation } from "~/reader/model";
 
 export const googleTranslate = async (
   s: string,
@@ -21,9 +21,9 @@ https://translate.googleapis.com\
     true
   ).then(res => {
     if (!res.sentences) {
-      return
+      return;
     }
-    let dictionaryEntries: DictionaryEntry[] | undefined
+    let dictionaryEntries: DictionaryEntry[] | undefined;
     if (res.dict) {
       dictionaryEntries = res.dict.map(e => ({
         word: e.base_form,
@@ -32,10 +32,10 @@ https://translate.googleapis.com\
           translation: en.word,
           reverseTranslations: en.reverse_translation
         }))
-      }))
+      }));
     }
     return {
       full: res.sentences.map(sentence => sentence.trans).join(""),
       dictionaryEntries
-    }
-  })
+    };
+  });

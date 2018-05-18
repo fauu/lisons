@@ -1,79 +1,79 @@
-import { remote } from "electron"
-import * as fs from "fs"
-import * as isBinaryFile from "isbinaryfile"
-import * as nodePath from "path"
+import { remote } from "electron";
+import * as fs from "fs";
+import * as isBinaryFile from "isbinaryfile";
+import * as nodePath from "path";
 
 export const getRootPath = (): string => {
-  const dirname = nodePath.dirname(require!.main!.filename)
-  return dirname.substring(0, dirname.lastIndexOf("/"))
-}
+  const dirname = nodePath.dirname(require!.main!.filename);
+  return dirname.substring(0, dirname.lastIndexOf("/"));
+};
 
 export const getUserDataPath = (): string => {
-  return remote.app.getPath("userData")
-}
+  return remote.app.getPath("userData");
+};
 
 export const readFile = (path: string): Promise<Buffer> =>
   new Promise<any>((resolve, reject) => {
     fs.readFile(path, (err, data) => {
       if (err) {
-        reject(err)
+        reject(err);
       }
-      resolve(data)
-    })
-  })
+      resolve(data);
+    });
+  });
 
 // TODO: Remove and replace all usages with writeFile
 export const writeStringToFile = (path: string, s: string): Promise<void> =>
   new Promise<void>((resolve, reject) => {
     fs.writeFile(path, s, err => {
       if (err) {
-        reject(err)
+        reject(err);
       }
-      resolve()
-    })
-  })
+      resolve();
+    });
+  });
 
 export const writeFile = <T>(path: string, data: T): Promise<void> =>
   new Promise<void>((resolve, reject) => {
     fs.writeFile(path, data, err => {
       if (err) {
-        reject(err)
+        reject(err);
       }
-      resolve()
-    })
-  })
+      resolve();
+    });
+  });
 
 export const fileSize = (path: string): Promise<number> =>
   new Promise<number>((resolve, reject) => {
     fs.lstat(path, (err, stat) => {
       if (err) {
-        reject(err)
+        reject(err);
       }
-      resolve(stat.size)
-    })
-  })
+      resolve(stat.size);
+    });
+  });
 
 export const isBufferText = (data: Buffer, size: number): Promise<boolean> =>
   new Promise<boolean>((resolve, _) => {
     isBinaryFile(data, size, (err: Error, result: boolean) => {
-      resolve(!err && !result)
-    })
-  })
+      resolve(!err && !result);
+    });
+  });
 
 // https://stackoverflow.com/a/40177447
 // TODO: Support multi-level paths
-const allRWEPermissions = parseInt("0777", 8)
+const allRWEPermissions = parseInt("0777", 8);
 export const ensurePathExists = (path: string, mask: number = allRWEPermissions): Promise<void> =>
   new Promise<void>((resolve, reject) => {
     fs.mkdir(path, mask, err => {
       if (err) {
         if (err.code === "EEXIST") {
-          resolve()
+          resolve();
         } else {
-          reject(err)
+          reject(err);
         }
       } else {
-        resolve()
+        resolve();
       }
-    })
-  })
+    });
+  });

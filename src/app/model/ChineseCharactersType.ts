@@ -1,1 +1,1 @@
-export type ChineseCharactersType = "simplified" | "traditional"
+export type ChineseCharactersType = "simplified" | "traditional";

@@ -1,1 +1,1 @@
-export type TextFileStatus = "NotSelected" | "Processing" | "Invalid" | "Valid"
+export type TextFileStatus = "NotSelected" | "Processing" | "Invalid" | "Valid";

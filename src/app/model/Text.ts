@@ -1,4 +1,4 @@
-import { languageFromCode6393 } from "~/util/LanguageUtils"
+import { languageFromCode6393 } from "~/util/LanguageUtils";
 
 import {
   Language,
@@ -7,7 +7,7 @@ import {
   TextProgress,
   TextSectionInfo,
   TokenizedTextContent
-} from "~/app/model"
+} from "~/app/model";
 
 export class Text {
   public static fromPersisted(data: TextInfo): Text {
@@ -21,7 +21,7 @@ export class Text {
         elementNo: data.progressElementNo,
         percentage: data.progressPercentage
       }
-    )
+    );
   }
 
   constructor(
@@ -38,68 +38,68 @@ export class Text {
 
   public getTokenizedContentSlice(from: number, count: number): TokenizedTextContent | undefined {
     if (!this.tokenizedContent) {
-      return undefined
+      return undefined;
     }
 
     return {
       types: this.tokenizedContent.types.slice(from, from + count),
       values: this.tokenizedContent.values.slice(from, from + count),
       startNo: from
-    }
+    };
   }
 
   public get id(): number {
-    return this._id
+    return this._id;
   }
 
   public get title(): string {
-    return this._title
+    return this._title;
   }
 
   public get author(): string {
-    return this._author
+    return this._author;
   }
 
   public get contentLanguage(): Language {
-    return this._contentLanguage
+    return this._contentLanguage;
   }
 
   public get translationLanguage(): Language {
-    return this._translationLanguage
+    return this._translationLanguage;
   }
 
   public get tokenizedContent(): TokenizedTextContent | undefined {
-    return this._tokenizedContent
+    return this._tokenizedContent;
   }
 
   public set tokenizedContent(value: TokenizedTextContent | undefined) {
     if (value) {
-      this._elementCount = value.types.length
+      this._elementCount = value.types.length;
     }
-    this._tokenizedContent = value
+    this._tokenizedContent = value;
   }
 
   public get elementCount(): number {
-    return this._elementCount
+    return this._elementCount;
   }
 
   public get structure(): TextSectionInfo[] | undefined {
-    return this._structure
+    return this._structure;
   }
 
   public set structure(value: TextSectionInfo[] | undefined) {
-    this._structure = value
+    this._structure = value;
   }
 
   public get progress(): TextProgress | undefined {
-    return this._progress
+    return this._progress;
   }
 
   public get isRtl(): boolean {
-    return (this.contentLanguage.flags & LanguageFlag.Rtl) > 0
+    return (this.contentLanguage.flags & LanguageFlag.Rtl) > 0;
   }
 
   public get areTranslationsRtl(): boolean {
-    return (this.translationLanguage.flags & LanguageFlag.Rtl) > 0
+    return (this.translationLanguage.flags & LanguageFlag.Rtl) > 0;
   }
 }

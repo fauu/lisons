@@ -1,16 +1,19 @@
-import { app, BrowserWindow } from "electron"
-import installExtension, { MOBX_DEVTOOLS, REACT_DEVELOPER_TOOLS } from "electron-devtools-installer"
-import localShortcut = require("electron-localshortcut")
-import * as path from "path"
-import * as url from "url"
+import { app, BrowserWindow } from "electron";
+import installExtension, {
+  MOBX_DEVTOOLS,
+  REACT_DEVELOPER_TOOLS
+} from "electron-devtools-installer";
+import localShortcut = require("electron-localshortcut");
+import * as path from "path";
+import * as url from "url";
 
-import { colors } from "~/app/data/Style"
+import { colors } from "~/app/data/Style";
 
-const installDevExtensions = false
+const installDevExtensions = false;
 
-const isDev = process.env.NODE_ENV === "dev"
+const isDev = process.env.NODE_ENV === "dev";
 
-let mainWindow: Electron.BrowserWindow | null
+let mainWindow: Electron.BrowserWindow | null;
 
 const createWindow = (): Electron.BrowserWindow => {
   mainWindow = new BrowserWindow({
@@ -22,15 +25,15 @@ const createWindow = (): Electron.BrowserWindow => {
     minHeight: 600,
     backgroundColor: colors.primary,
     icon: path.join(__dirname, "icon.png")
-  })
-  mainWindow.maximize()
+  });
+  mainWindow.maximize();
 
   if (isDev) {
-    const devServerUrl = "http://localhost:3000"
-    mainWindow.loadURL(devServerUrl)
+    const devServerUrl = "http://localhost:3000";
+    mainWindow.loadURL(devServerUrl);
     mainWindow.webContents.on("did-fail-load", () => {
-      setTimeout(() => mainWindow!.loadURL(devServerUrl), 1000)
-    })
+      setTimeout(() => mainWindow!.loadURL(devServerUrl), 1000);
+    });
   } else {
     mainWindow.loadURL(
       url.format({
@@ -38,58 +41,58 @@ const createWindow = (): Electron.BrowserWindow => {
         protocol: "file:",
         slashes: true
       })
-    )
+    );
   }
 
-  mainWindow.setMenu(null as any)
+  mainWindow.setMenu(null as any);
 
   mainWindow.on("closed", () => {
-    mainWindow = null
-  })
+    mainWindow = null;
+  });
 
-  return mainWindow
-}
+  return mainWindow;
+};
 
 const openDevTools = (win: Electron.BrowserWindow) => {
-  win.webContents.openDevTools({ mode: "bottom" })
-}
+  win.webContents.openDevTools({ mode: "bottom" });
+};
 
 const toggleDevTools = () => {
-  BrowserWindow.getFocusedWindow().webContents.toggleDevTools()
-}
+  BrowserWindow.getFocusedWindow().webContents.toggleDevTools();
+};
 
 const reload = () => {
-  BrowserWindow.getFocusedWindow().webContents.reloadIgnoringCache()
-}
+  BrowserWindow.getFocusedWindow().webContents.reloadIgnoringCache();
+};
 
 app.on("ready", () => {
-  createWindow()
-  localShortcut.register("F5", reload)
-  localShortcut.register("F12", toggleDevTools)
-})
+  createWindow();
+  localShortcut.register("F5", reload);
+  localShortcut.register("F12", toggleDevTools);
+});
 
 app.on("browser-window-created", (_, win) => {
   if (isDev) {
     if (installDevExtensions) {
-      const extensionIds = [MOBX_DEVTOOLS.id, REACT_DEVELOPER_TOOLS.id]
+      const extensionIds = [MOBX_DEVTOOLS.id, REACT_DEVELOPER_TOOLS.id];
       Promise.all(extensionIds.map(id => installExtension(id)))
         .then(extensionNames => console.log("Installed dev extensions:", extensionNames.join(", ")))
         .catch(err =>
           console.log("An error occured during the installation of dev extensions", err)
-        )
+        );
     }
-    openDevTools(win)
+    openDevTools(win);
   }
-})
+});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
-    app.quit()
+    app.quit();
   }
-})
+});
 
 app.on("activate", () => {
   if (mainWindow === null) {
-    createWindow()
+    createWindow();
   }
-})
+});

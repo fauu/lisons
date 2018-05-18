@@ -1,21 +1,21 @@
-import { shell } from "electron"
-import { BetaIcon } from "mdi-react"
-import { observer } from "mobx-react"
-import * as React from "react"
-import styled from "styled-components"
+import { shell } from "electron";
+import { BetaIcon } from "mdi-react";
+import { observer } from "mobx-react";
+import * as React from "react";
+import styled from "styled-components";
 
-import { animations, colors } from "~/app/data/Style"
-import { AppStore } from "~/app/stores"
+import { animations, colors } from "~/app/data/Style";
+import { AppStore } from "~/app/stores";
 
-import { AddTextDialog, TextList } from "~/library/components"
+import { AddTextDialog, TextList } from "~/library/components";
 
 export interface LibraryProps {
-  readonly appStore: AppStore
+  readonly appStore: AppStore;
 }
 export const Library = observer(function _Library({ appStore }: LibraryProps): JSX.Element {
-  const isEmpty = appStore.textStore.texts.size === 0
-  const addTextDialogStore = appStore.libraryStore.addTextDialogStore
-  const { settingsStore, isNewVersionAvailable } = appStore
+  const isEmpty = appStore.textStore.texts.size === 0;
+  const addTextDialogStore = appStore.libraryStore.addTextDialogStore;
+  const { settingsStore, isNewVersionAvailable } = appStore;
   return (
     <Root>
       <LogoWrapper>
@@ -47,8 +47,8 @@ export const Library = observer(function _Library({ appStore }: LibraryProps): J
         <span>{VERSION}</span>
       </VersionPanel>
     </Root>
-  )
-})
+  );
+});
 
 const Root = styled.div`
   padding: 2rem 3rem;
@@ -56,11 +56,11 @@ const Root = styled.div`
   flex-direction: column;
   background-color: ${colors.secondary};
   height: 100%;
-`
+`;
 
 const LogoWrapper = styled.div`
   display: flex;
-`
+`;
 
 const Logo = styled.h1`
   margin: 0;
@@ -71,7 +71,7 @@ const Logo = styled.h1`
   background-size: 300% 100%;
   border-radius: 3px;
   animation: ${animations.gradientRotate} 3s ease infinite;
-`
+`;
 
 const LogoText = styled.span`
   display: inline-block;
@@ -80,11 +80,11 @@ const LogoText = styled.span`
   font-size: 2em;
   letter-spacing: -0.04em;
   color: ${colors.secondary};
-`
+`;
 
 const BetaIndicator = styled(BetaIcon)`
   fill: ${colors.primaryFade2};
-`
+`;
 
 const Body = styled.div`
   margin-top: 2rem;
@@ -92,7 +92,7 @@ const Body = styled.div`
   flex: 1;
   color: ${colors.primary};
   font-size: 1.3em;
-`
+`;
 
 const ReadColumn = styled.div`
   display: flex;
@@ -100,30 +100,30 @@ const ReadColumn = styled.div`
   justify-content: center;
   flex: 3;
   animation: ${animations.fadeInBottom} ${animations.doubleTime};
-`
+`;
 
 const AddTextColumn = styled.div`
   border-left: 2px solid ${colors.primary};
   padding-left: 2rem;
   flex: 2;
-`
+`;
 
 const AddTextColumnContent = styled.div`
   animation: ${animations.fadeInBottom} ${animations.doubleTime};
-`
+`;
 
 const ColumnHeader = styled.h2`
   margin: 0;
   padding: 0;
   font-size: 0.9em;
-`
+`;
 
 const VersionPanel = styled.div`
   position: absolute;
   right: 0.8rem;
   top: 0.7rem;
   color: ${colors.primaryFade2};
-`
+`;
 
 const NewVersionMessage = styled.span`
   text-decoration: underline;
@@ -131,11 +131,11 @@ const NewVersionMessage = styled.span`
   &:hover {
     color: ${colors.accent2};
   }
-`
+`;
 
 const Separator = styled.span`
   margin: 0 0.5rem;
   &::after {
     content: "·";
   }
-`
+`;

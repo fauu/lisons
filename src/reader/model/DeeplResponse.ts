@@ -1,15 +1,15 @@
 export interface DeeplResponse {
-  result: DeeplResponseResult
+  result: DeeplResponseResult;
 }
 
 interface DeeplResponseResult {
-  translations: DeeplResponseTranslation[]
+  translations: DeeplResponseTranslation[];
 }
 
 interface DeeplResponseTranslation {
-  beams: DeeplResponseBeam[]
+  beams: DeeplResponseBeam[];
 }
 
 interface DeeplResponseBeam {
-  postprocessed_sentence: string
+  postprocessed_sentence: string;
 }

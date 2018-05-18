@@ -1,9 +1,9 @@
-import { zip } from "lodash"
+import { zip } from "lodash";
 
-import { languageFromCode6393 } from "~/util/LanguageUtils"
-import { firstNWords } from "~/util/StringUtils"
+import { languageFromCode6393 } from "~/util/LanguageUtils";
+import { firstNWords } from "~/util/StringUtils";
 
-import { Database } from "~/app/Database"
+import { Database } from "~/app/Database";
 import {
   Language,
   ParsedText,
@@ -12,68 +12,68 @@ import {
   TextProgress,
   TextSectionInfo,
   TokenizedTextContent
-} from "~/app/model"
-import { tokenize } from "~/app/tokenization"
+} from "~/app/model";
+import { tokenize } from "~/app/tokenization";
 
 export class TextRepository {
   public constructor(private db: Database) {}
 
   public async save(text: TextInfo, parsedText: ParsedText): Promise<Text> {
     if (!text.title) {
-      text.title = firstNWords(parsedText.sample, 5, 60, true)
+      text.title = firstNWords(parsedText.sample, 5, 60, true);
     }
 
     const [structure, tokenizedContent] = await this.processContent(
       parsedText,
       languageFromCode6393(text.contentLanguage)!
-    )
-    console.log(structure)
+    );
+    console.log(structure);
 
     return this.db.transaction("rw", this.db.texts, this.db.textContents, async () => {
-      const textId = await this.db.texts.put(text)
+      const textId = await this.db.texts.put(text);
       await this.db.textContents.put({
         textId,
         elementCount: tokenizedContent.types.length,
         elementTypes: tokenizedContent.types,
         elementValues: tokenizedContent.values,
         structure
-      })
+      });
       const newRecord = this.db.texts
         .where("id")
         .equals(textId)
-        .first()
-      return Text.fromPersisted((await newRecord)!)
-    })
+        .first();
+      return Text.fromPersisted((await newRecord)!);
+    });
   }
 
   public async loadAll(): Promise<Text[]> {
-    const persistedTexts = await this.db.texts.toArray()
-    return persistedTexts.map(t => Text.fromPersisted(t))
+    const persistedTexts = await this.db.texts.toArray();
+    return persistedTexts.map(t => Text.fromPersisted(t));
   }
 
   public async loadOneWithContent(id: number): Promise<Text | undefined> {
     const persistedText = await this.db.texts
       .where("id")
       .equals(id)
-      .first()
+      .first();
     if (!persistedText) {
-      return Promise.resolve(undefined)
+      return Promise.resolve(undefined);
     }
-    const text = Text.fromPersisted(persistedText)
+    const text = Text.fromPersisted(persistedText);
     const persistedContent = await this.db.textContents
       .where("textId")
       .equals(id)
-      .first()
+      .first();
     if (!persistedContent) {
-      return Promise.resolve(undefined)
+      return Promise.resolve(undefined);
     }
     text.tokenizedContent = {
       types: persistedContent.elementTypes,
       values: persistedContent.elementValues,
       startNo: 0
-    }
-    text.structure = persistedContent.structure
-    return text
+    };
+    text.structure = persistedContent.structure;
+    return text;
   }
 
   public updateProgress(id: number, progress: TextProgress): Promise<Text> {
@@ -81,13 +81,13 @@ export class TextRepository {
       await this.db.texts.update(id, {
         progressElementNo: progress.elementNo,
         progressPercentage: progress.percentage
-      })
+      });
       const updatedRecord = this.db.texts
         .where("id")
         .equals(id)
-        .first()
-      return Text.fromPersisted((await updatedRecord)!)
-    })
+        .first();
+      return Text.fromPersisted((await updatedRecord)!);
+    });
   }
 
   public async delete(id: number): Promise<void> {
@@ -100,27 +100,27 @@ export class TextRepository {
         .where("textId")
         .equals(id)
         .delete()
-    ])
+    ]);
   }
 
   private async processContent(
     parsedText: ParsedText,
     language: Language
   ): Promise<[TextSectionInfo[] | undefined, TokenizedTextContent]> {
-    const [tokenizedContent, sectionStartElementNos] = await tokenize(parsedText.content, language)
+    const [tokenizedContent, sectionStartElementNos] = await tokenize(parsedText.content, language);
     if (parsedText.sectionNames) {
       if (parsedText.sectionNames.length !== sectionStartElementNos.length) {
-        console.warn("'sectionNames' and 'sectionStartIndices' length mismatch")
+        console.warn("'sectionNames' and 'sectionStartIndices' length mismatch");
       } else {
         const textSectionInfos = zip(parsedText.sectionNames, sectionStartElementNos).map(
           ([name, startElementNo]) => ({
             name,
             startElementNo
           })
-        )
-        return [textSectionInfos as TextSectionInfo[], tokenizedContent]
+        );
+        return [textSectionInfos as TextSectionInfo[], tokenizedContent];
       }
     }
-    return [undefined, tokenizedContent]
+    return [undefined, tokenizedContent];
   }
 }

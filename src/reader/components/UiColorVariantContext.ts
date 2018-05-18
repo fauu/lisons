@@ -1,5 +1,5 @@
-import * as React from "react"
+import * as React from "react";
 
-import { UiColorVariant } from "~/reader/model"
+import { UiColorVariant } from "~/reader/model";
 
-export const UiColorVariantContext = React.createContext<UiColorVariant>("Light")
+export const UiColorVariantContext = React.createContext<UiColorVariant>("Light");

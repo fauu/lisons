@@ -1,4 +1,4 @@
-import { LanguageFlag } from "~/app/model"
+import { LanguageFlag } from "~/app/model";
 
 const data = [
   ["Afrikaans", "Afrikaans", "af", "afr"],
@@ -104,7 +104,7 @@ const data = [
   ["Yiddish", "ייִדיש", "yi", "yid", LanguageFlag.Rtl],
   ["Yoruba", "Yorùbá", "yo", "tor"],
   ["Zulu", "isiZulu", "zu", ""]
-]
+];
 
 export const languages = data
   .filter(d => d[3] !== "")
@@ -113,6 +113,6 @@ export const languages = data
     localName: d[1] as string,
     codeGt: d[2] as string,
     code6393: d[3] as string,
-    flags: d.length === 5 ? d[4] as LanguageFlag : LanguageFlag.None
+    flags: d.length === 5 ? (d[4] as LanguageFlag) : LanguageFlag.None
   }))
-  .sort((a, b) => a.localName.localeCompare(b.localName))
+  .sort((a, b) => a.localName.localeCompare(b.localName));

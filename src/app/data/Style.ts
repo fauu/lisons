@@ -1,4 +1,4 @@
-import { keyframes } from "styled-components"
+import { keyframes } from "styled-components";
 
 export const colors = {
   primary: "#282828",
@@ -11,17 +11,17 @@ export const colors = {
   accent2: "#ff99ac",
   danger: "#ff5a4b",
   inputBg: "#ffffff"
-}
+};
 
 export const fonts = {
   ui: "Lato",
   serif: "PT Serif"
-}
+};
 
-const time = "0.2s"
-const halfTime = "0.1s"
-const doubleTime = "0.4s"
-const timingFunction = "ease-out"
+const time = "0.2s";
+const halfTime = "0.1s";
+const doubleTime = "0.4s";
+const timingFunction = "ease-out";
 
 export const animations = {
   stdTime: time,
@@ -97,4 +97,4 @@ export const animations = {
       background-position: 0% 51%
     }
   `
-}
+};

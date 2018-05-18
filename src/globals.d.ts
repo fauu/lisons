@@ -1,18 +1,18 @@
-declare var VERSION
+declare var VERSION;
 
-declare module "*.png"
-declare module "*.woff2"
+declare module "*.png";
+declare module "*.woff2";
 
-declare module "electron-localshortcut"
-declare module "franc-min"
-declare module "isbinaryfile"
-declare module "jschardet"
-declare module "react-hint"
+declare module "electron-localshortcut";
+declare module "franc-min";
+declare module "isbinaryfile";
+declare module "jschardet";
+declare module "react-hint";
 
 declare module "worker-loader*" {
   class WebpackWorker extends Worker {
-    constructor()
+    constructor();
   }
 
-  export = WebpackWorker
+  export = WebpackWorker;
 }

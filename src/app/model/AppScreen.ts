@@ -1,1 +1,1 @@
-export type AppScreen = "Library" | "Reader"
+export type AppScreen = "Library" | "Reader";

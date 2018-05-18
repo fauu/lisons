@@ -1,7 +1,7 @@
-import { ExampleSentences, Language } from "~/app/model"
-import { xhr } from "~/app/Xhr"
+import { ExampleSentences, Language } from "~/app/model";
+import { xhr } from "~/app/Xhr";
 
-import { SentenceSource } from "~/reader/model"
+import { SentenceSource } from "~/reader/model";
 
 export class ReversoContextSource implements SentenceSource {
   private static languageMap = new Map([
@@ -18,25 +18,25 @@ export class ReversoContextSource implements SentenceSource {
     ["por", ["deu", "eng", "spa", "fra", "heb", "ita"]],
     ["ron", ["deu", "eng", "spa", "fra", "ita"]],
     ["rus", ["eng", "spa", "fra", "heb", "ita", "jpn", "nld"]]
-  ])
+  ]);
 
   public get name(): string {
-    return "Reverso Context"
+    return "Reverso Context";
   }
   public get domain(): string {
-    return "context.reverso.net"
+    return "context.reverso.net";
   }
   public get url(): string {
-    return `http://${this.domain}`
+    return `http://${this.domain}`;
   }
-  private parser = new DOMParser()
+  private parser = new DOMParser();
 
   public hasSentences(from: Language, to: Language): boolean {
-    const toCodes = ReversoContextSource.languageMap.get(from.code6393)
+    const toCodes = ReversoContextSource.languageMap.get(from.code6393);
     if (!toCodes) {
-      return false
+      return false;
     }
-    return toCodes.some(c => c === to.code6393)
+    return toCodes.some(c => c === to.code6393);
   }
 
   public async fetchSentences(
@@ -48,8 +48,8 @@ export class ReversoContextSource implements SentenceSource {
       encodeURI(phrase),
       this.getLanguageString(from),
       this.getLanguageString(to)
-    )
-    const doc = await this.fetchSentencesDocument(sourceUrl)
+    );
+    const doc = await this.fetchSentencesDocument(sourceUrl);
 
     return {
       data: Array.from(doc.querySelectorAll("#examples-content > .example:not(.blocked)")).map(
@@ -62,19 +62,19 @@ export class ReversoContextSource implements SentenceSource {
       ),
       sourceDomain: this.domain,
       sourceUrl
-    }
+    };
   }
 
   private getLanguageString(lang: Language): string {
-    return lang.name.toLowerCase()
+    return lang.name.toLowerCase();
   }
 
   private getSentencesDocumentUrl(query: string, fromLang: string, toLang: string): string {
-    return `${this.url}/translation/${fromLang}-${toLang}/${query}`
+    return `${this.url}/translation/${fromLang}-${toLang}/${query}`;
   }
 
   private async fetchSentencesDocument(url: string): Promise<Document> {
-    const res = await xhr<string>(url)
-    return this.parser.parseFromString(res, "text/html")
+    const res = await xhr<string>(url);
+    return this.parser.parseFromString(res, "text/html");
   }
 }

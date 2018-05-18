@@ -2,36 +2,36 @@
 //   - Migrate components away from componentWillMount:
 //     https://github.com/mobxjs/mobx-react/issues/447
 
-import { configure } from "mobx"
-import { observer } from "mobx-react"
-import * as React from "react"
-import { hot } from "react-hot-loader"
-import styled from "styled-components"
+import { configure } from "mobx";
+import { observer } from "mobx-react";
+import * as React from "react";
+import { hot } from "react-hot-loader";
+import styled from "styled-components";
 
-import { Library } from "~/library/components"
-import { Reader } from "~/reader/components"
+import { Library } from "~/library/components";
+import { Reader } from "~/reader/components";
 
-import { FadeTransition, Spinner } from "~/app/components"
-import { KeyCode } from "~/app/data/KeyCode"
-import { animations, colors, fonts } from "~/app/data/Style"
-import "~/app/GlobalCss.ts"
-import { AppScreen } from "~/app/model"
-import { AppStore } from "~/app/stores"
+import { FadeTransition, Spinner } from "~/app/components";
+import { KeyCode } from "~/app/data/KeyCode";
+import { animations, colors, fonts } from "~/app/data/Style";
+import "~/app/GlobalCss.ts";
+import { AppScreen } from "~/app/model";
+import { AppStore } from "~/app/stores";
 
-configure({ computedRequiresReaction: true, enforceActions: true })
+configure({ computedRequiresReaction: true, enforceActions: true });
 
 @hot(module)
 @observer
 export class App extends React.Component<{}> {
-  private appStore!: AppStore
+  private appStore!: AppStore;
 
   public componentWillMount(): void {
-    this.appStore = new AppStore()
-    document.addEventListener("keydown", this.handleKeyDown)
+    this.appStore = new AppStore();
+    document.addEventListener("keydown", this.handleKeyDown);
   }
 
   public componentWillUnmount(): void {
-    document.removeEventListener("keydown", this.handleKeyDown)
+    document.removeEventListener("keydown", this.handleKeyDown);
   }
 
   public render(): JSX.Element {
@@ -39,65 +39,65 @@ export class App extends React.Component<{}> {
       <Wrapper id="app">
         <FadeTransition>{this.renderScreen(this.appStore.activeScreen)}</FadeTransition>
       </Wrapper>
-    )
+    );
   }
 
   private renderScreen(screen?: AppScreen): JSX.Element {
     switch (screen) {
       case "Library":
-        return <Library appStore={this.appStore} key={screen} />
+        return <Library appStore={this.appStore} key={screen} />;
       case "Reader":
-        return <Reader appStore={this.appStore} key={screen} />
+        return <Reader appStore={this.appStore} key={screen} />;
       default:
         return (
           <LoadingScreen key={"loading"}>
             <Spinner color={"Light"} />}
           </LoadingScreen>
-        )
+        );
     }
   }
 
   // TODO: Keyboard-driven actions should share handlers with
   //       the corresponding mouse-driven actions
   private handleKeyDown = (e: KeyboardEvent): void => {
-    const appStore = this.appStore
-    const readerStore = appStore.readerStore
-    const sidebarStore = readerStore.sidebarStore
-    const inReader = this.appStore.activeScreen === "Reader"
+    const appStore = this.appStore;
+    const readerStore = appStore.readerStore;
+    const sidebarStore = readerStore.sidebarStore;
+    const inReader = this.appStore.activeScreen === "Reader";
     switch (e.keyCode) {
       case KeyCode.LeftArrow:
         if (inReader) {
           if (e.altKey) {
-            readerStore.skipBackward()
+            readerStore.skipBackward();
           } else {
-            readerStore.showPrevPage()
+            readerStore.showPrevPage();
           }
         }
-        break
+        break;
       case KeyCode.RightArrow:
         if (inReader) {
           if (e.altKey) {
-            readerStore.skipForward()
+            readerStore.skipForward();
           } else {
-            readerStore.showNextPage()
+            readerStore.showNextPage();
           }
         }
-        break
+        break;
       case KeyCode.B:
         if (e.ctrlKey && inReader) {
-          sidebarStore.setVisible(!sidebarStore.isVisible)
+          sidebarStore.setVisible(!sidebarStore.isVisible);
         }
-        break
+        break;
       case KeyCode.Escape:
         if (inReader) {
-          appStore.showLibraryScreen()
+          appStore.showLibraryScreen();
         }
-        break
+        break;
       case KeyCode.F11:
-        appStore.toggleFullScreen()
-        break
+        appStore.toggleFullScreen();
+        break;
     }
-  }
+  };
 }
 
 const Wrapper = styled.div`
@@ -157,7 +157,7 @@ const Wrapper = styled.div`
   textarea:focus {
     outline: none;
   }
-`
+`;
 
 const LoadingScreen = styled.div`
   width: 100vw;
@@ -165,4 +165,4 @@ const LoadingScreen = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;

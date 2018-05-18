@@ -1,4 +1,4 @@
-import { Settings } from "~/app/model"
+import { Settings } from "~/app/model";
 
 export const defaultSettings: Settings = {
   defaultTranslationLanguage: "eng",
@@ -15,4 +15,4 @@ export const defaultSettings: Settings = {
     translationBgColor: "#222222",
     translationTextColor: "#fefefe"
   }
-}
+};

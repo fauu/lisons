@@ -1,25 +1,25 @@
-import { debounce } from "lodash"
-import { action, observable, reaction } from "mobx"
-import { observer } from "mobx-react"
-import * as React from "react"
-import styled from "styled-components"
+import { debounce } from "lodash";
+import { action, observable, reaction } from "mobx";
+import { observer } from "mobx-react";
+import * as React from "react";
+import styled from "styled-components";
 
-import { defaultSettings } from "~/app/data/DefaultSettings"
-import { colors } from "~/app/data/Style"
-import { ReaderStyleSettings } from "~/app/model"
-import { SettingsStore } from "~/app/stores"
-import { withProps } from "~/util/StyleUtils"
+import { defaultSettings } from "~/app/data/DefaultSettings";
+import { colors } from "~/app/data/Style";
+import { ReaderStyleSettings } from "~/app/model";
+import { SettingsStore } from "~/app/stores";
+import { withProps } from "~/util/StyleUtils";
 
-import { SidebarStore } from "~/reader/stores"
+import { SidebarStore } from "~/reader/stores";
 
 interface RangeInputProps {
-  readonly min: number
-  readonly max: number
-  readonly step: number
+  readonly min: number;
+  readonly max: number;
+  readonly step: number;
 }
-type SelectInputOptions = Array<[string, string]>
-type FormModelElementOptions = RangeInputProps | SelectInputOptions | {}
-type FormModelElement = [string, string, string, FormModelElementOptions]
+type SelectInputOptions = Array<[string, string]>;
+type FormModelElementOptions = RangeInputProps | SelectInputOptions | {};
+type FormModelElement = [string, string, string, FormModelElementOptions];
 const formModel: FormModelElement[] = [
   ["Background color", "background", "color", {}],
   ["Text color", "textColor", "color", {}],
@@ -37,60 +37,60 @@ const formModel: FormModelElement[] = [
   ["Selection color", "selectionColor", "color", {}],
   ["Translation pop-up background color", "translationBgColor", "color", {}],
   ["Translation pop-up text color", "translationTextColor", "color", {}]
-]
+];
 
 // TODO: Rename to 'StyleCustomizer' or sth?
 export interface SettingsProps {
-  readonly sidebarStore: SidebarStore
-  readonly settingsStore: SettingsStore
+  readonly sidebarStore: SidebarStore;
+  readonly settingsStore: SettingsStore;
 }
 @observer
 export class Settings extends React.Component<SettingsProps> {
-  private static readonly commitDebounceMs = 200
+  private static readonly commitDebounceMs = 200;
 
-  @observable private formData: ReaderStyleSettings = defaultSettings.readerStyle
+  @observable private formData: ReaderStyleSettings = defaultSettings.readerStyle;
 
-  private settingsStore!: SettingsStore
-  private sidebarStore!: SidebarStore
+  private settingsStore!: SettingsStore;
+  private sidebarStore!: SidebarStore;
 
   public componentWillMount(): void {
-    this.settingsStore = this.props.settingsStore
-    this.sidebarStore = this.props.sidebarStore
-    Object.assign(this.formData, this.settingsStore.settings.readerStyle)
+    this.settingsStore = this.props.settingsStore;
+    this.sidebarStore = this.props.sidebarStore;
+    Object.assign(this.formData, this.settingsStore.settings.readerStyle);
   }
 
   public componentDidMount(): void {
     reaction(
       () => this.formData,
       readerStyle => {
-        this.commit(readerStyle)
+        this.commit(readerStyle);
       }
-    )
+    );
   }
 
   // tslint:disable-next-line:member-ordering
   private commit = debounce((readerStyle: ReaderStyleSettings) => {
-    this.settingsStore.set({ readerStyle })
-  }, Settings.commitDebounceMs)
+    this.settingsStore.set({ readerStyle });
+  }, Settings.commitDebounceMs);
 
   private handleFieldChange = (fieldName: string) =>
     action((e: React.FormEvent<HTMLInputElement>) => {
       this.formData = {
         ...this.formData,
         [`${fieldName}`]: e.currentTarget.value
-      }
-    })
+      };
+    });
 
   private handleDoneButtonClick = (e: React.FormEvent<HTMLButtonElement>) => {
-    this.sidebarStore.setSettingsTabActive(false)
-    e.preventDefault()
-  }
+    this.sidebarStore.setSettingsTabActive(false);
+    e.preventDefault();
+  };
 
   @action
   private handleResetButtonClick = (e: React.FormEvent<HTMLButtonElement>) => {
-    this.formData = defaultSettings.readerStyle
-    e.preventDefault()
-  }
+    this.formData = defaultSettings.readerStyle;
+    e.preventDefault();
+  };
 
   public render(): JSX.Element {
     return (
@@ -112,7 +112,7 @@ export class Settings extends React.Component<SettingsProps> {
           Reset to defaults
         </Button>
       </Form>
-    )
+    );
   }
 
   private renderInput(key: string, type: string, options: FormModelElementOptions): JSX.Element {
@@ -125,7 +125,7 @@ export class Settings extends React.Component<SettingsProps> {
             </Option>
           ))}
         </Select>
-      )
+      );
     }
     return (
       <Input
@@ -134,7 +134,7 @@ export class Settings extends React.Component<SettingsProps> {
         onChange={this.handleFieldChange(key)}
         {...options}
       />
-    )
+    );
   }
 }
 
@@ -157,17 +157,17 @@ const Form = styled.form`
   &::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.05);
   }
-`
+`;
 
 const FormMain = styled.div`
   margin-bottom: 3rem;
-`
+`;
 
 const Field = styled.label`
   display: flex;
   justify-content: space-between;
   margin-bottom: 1rem;
-`
+`;
 
 const Label = styled.div`
   flex: 2;
@@ -175,7 +175,7 @@ const Label = styled.div`
   align-items: center;
   padding-right: 1em;
   line-height: 1.1em;
-`
+`;
 
 const Input = styled.input`
   width: 14rem;
@@ -206,7 +206,7 @@ const Input = styled.input`
       outline: none;
     }
   }
-`
+`;
 
 // TODO: DRY
 const Select = styled.select`
@@ -220,14 +220,14 @@ const Select = styled.select`
   &:hover {
     transform: translate(0, -1px);
   }
-`
+`;
 
 const Option = styled.option`
   background: #444;
   color: #fefefe;
   font-size: 0.95em;
   padding: 0.5rem;
-`
+`;
 
 const Button = withProps<{ warning?: boolean }>()(styled.button)`
   width: 100%;
@@ -252,4 +252,4 @@ const Button = withProps<{ warning?: boolean }>()(styled.button)`
     color: ${colors.primaryFade};
     border-color: ${colors.primaryFade}55;
   }
-`
+`;

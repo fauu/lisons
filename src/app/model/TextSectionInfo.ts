@@ -1,4 +1,4 @@
 export interface TextSectionInfo {
-  name: string
-  startElementNo: number
+  name: string;
+  startElementNo: number;
 }

@@ -1,4 +1,4 @@
 export interface TextProgress {
-  elementNo: number
-  percentage: number
+  elementNo: number;
+  percentage: number;
 }

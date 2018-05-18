@@ -1,1 +1,1 @@
-export type UiColorVariant = "Light" | "Dark"
+export type UiColorVariant = "Light" | "Dark";

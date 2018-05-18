@@ -1,2 +1,2 @@
-export * from "./AddTextDialogStore"
-export * from "./LibraryStore"
+export * from "./AddTextDialogStore";
+export * from "./LibraryStore";

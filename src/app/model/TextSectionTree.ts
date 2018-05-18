@@ -1,5 +1,5 @@
-import { TextSectionTreeNode } from "~/app/model"
+import { TextSectionTreeNode } from "~/app/model";
 
 export interface TextSectionTree {
-  root: TextSectionTreeNode
+  root: TextSectionTreeNode;
 }

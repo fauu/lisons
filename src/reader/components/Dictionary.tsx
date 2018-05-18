@@ -1,14 +1,14 @@
-import * as React from "react"
-import styled from "styled-components"
+import * as React from "react";
+import styled from "styled-components";
 
-import { animations, colors, fonts } from "~/app/data/Style"
+import { animations, colors, fonts } from "~/app/data/Style";
 
-import { DictionaryEntry } from "~/reader/model"
+import { DictionaryEntry } from "~/reader/model";
 
-const variantCountLimit = 5
+const variantCountLimit = 5;
 
 export interface DictionaryProps {
-  readonly entries: DictionaryEntry[]
+  readonly entries: DictionaryEntry[];
 }
 export function Dictionary({ entries }: DictionaryProps): JSX.Element {
   return (
@@ -35,14 +35,14 @@ export function Dictionary({ entries }: DictionaryProps): JSX.Element {
                         (…{numNotShownVariants} more)
                       </NotAllVariantsMsg>} */}
                   </EntryVariant>
-                )
+                );
               })}
             </EntryBody>
           </Entry>
-        )
+        );
       })}
     </Root>
-  )
+  );
 }
 
 const Root = styled.div`
@@ -65,42 +65,42 @@ const Root = styled.div`
   &::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.1);
   }
-`
+`;
 
 const Entry = styled.article`
   &:not(:last-child) {
     margin-bottom: 1rem;
   }
-`
+`;
 
-const EntryHeader = styled.header``
+const EntryHeader = styled.header``;
 
 const Word = styled.span`
   font-weight: bold;
   font-style: italic;
   font-family: ${fonts.serif};
-`
+`;
 
 const PartOfSpeech = styled.span`
   color: ${colors.primaryFade};
   margin-left: 0.5rem;
   font-size: 0.7em;
-`
+`;
 
 const EntryBody = styled.ul`
   list-style-type: none;
   margin: 0.3rem 0 0 0;
   padding-left: 1em;
   font-size: 0.9em;
-`
+`;
 
-const EntryVariant = styled.li``
+const EntryVariant = styled.li``;
 
 const ReverseTranslations = styled.span`
   margin-left: 0.5em;
   font-size: 0.7em;
   opacity: 0.6;
-`
+`;
 
 // const NotAllVariantsMsg = styled.span`
 //   margin-left: 1rem;

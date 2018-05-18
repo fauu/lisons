@@ -1,8 +1,8 @@
-import * as React from "react"
-import * as ReactCSSTransitionReplace from "react-css-transition-replace"
+import * as React from "react";
+import * as ReactCSSTransitionReplace from "react-css-transition-replace";
 
 export interface FadeTransitionProps {
-  readonly children: JSX.Element
+  readonly children: JSX.Element;
 }
 export function FadeTransition({ children }: FadeTransitionProps): JSX.Element {
   return (
@@ -13,5 +13,5 @@ export function FadeTransition({ children }: FadeTransitionProps): JSX.Element {
     >
       {children}
     </ReactCSSTransitionReplace>
-  )
+  );
 }

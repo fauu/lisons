@@ -1,68 +1,68 @@
-import { ChevronLeftIcon, ChevronRightIcon, SkipBackwardIcon, SkipForwardIcon } from "mdi-react"
-import { computed } from "mobx"
-import { observer } from "mobx-react"
-import * as React from "react"
-import styled from "styled-components"
+import { ChevronLeftIcon, ChevronRightIcon, SkipBackwardIcon, SkipForwardIcon } from "mdi-react";
+import { computed } from "mobx";
+import { observer } from "mobx-react";
+import * as React from "react";
+import styled from "styled-components";
 
-import { animations } from "~/app/data/Style"
-import { ReaderStyleSettings } from "~/app/model"
-import { AppStore, SettingsStore } from "~/app/stores"
-import { formatPercentage } from "~/util/FormatUtils"
-import { hexToRgb, isColorDark, withProps } from "~/util/StyleUtils"
+import { animations } from "~/app/data/Style";
+import { ReaderStyleSettings } from "~/app/model";
+import { AppStore, SettingsStore } from "~/app/stores";
+import { formatPercentage } from "~/util/FormatUtils";
+import { hexToRgb, isColorDark, withProps } from "~/util/StyleUtils";
 
-import { Header, Sidebar, Toc, UiColorVariantContext } from "~/reader/components"
-import { UiColorVariant } from "~/reader/model"
-import { ReaderStore, SidebarStore } from "~/reader/stores"
+import { Header, Sidebar, Toc, UiColorVariantContext } from "~/reader/components";
+import { UiColorVariant } from "~/reader/model";
+import { ReaderStore, SidebarStore } from "~/reader/stores";
 
-import * as noiseTexture from "~/res/images/noise-texture.png"
+import * as noiseTexture from "~/res/images/noise-texture.png";
 
 export interface ReaderProps {
-  readonly appStore: AppStore
+  readonly appStore: AppStore;
 }
 @observer
 export class Reader extends React.Component<ReaderProps> {
-  private appStore!: AppStore
-  private settingsStore!: SettingsStore
-  private readerStore!: ReaderStore
-  private sidebarStore!: SidebarStore
+  private appStore!: AppStore;
+  private settingsStore!: SettingsStore;
+  private readerStore!: ReaderStore;
+  private sidebarStore!: SidebarStore;
 
   public componentWillMount(): void {
-    this.appStore = this.props.appStore
-    this.settingsStore = this.appStore.settingsStore
-    this.readerStore = this.appStore.readerStore
-    this.sidebarStore = this.readerStore.sidebarStore
+    this.appStore = this.props.appStore;
+    this.settingsStore = this.appStore.settingsStore;
+    this.readerStore = this.appStore.readerStore;
+    this.sidebarStore = this.readerStore.sidebarStore;
   }
 
   public componentWillUnmount(): void {
-    this.sidebarStore.setResourcesNotLoading()
-    this.readerStore.clear()
+    this.sidebarStore.setResourcesNotLoading();
+    this.readerStore.clear();
   }
 
   public componentDidMount(): void {
-    this.readerStore.initTextView().attach("text-view")
-    this.readerStore.scrollText("LastKnownPosition")
+    this.readerStore.initTextView().attach("text-view");
+    this.readerStore.scrollText("LastKnownPosition");
   }
 
   @computed
   private get uiColorVariant(): UiColorVariant {
     return isColorDark(hexToRgb(this.settingsStore.settings.readerStyle.background))
       ? "Light"
-      : "Dark"
+      : "Dark";
   }
 
   private handleTocAnyClick = () => {
-    this.readerStore.setTocVisible(false)
-  }
+    this.readerStore.setTocVisible(false);
+  };
 
   private handleTocSectionLinkClick = (startElementNo: number) => {
-    this.readerStore.scrollText(startElementNo)
-  }
+    this.readerStore.scrollText(startElementNo);
+  };
 
   public render(): JSX.Element | null {
-    const readerStore = this.readerStore
-    const text = readerStore.text
+    const readerStore = this.readerStore;
+    const text = readerStore.text;
     if (!text) {
-      return null
+      return null;
     }
     const {
       currentSection,
@@ -72,11 +72,11 @@ export class Reader extends React.Component<ReaderProps> {
       isLastPage,
       showPrevPage,
       showNextPage
-    } = readerStore
-    const userStyle = this.settingsStore.settings.readerStyle
-    const variant = this.uiColorVariant
-    const isOnlyPage = isFirstPage && isLastPage
-    const isRtl = text!.isRtl
+    } = readerStore;
+    const userStyle = this.settingsStore.settings.readerStyle;
+    const variant = this.uiColorVariant;
+    const isOnlyPage = isFirstPage && isLastPage;
+    const isRtl = text!.isRtl;
     return (
       <Root>
         <Body
@@ -120,7 +120,7 @@ export class Reader extends React.Component<ReaderProps> {
           <Sidebar sidebarStore={this.sidebarStore} settingsStore={this.settingsStore} />
         )}
       </Root>
-    )
+    );
   }
 
   private renderTextProgress(): JSX.Element | null {
@@ -131,11 +131,11 @@ export class Reader extends React.Component<ReaderProps> {
       isLastPage,
       skipBackward,
       skipForward
-    } = this.readerStore
-    const variant = this.uiColorVariant
-    const isRtl = text!.isRtl
-    const showLeftButton = (isRtl && !isLastPage) || (!isRtl && !isFirstPage)
-    const showRightButton = (isRtl && !isFirstPage) || (!isRtl && !isLastPage)
+    } = this.readerStore;
+    const variant = this.uiColorVariant;
+    const isRtl = text!.isRtl;
+    const showLeftButton = (isRtl && !isLastPage) || (!isRtl && !isFirstPage);
+    const showRightButton = (isRtl && !isFirstPage) || (!isRtl && !isLastPage);
     return (
       <TextProgress variant={variant}>
         <SecondaryTextNavButtonWrapper left>
@@ -154,7 +154,7 @@ export class Reader extends React.Component<ReaderProps> {
           )}
         </SecondaryTextNavButtonWrapper>
       </TextProgress>
-    )
+    );
   }
 }
 
@@ -162,13 +162,13 @@ const Root = styled.div`
   height: 100vh;
   width: 100vw;
   display: flex;
-`
+`;
 
 interface TextAreaProps {
-  readonly userStyle: ReaderStyleSettings
-  readonly animateSelection: boolean
-  readonly isContentRtl: boolean
-  readonly areTranslationsRtl: boolean
+  readonly userStyle: ReaderStyleSettings;
+  readonly animateSelection: boolean;
+  readonly isContentRtl: boolean;
+  readonly areTranslationsRtl: boolean;
 }
 const Body = withProps<TextAreaProps>()(styled.div)`
   position: relative;
@@ -217,16 +217,16 @@ const Body = withProps<TextAreaProps>()(styled.div)`
       direction: ${p => (p.areTranslationsRtl ? "rtl" : "ltr")}
     }
   }
-`
+`;
 
 const TextWithNavigation = styled.div`
   display: flex;
   position: relative;
-`
+`;
 
 interface TextNavButtonProps {
-  readonly visible: boolean
-  readonly variant: UiColorVariant
+  readonly visible: boolean;
+  readonly variant: UiColorVariant;
 }
 const TextNavButton = withProps<TextNavButtonProps>()(styled.div)`
   visibility: ${p => (p.visible ? "visible" : "hidden")};
@@ -248,15 +248,15 @@ const TextNavButton = withProps<TextNavButtonProps>()(styled.div)`
     transition: all ${animations.std};
     transform: scale(2);
   }
-`
+`;
 
 const PrevPageButton = TextNavButton.extend`
   margin-right: 1em;
-`
+`;
 
 const NextPageButton = TextNavButton.extend`
   margin-left: 1em;
-`
+`;
 
 const TextProgress = withProps<{ variant: UiColorVariant }>()(styled.div)`
   position: absolute;
@@ -269,18 +269,18 @@ const TextProgress = withProps<{ variant: UiColorVariant }>()(styled.div)`
   font-size: 1.4rem;
   color: ${p => (p.variant === "Light" ? "#ffffffaa" : "#000000aa")};
   z-index: 5;
-`
+`;
 
 const ProgressWrapper = styled.div`
   padding: 0 1.25rem;
-`
+`;
 
 const SecondaryTextNavButtonWrapper = withProps<{ left?: boolean }>()(styled.div)`
   flex: 1;
   display: flex;
   align-items: center;
   ${p => (p.left ? "justify-content: flex-end" : "")}
-`
+`;
 
 const SecondaryTextNavButton = withProps<{ variant: UiColorVariant; onClick: any }>()(styled.div)`
   transform: scale(1.3);
@@ -293,8 +293,8 @@ const SecondaryTextNavButton = withProps<{ variant: UiColorVariant; onClick: any
   &:not(:last-child) {
     margin-right: 0.6rem;
   }
-`
+`;
 // @ts-ignore
-const SkipBackwardButton = SecondaryTextNavButton.withComponent(SkipBackwardIcon)
+const SkipBackwardButton = SecondaryTextNavButton.withComponent(SkipBackwardIcon);
 // @ts-ignore
-const SkipForwardButton = SecondaryTextNavButton.withComponent(SkipForwardIcon)
+const SkipForwardButton = SecondaryTextNavButton.withComponent(SkipForwardIcon);

@@ -1,22 +1,22 @@
-import { observer } from "mobx-react"
-import * as React from "react"
-import styled from "styled-components"
+import { observer } from "mobx-react";
+import * as React from "react";
+import styled from "styled-components";
 
-import { AppStore } from "~/app/stores"
+import { AppStore } from "~/app/stores";
 
-import { TextListElement } from "~/library/components"
+import { TextListElement } from "~/library/components";
 
 export interface TextListProps {
-  readonly appStore: AppStore
+  readonly appStore: AppStore;
 }
 export const TextList = observer(function _TextList({ appStore }: TextListProps): JSX.Element {
-  const texts = appStore.textStore.texts.values()
+  const texts = appStore.textStore.texts.values();
   return (
     <Root>
       {Array.from(texts).map(t => <TextListElement key={t.id} appStore={appStore} text={t} />)}
     </Root>
-  )
-})
+  );
+});
 
 const Root = styled.ul`
   margin: 0;
@@ -35,4 +35,4 @@ const Root = styled.ul`
   &::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.05);
   }
-`
+`;

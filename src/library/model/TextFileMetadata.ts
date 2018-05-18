@@ -1,5 +1,5 @@
 export interface TextFileMetadata {
-  author?: string
-  title?: string
-  language?: string
+  author?: string;
+  title?: string;
+  language?: string;
 }

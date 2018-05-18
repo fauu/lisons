@@ -1,119 +1,120 @@
-import * as zip from "jszip"
-import * as path from "path"
+import * as zip from "jszip";
+import * as path from "path";
 
-import { Language, TextChunkMap, TextSectionTree, TextSectionTreeNode } from "~/app/model"
-import { getWrapWordsInTagsFn } from "~/app/Tokenization"
+import { Language, TextChunkMap, TextSectionTree, TextSectionTreeNode } from "~/app/model";
+import { getWrapWordsInTagsFn } from "~/app/Tokenization";
 
-import { TextFileMetadata } from "~/library/model"
-import { ensurePathExists, writeFile } from "~/util/FileUtils"
+import { TextFileMetadata } from "~/library/model";
+import { ensurePathExists, writeFile } from "~/util/FileUtils";
 
 interface OpfMetadata {
-  title?: string
-  creator?: string
-  language?: string
+  title?: string;
+  creator?: string;
+  language?: string;
 }
 
 interface OpfManifest {
-  items: OpfItem[]
+  items: OpfItem[];
 }
 
 interface OpfItem {
-  id: string
-  mediaType: string
-  href: string
+  id: string;
+  mediaType: string;
+  href: string;
 }
 
 interface OpfSpine {
-  toc?: string
-  itemRefs: OpfItemRef[]
+  toc?: string;
+  itemRefs: OpfItemRef[];
 }
 
 interface OpfItemRef {
-  idRef: string
+  idRef: string;
 }
 
 const { parseXml } = new class {
-  private parser?: DOMParser
+  private parser?: DOMParser;
   public parseXml = (s: string, mimetype: string) => {
     if (!this.parser) {
-      this.parser = new DOMParser()
+      this.parser = new DOMParser();
     }
-    return this.parser.parseFromString(s, mimetype)
-  }
-}()
+    return this.parser.parseFromString(s, mimetype);
+  };
+}();
 
 export const loadMetadata = async (buffer: Buffer): Promise<TextFileMetadata> => {
-  const archive = await zip.loadAsync(buffer)
+  const archive = await zip.loadAsync(buffer);
 
-  const opfPath = await getOpfPath(archive)
-  const opfFragment = await getOpfFragment(archive, opfPath)
-  const opfMetadata = getOpfMetadata(opfFragment)
+  const opfPath = await getOpfPath(archive);
+  const opfFragment = await getOpfFragment(archive, opfPath);
+  const opfMetadata = getOpfMetadata(opfFragment);
 
-  return { author: opfMetadata.creator, title: opfMetadata.title, language: opfMetadata.language }
-}
+  return { author: opfMetadata.creator, title: opfMetadata.title, language: opfMetadata.language };
+};
 
 export const convertEpubToLisonsText = async (
   textPath: string,
   buffer: Buffer,
   contentLanguage: Language
 ): Promise<[TextChunkMap, TextSectionTree | undefined]> => {
-  const archive = await zip.loadAsync(buffer)
+  const archive = await zip.loadAsync(buffer);
 
-  const opfPath = await getOpfPath(archive)
-  const opfFragment = await getOpfFragment(archive, opfPath)
+  const opfPath = await getOpfPath(archive);
+  const opfFragment = await getOpfFragment(archive, opfPath);
   const opfManifest = getOpfManifest(opfFragment, [
     "application/xhtml+xml",
     "application/x-dtbncx+xml"
-  ])
-  const opfSpine = getOpfSpine(opfFragment)
-  const itemsDir = path.dirname(opfPath)
+  ]);
+  const opfSpine = getOpfSpine(opfFragment);
+  const itemsDir = path.dirname(opfPath);
 
-  const serializer = new XMLSerializer()
-  const wrapWordsInTags = getWrapWordsInTagsFn(contentLanguage)
+  const serializer = new XMLSerializer();
+  const wrapWordsInTags = getWrapWordsInTagsFn(contentLanguage);
 
-  const textChunkMap: TextChunkMap = []
+  const textChunkMap: TextChunkMap = [];
 
   for (const item of opfManifest.items) {
-    const itemPath = path.join(textPath, item.href)
-    await ensurePathExists(path.dirname(itemPath))
-    const itemFile = archive.file(path.join(itemsDir, item.href))
+    const itemPath = path.join(textPath, item.href);
+    await ensurePathExists(path.dirname(itemPath));
+    const itemFile = archive.file(path.join(itemsDir, item.href));
 
     if (item.mediaType !== "application/xhtml+xml") {
-      writeFile<Buffer>(itemPath, await itemFile.async("nodebuffer"))
+      writeFile<Buffer>(itemPath, await itemFile.async("nodebuffer"));
     } else {
-      let chunkWordCount = 0
-      const itemHtmlContent = await itemFile.async("text")
-      const itemHtmlDocument = parseXml(itemHtmlContent, "text/xml")
+      let chunkWordCount = 0;
+      const itemHtmlContent = await itemFile.async("text");
+      const itemHtmlDocument = parseXml(itemHtmlContent, "text/xml");
 
-      itemHtmlDocument.head.innerHTML = "<meta charset='utf-8' />" + itemHtmlDocument.head.innerHTML
+      itemHtmlDocument.head.innerHTML =
+        "<meta charset='utf-8' />" + itemHtmlDocument.head.innerHTML;
 
       const treeWalker = document.createTreeWalker(
         itemHtmlDocument.body,
         NodeFilter.SHOW_TEXT,
         { acceptNode: _ => NodeFilter.FILTER_ACCEPT },
         false
-      )
+      );
       while (treeWalker.nextNode()) {
-        const node = treeWalker.currentNode
+        const node = treeWalker.currentNode;
         if (!node.textContent || node.textContent.trim() === "") {
-          continue
+          continue;
         }
-        const [newTextContent, wordCount] = await wrapWordsInTags(node.textContent)
-        node.textContent = newTextContent
-        chunkWordCount += wordCount
+        const [newTextContent, wordCount] = await wrapWordsInTags(node.textContent);
+        node.textContent = newTextContent;
+        chunkWordCount += wordCount;
       }
 
-      let newItemHtmlContent = serializer.serializeToString(itemHtmlDocument)
-      newItemHtmlContent = newItemHtmlContent.replace(/&gt;/g, ">")
-      newItemHtmlContent = newItemHtmlContent.replace(/&lt;/g, "<")
+      let newItemHtmlContent = serializer.serializeToString(itemHtmlDocument);
+      newItemHtmlContent = newItemHtmlContent.replace(/&gt;/g, ">");
+      newItemHtmlContent = newItemHtmlContent.replace(/&lt;/g, "<");
 
       textChunkMap.push({
         id: item.id,
         href: item.href,
         wordCount: chunkWordCount,
         startWordNo: -1
-      })
-      writeFile<string>(itemPath, newItemHtmlContent)
+      });
+      writeFile<string>(itemPath, newItemHtmlContent);
     }
   }
 
@@ -121,172 +122,172 @@ export const convertEpubToLisonsText = async (
     (a, b) =>
       opfSpine.itemRefs.findIndex(ref => ref.idRef === a.id) -
       opfSpine.itemRefs.findIndex(ref => ref.idRef === b.id)
-  )
+  );
 
-  let currentWordCount = 0
+  let currentWordCount = 0;
   textChunkMap.forEach(chunk => {
-    chunk.startWordNo = currentWordCount
-    currentWordCount += chunk.wordCount
-  })
+    chunk.startWordNo = currentWordCount;
+    currentWordCount += chunk.wordCount;
+  });
 
-  const sectionTree = await getSectionTree(archive, opfManifest, opfSpine, itemsDir)
+  const sectionTree = await getSectionTree(archive, opfManifest, opfSpine, itemsDir);
 
-  return [textChunkMap, sectionTree]
-}
+  return [textChunkMap, sectionTree];
+};
 
 const getOpfPath = async (archive: zip): Promise<string> => {
-  const containerFile = archive.file("META-INF/container.xml")
+  const containerFile = archive.file("META-INF/container.xml");
   if (!containerFile) {
-    throw new Error("'container.xml' not found")
+    throw new Error("'container.xml' not found");
   }
-  const containerDocument = parseXml(await containerFile.async("text"), "text/xml")
-  const rootfileElement = containerDocument.querySelector("rootfile")
+  const containerDocument = parseXml(await containerFile.async("text"), "text/xml");
+  const rootfileElement = containerDocument.querySelector("rootfile");
   if (!rootfileElement) {
-    throw new Error("'rootfile' element not found")
+    throw new Error("'rootfile' element not found");
   }
-  const fullpathValue = rootfileElement.getAttribute("full-path")
+  const fullpathValue = rootfileElement.getAttribute("full-path");
   if (!fullpathValue) {
-    throw new Error("'full-path' attribute not found")
+    throw new Error("'full-path' attribute not found");
   }
-  return fullpathValue
-}
+  return fullpathValue;
+};
 
 const getOpfFragment = async (archive: zip, opfPath: string): Promise<DocumentFragment> => {
-  const opfFile = archive.file(opfPath)
+  const opfFile = archive.file(opfPath);
   if (opfFile === null) {
-    throw new Error(`OPF file not found at '${opfPath}'`)
+    throw new Error(`OPF file not found at '${opfPath}'`);
   }
-  return document.createRange().createContextualFragment(await opfFile.async("text"))
-}
+  return document.createRange().createContextualFragment(await opfFile.async("text"));
+};
 
 const getOpfMetadata = (fragment: DocumentFragment): OpfMetadata => {
-  const opfMetadata = {}
-  const fieldNames = ["title", "creator", "language"]
+  const opfMetadata = {};
+  const fieldNames = ["title", "creator", "language"];
   fieldNames.forEach(fieldName => {
-    const element = fragment.querySelector(`metadata > dc\\:${fieldName}`)
+    const element = fragment.querySelector(`metadata > dc\\:${fieldName}`);
     if (element && element.textContent) {
-      opfMetadata[fieldName] = element.textContent
+      opfMetadata[fieldName] = element.textContent;
     }
-  })
-  return opfMetadata
-}
+  });
+  return opfMetadata;
+};
 
 const getOpfManifest = (fragment: DocumentFragment, acceptedMediaTypes: string[]): OpfManifest => {
   const items = Array.from(fragment.querySelectorAll("manifest item"))
     .map(itemElement => {
-      const mediaType = itemElement.getAttribute("media-type") || ""
-      const id = itemElement.getAttribute("id")
+      const mediaType = itemElement.getAttribute("media-type") || "";
+      const id = itemElement.getAttribute("id");
       if (acceptedMediaTypes.includes(mediaType) || id === "ncx") {
-        const href = itemElement.getAttribute("href")
-        return id !== null && href !== null ? { id, mediaType, href } : undefined
+        const href = itemElement.getAttribute("href");
+        return id !== null && href !== null ? { id, mediaType, href } : undefined;
       }
-      return undefined
+      return undefined;
     })
-    .filter(item => item !== undefined)
-  return { items: items as OpfItem[] }
-}
+    .filter(item => item !== undefined);
+  return { items: items as OpfItem[] };
+};
 
 const getOpfSpine = (fragment: DocumentFragment): OpfSpine => {
-  const spineElement = fragment.querySelector("spine")
+  const spineElement = fragment.querySelector("spine");
   if (!spineElement) {
-    throw new Error("The OPF file is spineless")
+    throw new Error("The OPF file is spineless");
   }
-  let tocValue: string | null | undefined = spineElement.getAttribute("toc")
+  let tocValue: string | null | undefined = spineElement.getAttribute("toc");
   if (!tocValue || tocValue === "") {
-    tocValue = undefined
-    console.warn("Spine has no toc reference")
+    tocValue = undefined;
+    console.warn("Spine has no toc reference");
   }
 
   const itemRefs = Array.from(fragment.querySelectorAll("spine itemref"))
     .map(itemRefElement => ({ idRef: itemRefElement.getAttribute("idref") }))
-    .filter(itemRef => itemRef.idRef !== null)
+    .filter(itemRef => itemRef.idRef !== null);
   return {
     toc: tocValue,
     itemRefs: itemRefs as OpfItemRef[]
-  }
-}
+  };
+};
 
 const parseTocNavLabel = (navLabel: Element): string | undefined => {
   if (navLabel.children.length !== 1) {
-    console.warn(`Expected 1 element inside <navLabel>, got ${navLabel.children.length}`)
-    return
+    console.warn(`Expected 1 element inside <navLabel>, got ${navLabel.children.length}`);
+    return;
   }
-  const onlyChild = navLabel.children[0]
+  const onlyChild = navLabel.children[0];
   if (onlyChild.tagName.toLowerCase() !== "text" || onlyChild.textContent === null) {
-    console.warn("<navLabel> has no <text> or its content is empty")
-    return
+    console.warn("<navLabel> has no <text> or its content is empty");
+    return;
   }
-  return onlyChild.textContent
-}
+  return onlyChild.textContent;
+};
 
 const parseTocContent = (content: Element): string | undefined => {
-  const src = content.getAttribute("src")
+  const src = content.getAttribute("src");
   if (!src) {
-    console.warn("<content> has no 'src' attribute")
-    return
+    console.warn("<content> has no 'src' attribute");
+    return;
   }
-  return src
-}
+  return src;
+};
 
 const parseTocNavPoint = (navPoint: Element): TextSectionTreeNode | undefined => {
-  let label
-  let contentFilePath
-  let contentFragmentId
-  const children = []
+  let label;
+  let contentFilePath;
+  let contentFragmentId;
+  const children = [];
   for (const childEl of navPoint.children) {
     switch (childEl.tagName.toLowerCase()) {
       case "navlabel":
-        label = parseTocNavLabel(childEl)
-        break
+        label = parseTocNavLabel(childEl);
+        break;
       case "content":
-        const src = parseTocContent(childEl)
+        const src = parseTocContent(childEl);
         if (src) {
           // XXX: Prettier plugin messes this up, '// prettier-ignore' doesn't help
           // [contentFilePath, contentFragmentId] = src.split("#")
-          const splitSrc = src.split("#")
-          contentFilePath = splitSrc[0]
+          const splitSrc = src.split("#");
+          contentFilePath = splitSrc[0];
           if (splitSrc.length === 2) {
-            contentFragmentId = splitSrc[1]
+            contentFragmentId = splitSrc[1];
           } else if (splitSrc.length > 2) {
-            console.warn(`Encountered more than one '#' in <content> src: '${src}'`)
+            console.warn(`Encountered more than one '#' in <content> src: '${src}'`);
           }
         }
-        break
+        break;
       case "navpoint":
-        const childNavPoint = parseTocNavPoint(childEl)
+        const childNavPoint = parseTocNavPoint(childEl);
         if (childNavPoint) {
-          children.push(childNavPoint)
+          children.push(childNavPoint);
         }
-        break
+        break;
       default:
-        console.warn(`Encountered unexpected element '${childEl.tagName}' inside <navPoint>`)
+        console.warn(`Encountered unexpected element '${childEl.tagName}' inside <navPoint>`);
     }
   }
   if (!label) {
-    console.warn("<navLabel> missing in <navPoint>")
-    return
+    console.warn("<navLabel> missing in <navPoint>");
+    return;
   }
   if (!contentFilePath) {
-    console.warn("<content> src missing in <navPoint>")
-    return
+    console.warn("<content> src missing in <navPoint>");
+    return;
   }
-  return { label, contentFilePath, contentFragmentId, children }
-}
+  return { label, contentFilePath, contentFragmentId, children };
+};
 
 const parseTocNavMap = async (navMap: Element): Promise<TextSectionTree> => {
-  const topLevelNodes = []
+  const topLevelNodes = [];
   for (const childEl of navMap.children) {
     if (childEl.tagName.toLowerCase() !== "navpoint") {
-      console.warn(`Encountered unexpected element '${childEl.tagName}' inside <navMap>`)
-      continue
+      console.warn(`Encountered unexpected element '${childEl.tagName}' inside <navMap>`);
+      continue;
     }
-    const navPoint = parseTocNavPoint(childEl)
+    const navPoint = parseTocNavPoint(childEl);
     if (navPoint) {
-      topLevelNodes.push(navPoint)
+      topLevelNodes.push(navPoint);
     }
   }
-  return { root: { label: "root", contentFilePath: "/", children: topLevelNodes } }
-}
+  return { root: { label: "root", contentFilePath: "/", children: topLevelNodes } };
+};
 
 const getSectionTree = async (
   archive: zip,
@@ -295,25 +296,25 @@ const getSectionTree = async (
   itemsDir: string
 ): Promise<TextSectionTree | undefined> => {
   if (!spine.toc) {
-    return
+    return;
   }
-  const tocItem = manifest.items.find(item => item.id === spine.toc)
+  const tocItem = manifest.items.find(item => item.id === spine.toc);
   if (!tocItem) {
-    console.warn("Manifest has no TOC item despite the spine having TOC reference")
-    return
+    console.warn("Manifest has no TOC item despite the spine having TOC reference");
+    return;
   }
-  const tocPath = path.join(itemsDir, tocItem.href)
-  const tocFile = archive.file(tocPath)
+  const tocPath = path.join(itemsDir, tocItem.href);
+  const tocFile = archive.file(tocPath);
   if (!tocFile) {
-    console.warn("Referenced TOC file not found")
-    return
+    console.warn("Referenced TOC file not found");
+    return;
   }
-  const tocContent = await tocFile.async("text")
-  const tocDocument = parseXml(tocContent, "text/xml")
-  const navMapElement = tocDocument.querySelector("navMap")
+  const tocContent = await tocFile.async("text");
+  const tocDocument = parseXml(tocContent, "text/xml");
+  const navMapElement = tocDocument.querySelector("navMap");
   if (!navMapElement) {
-    console.warn("TOC has no 'navMap' element")
-    return
+    console.warn("TOC has no 'navMap' element");
+    return;
   }
-  return parseTocNavMap(navMapElement)
-}
+  return parseTocNavMap(navMapElement);
+};

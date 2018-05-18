@@ -1,7 +1,7 @@
-import { TextTokenType } from "~/app/model"
+import { TextTokenType } from "~/app/model";
 
 export interface TokenizedTextContent {
-  types: TextTokenType[]
-  values: string[]
-  startNo: number
+  types: TextTokenType[];
+  values: string[];
+  startNo: number;
 }

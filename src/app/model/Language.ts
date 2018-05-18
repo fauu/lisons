@@ -1,9 +1,9 @@
 export interface Language {
-  name: string
-  localName: string
-  codeGt: string
-  code6393: string
-  flags: number
+  name: string;
+  localName: string;
+  codeGt: string;
+  code6393: string;
+  flags: number;
 }
 
 export enum LanguageFlag {

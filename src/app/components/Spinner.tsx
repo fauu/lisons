@@ -1,11 +1,11 @@
-import * as React from "react"
-import styled, { keyframes } from "styled-components"
+import * as React from "react";
+import styled, { keyframes } from "styled-components";
 
-import { withProps } from "~/util/StyleUtils"
+import { withProps } from "~/util/StyleUtils";
 
 // http://tobiasahlin.com/spinkit/
 export interface SpinnerProps {
-  readonly color: string | "Light" | "Dark"
+  readonly color: string | "Light" | "Dark";
 }
 export function Spinner({ color }: SpinnerProps): JSX.Element {
   return (
@@ -20,7 +20,7 @@ export function Spinner({ color }: SpinnerProps): JSX.Element {
       <div className="sk-cube sk-cube8" />
       <div className="sk-cube sk-cube9" />
     </SkCubeGrid>
-  )
+  );
 }
 
 const skCubeGridDelay = keyframes`
@@ -32,7 +32,7 @@ const skCubeGridDelay = keyframes`
   35% {
     transform: scale3D(0, 0, 1);
   }
-`
+`;
 
 const SkCubeGrid = withProps<{ color: string }>()(styled.div)`
   width: 40px;
@@ -77,4 +77,4 @@ const SkCubeGrid = withProps<{ color: string }>()(styled.div)`
   .sk-cube9 {
     animation-delay: 0.2s;
   }
-`
+`;

@@ -6,33 +6,33 @@ import {
   FullscreenExitIcon,
   FullscreenIcon,
   MenuDownIcon
-} from "mdi-react"
-import { observer } from "mobx-react"
-import * as React from "react"
-import styled from "styled-components"
+} from "mdi-react";
+import { observer } from "mobx-react";
+import * as React from "react";
+import styled from "styled-components";
 
-import { animations } from "~/app/data/Style"
-import { AppStore } from "~/app/stores"
-import { withProps } from "~/util/StyleUtils"
+import { animations } from "~/app/data/Style";
+import { AppStore } from "~/app/stores";
+import { withProps } from "~/util/StyleUtils";
 
-import { HeaderButton } from "~/reader/components"
-import { UiColorVariant } from "~/reader/model"
+import { HeaderButton } from "~/reader/components";
+import { UiColorVariant } from "~/reader/model";
 
 export interface HeaderProps {
-  readonly appStore: AppStore
-  readonly variant: UiColorVariant
+  readonly appStore: AppStore;
+  readonly variant: UiColorVariant;
 }
 export const Header = observer(function _Header({
   appStore,
   variant
 }: HeaderProps): JSX.Element | null {
-  const readerStore = appStore.readerStore
-  const sidebarStore = readerStore.sidebarStore
-  const text = readerStore.text
+  const readerStore = appStore.readerStore;
+  const sidebarStore = readerStore.sidebarStore;
+  const text = readerStore.text;
   if (!text) {
-    return null
+    return null;
   }
-  const { currentSection, toggleTocVisible } = readerStore
+  const { currentSection, toggleTocVisible } = readerStore;
   return (
     <Root variant={variant}>
       <TextTitle>{text.title}</TextTitle>
@@ -81,8 +81,8 @@ export const Header = observer(function _Header({
         />
       </Actions>
     </Root>
-  )
-})
+  );
+});
 
 const Root = withProps<{ variant: UiColorVariant }>()(styled.div)`
   color: ${p => (p.variant === "Light" ? "#ffffffaa" : "#000000aa")};
@@ -94,7 +94,7 @@ const Root = withProps<{ variant: UiColorVariant }>()(styled.div)`
   width: 100%;
   position: relative;
   letter-spacing: -0.03em;
-`
+`;
 
 const TextTitle = styled.span`
   flex: 1;
@@ -105,7 +105,7 @@ const TextTitle = styled.span`
   margin-left: 0.7rem;
   font-weight: bold;
   font-size: 0.95em;
-`
+`;
 
 const SectionInfo = withProps<{ variant: UiColorVariant }>()(styled.div)`
   flex: 1;
@@ -127,7 +127,7 @@ const SectionInfo = withProps<{ variant: UiColorVariant }>()(styled.div)`
     fill: ${p => (p.variant === "Light" ? "#ffffffaa" : "#000000aa")};
     transition: opacity ${animations.std};
   }
-`
+`;
 
 const SectionName = styled.div`
   flex: 1;
@@ -138,7 +138,7 @@ const SectionName = styled.div`
   max-width: 100%;
   opacity: 0.8;
   transition: opacity ${animations.std};
-`
+`;
 
 const Actions = withProps<{ variant: UiColorVariant }>()(styled.div)`
   display: flex;
@@ -146,4 +146,4 @@ const Actions = withProps<{ variant: UiColorVariant }>()(styled.div)`
   height: 100%;
   align-items: center;
   padding: 0 0.5rem;
-`
+`;
