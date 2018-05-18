@@ -5,8 +5,8 @@ import { action, computed, observable, reaction } from "mobx";
 import { IPromiseBasedObservable } from "mobx-utils";
 import * as path from "path";
 
-import { convertEpubToLisonsText, loadMetadata } from "~/app/epub";
 import { Language } from "~/app/model";
+import { metadataFromEpub, storeEpubContent, storePlaintextContent } from "~/app/textProcessing";
 
 import {
   ensurePathExists,
@@ -28,30 +28,30 @@ export class AddTextDialogStore {
   private static readonly languageDetectionSampleLength = 5000;
 
   @observable public detectedTextLanguage?: Language;
+  @observable public fileMetadata?: TextFileMetadata;
   @observable public isLanguageConfigurationValid: boolean = true;
   @observable public isSavingText: boolean = false;
-  @observable public textFileMetadata?: TextFileMetadata;
 
   public tatoebaTranslationCount?: IPromiseBasedObservable<number>;
 
-  @observable private isProcessingTextFile: boolean = false;
+  @observable private fileBuffer?: Buffer;
+  @observable private isProcessingFile: boolean = false;
   @observable private pastedText?: string;
-  @observable private textFileBuffer?: Buffer;
 
-  private textFilePlaintext?: string;
+  private filePlaintext?: string;
 
   public constructor() {
     reaction(() => this.pastedText, text => this.handlePastedTextChange(text), { delay: 1000 });
-    reaction(() => this.textFileMetadata, metadata => this.handleTextFileMetadataChange(metadata));
+    reaction(() => this.fileMetadata, metadata => this.handleTextFileMetadataChange(metadata));
   }
 
   @computed
-  public get textFileStatus(): TextFileStatus {
-    if (this.isProcessingTextFile) {
+  public get fileStatus(): TextFileStatus {
+    if (this.isProcessingFile) {
       return "Processing";
-    } else if (!this.textFileBuffer) {
+    } else if (!this.fileBuffer) {
       return "NotSelected";
-    } else if (!this.textFileMetadata) {
+    } else if (!this.fileMetadata) {
       return "Invalid";
     } else {
       return "Valid";
@@ -62,15 +62,6 @@ export class AddTextDialogStore {
   public *saveText(formData: AddTextFormData): IterableIterator<Promise<any>> {
     this.isSavingText = true;
 
-    console.log("saveText()", {
-      title: formData.title,
-      author: formData.author,
-      contentLanguage: formData.contentLanguage,
-      translationLanguage: formData.translationLanguage,
-      pastedContent: this.pastedText,
-      textFileBuffer: this.textFileBuffer,
-      textFilePlaintext: this.textFilePlaintext
-    });
     const id = crypto.randomBytes(16).toString("hex");
     const userDataPath = getUserDataPath();
     const textsDirName = "texts";
@@ -79,11 +70,21 @@ export class AddTextDialogStore {
     const newTextPath = path.join(textsPath, id);
     yield ensurePathExists(newTextPath);
 
-    const [textChunkMap, textSectionTree] = yield convertEpubToLisonsText(
-      newTextPath,
-      this.textFileBuffer!,
-      formData.contentLanguage
-    );
+    let chunkMap;
+    let sectionTree;
+    if (this.pastedText || this.filePlaintext) {
+      chunkMap = yield storePlaintextContent(
+        newTextPath,
+        this.pastedText || this.filePlaintext!,
+        formData.contentLanguage
+      );
+    } else {
+      [chunkMap, sectionTree] = yield storeEpubContent(
+        newTextPath,
+        this.fileBuffer!,
+        formData.contentLanguage
+      );
+    }
 
     const indexFileName = "index.json";
     const indexFilePath = path.join(newTextPath, indexFileName);
@@ -92,8 +93,8 @@ export class AddTextDialogStore {
       author: formData.author,
       contentLanguage: formData.contentLanguage.code6393,
       translationLanguage: formData.translationLanguage.code6393,
-      chunkMap: textChunkMap,
-      sectionTree: textSectionTree
+      chunkMap,
+      sectionTree
     };
     yield writeStringToFile(indexFilePath, JSON.stringify(indexContent));
     this.discardText();
@@ -103,29 +104,27 @@ export class AddTextDialogStore {
   // TODO: Cleanup
   @flowed
   public *processFile(filePath: string): IterableIterator<Promise<any>> {
-    this.isProcessingTextFile = true;
+    this.isProcessingFile = true;
     try {
-      this.textFileBuffer = yield readFile(filePath);
-      if (this.textFileBuffer) {
-        this.textFileMetadata = yield loadMetadata(this.textFileBuffer);
+      this.fileBuffer = yield readFile(filePath);
+      if (this.fileBuffer) {
+        this.fileMetadata = yield metadataFromEpub(this.fileBuffer);
       }
-      this.isProcessingTextFile = false;
+      this.isProcessingFile = false;
       return;
     } catch (_) {
       // skip
     }
-    const isFilePlaintext = this.textFileBuffer
-      ? yield isBufferText(this.textFileBuffer, yield fileSize(filePath))
+    const isFilePlaintext = this.fileBuffer
+      ? yield isBufferText(this.fileBuffer, yield fileSize(filePath))
       : false;
-    if (this.textFileBuffer && isFilePlaintext) {
-      this.textFilePlaintext = isUtf8(this.textFileBuffer)
-        ? this.textFileBuffer.toString()
-        : iconv
-            .decode(this.textFileBuffer, jschardet.detect(this.textFileBuffer).encoding)
-            .toString();
-      this.textFileMetadata = {};
+    if (this.fileBuffer && isFilePlaintext) {
+      this.filePlaintext = isUtf8(this.fileBuffer)
+        ? this.fileBuffer.toString()
+        : iconv.decode(this.fileBuffer, jschardet.detect(this.fileBuffer).encoding).toString();
+      this.fileMetadata = {};
     }
-    this.isProcessingTextFile = false;
+    this.isProcessingFile = false;
     return;
   }
 
@@ -143,10 +142,11 @@ export class AddTextDialogStore {
   @action
   public discardText(): void {
     this.detectedTextLanguage = undefined;
-    this.isProcessingTextFile = false;
+    this.fileBuffer = undefined;
+    this.fileMetadata = undefined;
+    this.filePlaintext = undefined;
+    this.isProcessingFile = false;
     this.pastedText = undefined;
-    this.textFileBuffer = undefined;
-    this.textFileMetadata = undefined;
   }
 
   @action
@@ -172,9 +172,9 @@ export class AddTextDialogStore {
   private handleTextFileMetadataChange(metadata: TextFileMetadata | undefined): void {
     if (metadata && metadata.language) {
       this.detectedTextLanguage = languageFromCodeGt(metadata.language.substr(0, 2));
-    } else if (this.textFilePlaintext) {
+    } else if (this.filePlaintext) {
       this.detectedTextLanguage = detectLanguage(
-        this.textFilePlaintext.substr(0, AddTextDialogStore.languageDetectionSampleLength)
+        this.filePlaintext.substr(0, AddTextDialogStore.languageDetectionSampleLength)
       );
     }
   }

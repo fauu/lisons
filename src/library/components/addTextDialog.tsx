@@ -52,7 +52,7 @@ export class AddTextDialog extends React.Component<AddTextDialogProps> {
       language => this.handleDetectedTextLanguageChange(language)
     );
     reaction(
-      () => this.addTextDialogStore.textFileMetadata,
+      () => this.addTextDialogStore.fileMetadata,
       metadata => this.handleTextFileMetadataChange(metadata)
     );
     reaction(
@@ -179,9 +179,9 @@ export class AddTextDialog extends React.Component<AddTextDialogProps> {
   };
 
   public render(): JSX.Element {
-    const { isSavingText, textFileStatus } = this.addTextDialogStore;
+    const { isSavingText, fileStatus } = this.addTextDialogStore;
     const filePath = this.formData.filePath;
-    const showFinalFields = textFileStatus === "Valid" || this.formData.pastedText;
+    const showFinalFields = fileStatus === "Valid" || this.formData.pastedText;
     return (
       <Form disabled={isSavingText}>
         {isSavingText && (
@@ -192,19 +192,17 @@ export class AddTextDialog extends React.Component<AddTextDialogProps> {
         {!this.formData.pastedText && this.renderFileField()}
         {!filePath && this.renderPasteField()}
         {showFinalFields && this.renderFinalFields()}
-        {textFileStatus === "Invalid" && (
-          <InvalidFileMsg>This file cannot be added.</InvalidFileMsg>
-        )}
+        {fileStatus === "Invalid" && <InvalidFileMsg>This file cannot be added.</InvalidFileMsg>}
       </Form>
     );
   }
 
   private renderFileField(): JSX.Element {
-    const { textFileStatus } = this.addTextDialogStore;
+    const { fileStatus } = this.addTextDialogStore;
     return (
       <FileField>
         <Button onClick={this.handleLoadFileButtonClick} disabled={this.isPickingFile}>
-          {textFileStatus === "NotSelected" ? "Choose .epub or .txt file" : "Change my choice"}
+          {fileStatus === "NotSelected" ? "Choose .epub or .txt file" : "Change my choice"}
         </Button>
         {this.formData.filePath && (
           <SelectedFileGroup>

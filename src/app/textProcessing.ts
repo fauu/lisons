@@ -42,7 +42,30 @@ const { parseXml } = new class {
   };
 }();
 
-export const loadMetadata = async (buffer: Buffer): Promise<TextFileMetadata> => {
+// TODO: Move magic strings to consts
+// TODO: Single dispatch fucntion for storePlaintextContent and storeEpubContent?
+
+export const storePlaintextContent = async (
+  textPath: string,
+  plaintext: string,
+  contentLanguage: Language
+): Promise<TextChunkMap> => {
+  const [newContent, wordCount] = await getWrapWordsInTagsFn(contentLanguage)(plaintext);
+  writeFile<string>(
+    path.join(textPath, "content.html"),
+    `<html>
+      <head>
+        <meta charset='utf-8' />
+      </head>
+      <body>
+        ${newContent}
+      </body>
+     </html>`
+  );
+  return [{ id: "content", href: "content.html", wordCount, startWordNo: 0 }];
+};
+
+export const metadataFromEpub = async (buffer: Buffer): Promise<TextFileMetadata> => {
   const archive = await zip.loadAsync(buffer);
 
   const opfPath = await getOpfPath(archive);
@@ -52,7 +75,7 @@ export const loadMetadata = async (buffer: Buffer): Promise<TextFileMetadata> =>
   return { author: opfMetadata.creator, title: opfMetadata.title, language: opfMetadata.language };
 };
 
-export const convertEpubToLisonsText = async (
+export const storeEpubContent = async (
   textPath: string,
   buffer: Buffer,
   contentLanguage: Language
