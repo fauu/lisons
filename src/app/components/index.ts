@@ -1,3 +1,3 @@
-export { App } from "./App";
-export { FadeTransition } from "./FadeTransition";
-export { Spinner } from "./Spinner";
+export { App } from "./app";
+export { FadeTransition } from "./fadeTransition";
+export { Spinner } from "./spinner";

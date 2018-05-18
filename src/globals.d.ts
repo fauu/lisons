@@ -8,11 +8,3 @@ declare module "franc-min";
 declare module "isbinaryfile";
 declare module "jschardet";
 declare module "react-hint";
-
-declare module "worker-loader*" {
-  class WebpackWorker extends Worker {
-    constructor();
-  }
-
-  export = WebpackWorker;
-}

@@ -7,7 +7,7 @@ import localShortcut = require("electron-localshortcut");
 import * as path from "path";
 import * as url from "url";
 
-import { colors } from "~/app/data/Style";
+import { colors } from "~/app/data/style";
 
 const installDevExtensions = false;
 

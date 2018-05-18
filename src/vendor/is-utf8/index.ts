@@ -1,1 +1,1 @@
-export { isUtf8 } from "./IsUtf8";
+export { isUtf8 } from "./isUtf8";

@@ -1,3 +1,3 @@
-export * from "./AppStore";
-export * from "./SettingsStore";
-export * from "./TextStore";
+export * from "./appStore";
+export * from "./settingsStore";
+export * from "./textStore";

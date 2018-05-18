@@ -1,3 +1,3 @@
-export * from "./AddTextFormData";
-export * from "./TextFileMetadata";
-export * from "./TextFileStatus";
+export * from "./addTextFormData";
+export * from "./textFileMetadata";
+export * from "./textFileStatus";
