@@ -79,7 +79,7 @@ export const storeEpubContent = async (
   textPath: string,
   buffer: Buffer,
   contentLanguage: Language
-): Promise<[TextChunkMap, TextSectionTree | undefined]> => {
+): Promise<[string | undefined, TextChunkMap, TextSectionTree | undefined]> => {
   const archive = await zip.loadAsync(buffer);
 
   const opfPath = await getOpfPath(archive);
@@ -95,6 +95,7 @@ export const storeEpubContent = async (
   const wrapWordsInTags = getWrapWordsInTagsFn(contentLanguage);
 
   const textChunkMap: TextChunkMap = [];
+  let coverPath;
 
   for (const item of opfManifest.items) {
     const itemPath = path.join(textPath, item.href);
@@ -102,6 +103,9 @@ export const storeEpubContent = async (
     const itemFile = archive.file(path.join(itemsDir, item.href));
 
     if (item.mediaType !== "application/xhtml+xml") {
+      if (item.id.includes("cover")) {
+        coverPath = item.href;
+      }
       writeFile<Buffer>(itemPath, await itemFile.async("nodebuffer"));
     } else {
       let chunkWordCount = 0;
@@ -155,7 +159,7 @@ export const storeEpubContent = async (
 
   const sectionTree = await getSectionTree(archive, opfManifest, opfSpine, itemsDir);
 
-  return [textChunkMap, sectionTree];
+  return [coverPath, textChunkMap, sectionTree];
 };
 
 const getOpfPath = async (archive: zip): Promise<string> => {
@@ -200,7 +204,7 @@ const getOpfManifest = (fragment: DocumentFragment, acceptedMediaTypes: string[]
     .map(itemElement => {
       const mediaType = itemElement.getAttribute("media-type") || "";
       const id = itemElement.getAttribute("id");
-      if (acceptedMediaTypes.includes(mediaType) || id === "ncx") {
+      if (acceptedMediaTypes.includes(mediaType) || id === "ncx" || (id && id.includes("cover"))) {
         const href = itemElement.getAttribute("href");
         return id !== null && href !== null ? { id, mediaType, href } : undefined;
       }

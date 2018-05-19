@@ -5,9 +5,11 @@ import { action, computed, observable, reaction } from "mobx";
 import { IPromiseBasedObservable } from "mobx-utils";
 import * as path from "path";
 
-import { Language } from "~/app/model";
-import { metadataFromEpub, storeEpubContent, storePlaintextContent } from "~/app/textProcessing";
+import { isUtf8 } from "~/vendor/is-utf8";
 
+import { Language } from "~/app/model";
+import { TextStore } from "~/app/stores";
+import { metadataFromEpub, storeEpubContent, storePlaintextContent } from "~/app/textProcessing";
 import {
   ensurePathExists,
   fileSize,
@@ -19,8 +21,6 @@ import {
 import { languageFromCodeGt } from "~/util/languageUtils";
 import { flowed } from "~/util/mobxUtils";
 import { detectLanguage } from "~/util/textUtils";
-
-import { isUtf8 } from "~/vendor/is-utf8";
 
 import { AddTextFormData, TextFileMetadata, TextFileStatus } from "~/library/model";
 
@@ -40,7 +40,7 @@ export class AddTextDialogStore {
 
   private filePlaintext?: string;
 
-  public constructor() {
+  public constructor(private textStore: TextStore) {
     reaction(() => this.pastedText, text => this.handlePastedTextChange(text), { delay: 1000 });
     reaction(() => this.fileMetadata, metadata => this.handleTextFileMetadataChange(metadata));
   }
@@ -70,6 +70,7 @@ export class AddTextDialogStore {
     const newTextPath = path.join(textsPath, id);
     yield ensurePathExists(newTextPath);
 
+    let coverPath;
     let chunkMap;
     let sectionTree;
     if (this.pastedText || this.filePlaintext) {
@@ -79,7 +80,7 @@ export class AddTextDialogStore {
         formData.contentLanguage
       );
     } else {
-      [chunkMap, sectionTree] = yield storeEpubContent(
+      [coverPath, chunkMap, sectionTree] = yield storeEpubContent(
         newTextPath,
         this.fileBuffer!,
         formData.contentLanguage
@@ -89,14 +90,18 @@ export class AddTextDialogStore {
     const indexFileName = "index.json";
     const indexFilePath = path.join(newTextPath, indexFileName);
     const indexContent = {
-      title: formData.title,
-      author: formData.author,
-      contentLanguage: formData.contentLanguage.code6393,
-      translationLanguage: formData.translationLanguage.code6393,
       chunkMap,
       sectionTree
     };
     yield writeStringToFile(indexFilePath, JSON.stringify(indexContent));
+    this.textStore.addToLibrary({
+      id,
+      title: formData.title,
+      author: formData.author,
+      contentLanguage: formData.contentLanguage.code6393,
+      translationLanguage: formData.translationLanguage.code6393,
+      coverPath
+    });
     this.discardText();
     this.isSavingText = false;
   }

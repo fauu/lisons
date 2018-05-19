@@ -12,6 +12,11 @@ export const getUserDataPath = (): string => {
   return remote.app.getPath("userData");
 };
 
+export const exists = (path: string): Promise<boolean> =>
+  new Promise<boolean>((resolve, _) => {
+    fs.exists(path, result => resolve(result));
+  });
+
 export const readFile = (path: string): Promise<Buffer> =>
   new Promise<any>((resolve, reject) => {
     fs.readFile(path, (err, data) => {

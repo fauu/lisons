@@ -34,11 +34,11 @@ export class AppStore {
     this._db = new Database();
     this._textRepository = new TextRepository(this._db);
     this._settingsStore = new SettingsStore();
-    await this._settingsStore.init();
+    this._settingsStore.init();
     this._textStore = new TextStore(this._textRepository);
     this._libraryStore = new LibraryStore(this._textStore);
+    this._textStore.loadLibrary();
     this._readerStore = new ReaderStore(this._textStore);
-    await this._textStore.loadAll();
     if (AppStore.startInReader) {
       this.showReaderScreen(parseInt(this._textStore.texts.keys()[0], 10));
     } else {

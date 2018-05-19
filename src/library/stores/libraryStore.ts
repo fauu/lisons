@@ -11,7 +11,7 @@ export class LibraryStore {
   }
 
   public init(): void {
-    this._addTextDialogStore = new AddTextDialogStore();
+    this._addTextDialogStore = new AddTextDialogStore(this._textStore);
   }
 
   public get addTextDialogStore(): AddTextDialogStore {
