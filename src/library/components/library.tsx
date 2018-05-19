@@ -13,7 +13,7 @@ export interface LibraryProps {
   readonly appStore: AppStore;
 }
 export const Library = observer(function _Library({ appStore }: LibraryProps): JSX.Element {
-  const isEmpty = appStore.textStore.texts.size === 0;
+  const isEmpty = appStore.textStore.library.size === 0;
   const addTextDialogStore = appStore.libraryStore.addTextDialogStore;
   const { settingsStore, isNewVersionAvailable } = appStore;
   return (
@@ -95,9 +95,6 @@ const Body = styled.div`
 `;
 
 const ReadColumn = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
   flex: 3;
   animation: ${animations.fadeInBottom} ${animations.doubleTime};
 `;

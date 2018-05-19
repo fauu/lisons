@@ -100,7 +100,7 @@ export class AddTextDialogStore {
       author: formData.author,
       contentLanguage: formData.contentLanguage.code6393,
       translationLanguage: formData.translationLanguage.code6393,
-      coverPath
+      coverPath: coverPath ? path.join(`texts/${id}`, coverPath) : undefined
     });
     this.discardText();
     this.isSavingText = false;

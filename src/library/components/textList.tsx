@@ -10,19 +10,23 @@ export interface TextListProps {
   readonly appStore: AppStore;
 }
 export const TextList = observer(function _TextList({ appStore }: TextListProps): JSX.Element {
-  const texts = appStore.textStore.texts.values();
+  const entries = appStore.textStore.library.values();
+  console.log(entries);
   return (
     <Root>
-      {Array.from(texts).map(t => <TextListElement key={t.id} appStore={appStore} text={t} />)}
+      {Array.from(entries).map(e => <TextListElement key={e.id} appStore={appStore} entry={e} />)}
     </Root>
   );
 });
 
-const Root = styled.ul`
-  margin: 0;
-  padding: 0 1rem 0 0;
-  flex: 1;
-  list-style-type: none;
+const Root = styled.div`
+  position: relative;
+  padding: 1rem 0;
+  background: transparent;
+  display: grid;
+  grid-template-columns: 200px 200px 200px 200px;
+  grid-gap: 40px;
+  width: 100%;
   height: 100%;
   overflow-x: hidden;
   overflow-y: scroll;

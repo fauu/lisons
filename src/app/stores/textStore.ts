@@ -1,20 +1,11 @@
 import { action, observable, ObservableMap, toJS } from "mobx";
 import * as path from "path";
 
-import { ParsedText, Text, TextInfo, TextProgress } from "~/app/model";
+import { LibraryEntry, ParsedText, Text, TextInfo, TextProgress } from "~/app/model";
 import { TextRepository } from "~/app/textRepository";
 
-import { getUserDataPath, writeFile, readFile, exists } from "~/util/fileUtils";
+import { exists, getUserDataPath, readFile, writeFile } from "~/util/fileUtils";
 import { flowed } from "~/util/mobxUtils";
-
-export interface LibraryEntry {
-  id: string;
-  title: string;
-  author: string;
-  contentLanguage: string;
-  translationLanguage: string;
-  coverPath: string;
-}
 
 export class TextStore {
   private static readonly libraryPath = path.join(getUserDataPath(), "library.json");
@@ -29,10 +20,10 @@ export class TextStore {
 
   public constructor(private _textRepository: TextRepository) {}
 
-  public async loadLibrary(): Promise<void> {
-    if (await exists(TextStore.libraryPath)) {
-      this.library.replace(JSON.parse((await readFile(TextStore.libraryPath)).toString()));
-      console.log("library loaded", this.library);
+  @flowed
+  public *loadLibrary(): IterableIterator<Promise<any>> {
+    if (yield exists(TextStore.libraryPath)) {
+      this.library.replace(JSON.parse((yield readFile(TextStore.libraryPath)).toString()));
     }
   }
 

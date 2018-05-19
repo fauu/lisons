@@ -2,6 +2,7 @@ export * from "./appScreen";
 export * from "./chineseCharactersType";
 export * from "./exampleSentences";
 export * from "./language";
+export * from "./libraryEntry";
 export * from "./parsedText";
 export * from "./readerStyleSettings";
 export * from "./sentenceWithTranslations";
