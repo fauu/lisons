@@ -1,16 +1,12 @@
-// @ts-ignore
 import { ArrowRightIcon, DeleteIcon } from "mdi-react";
 import * as path from "path";
 import * as React from "react";
 import styled from "styled-components";
 
-import * as noiseTexture from "~/res/images/noise-texture.png";
-
 import { animations, colors, fonts } from "~/app/data/style";
 import { LibraryEntry } from "~/app/model";
 import { AppStore } from "~/app/stores";
 import { getUserDataPath } from "~/util/fileUtils";
-// @ts-ignore
 import { formatPercentage } from "~/util/formatUtils";
 import { withProps } from "~/util/styleUtils";
 
@@ -21,11 +17,9 @@ export interface TextListElementProps {
   readonly appStore: AppStore;
   readonly entry: LibraryEntry;
 }
-// @ts-ignore
+
 // TODO: Rename to TextGridElement etc.
 export function TextListElement({ appStore, entry }: TextListElementProps): JSX.Element {
-  // @ts-ignore
-  // const progress = text.progress && text.progress.percentage > 0 && text.progress.percentage;
   return (
     <Root key={entry.id}>
       <Cover coverPath={entry.coverPath && path.join(userDataPath, entry.coverPath)}>
@@ -36,9 +30,10 @@ export function TextListElement({ appStore, entry }: TextListElementProps): JSX.
           </AuthorAndTitle>
         )}
         <Bar>
+          <Progress>{formatPercentage(99, 0)}</Progress>
           <Languages>
             {entry.contentLanguage}
-            &rarr;
+            <ArrowRight />
             {entry.translationLanguage}
           </Languages>
           <Actions>
@@ -46,23 +41,6 @@ export function TextListElement({ appStore, entry }: TextListElementProps): JSX.
           </Actions>
         </Bar>
       </Cover>
-      {/* <Primary>
-        <TitleAndAuthor>
-          <Title onClick={() => appStore.showReaderScreen(text.id)}>{text.title}</Title>
-          {text.author && <Author>{text.author}</Author>}
-        </TitleAndAuthor>
-        <span className="actions">
-          <DeleteButton onClick={() => appStore.textStore.delete(text.id)} />
-        </span>
-      </Primary>
-      <Secondary>
-        {progress && <Progress>{formatPercentage(progress)}</Progress>}
-        <Languages>
-          {text.contentLanguage.localName}
-          <ArrowRightIcon />
-          {text.translationLanguage.localName}
-        </Languages>
-      </Secondary> */}
     </Root>
   );
 }
@@ -70,6 +48,16 @@ export function TextListElement({ appStore, entry }: TextListElementProps): JSX.
 const Root = styled.div`
   height: 300px;
   animation: ${animations.fadeInBottom} ${animations.doubleTime};
+  border: 2px solid ${colors.primary};
+  border-radius: 3px;
+
+  transition: all 0.05s ${animations.stdFunction};
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    transform: translate(0, -1px);
+    border-color: ${colors.accent};
+  }
 `;
 
 const Cover = withProps<{ coverPath?: string }>()(styled.div)`
@@ -89,7 +77,7 @@ const Cover = withProps<{ coverPath?: string }>()(styled.div)`
 
   &:hover {
     > div:last-child {
-      display: initial;
+      display: flex;
     }
   }
 `;
@@ -111,111 +99,54 @@ const Title = styled.div`
 const Bar = styled.div`
   position: absolute;
   bottom: 0;
-  height: 30px;
+  height: 1.8rem;
   width: 100%;
-  background: #22222255;
-  backdrop-filter: blur(15px);
-  background-image: url('${noiseTexture}');
-  color: ${colors.secondary};
-  line-height: 30px;
+  padding: 0 0.3rem 0 0.5rem;
+  background: ${colors.secondary};
+  color: ${colors.primary};
+  border-top: 2px solid ${colors.accent};
   display: flex;
   justify-content: space-between;
+  font-weight: bold;
+
+  .mdi-icon {
+    fill: ${colors.primary};
+  }
 `;
 
-const Languages = styled.span``;
+const Progress = styled.span`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 0.7em;
+`;
 
-const Actions = styled.span``;
+const Languages = styled.span`
+  flex: 1;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  font-size: 0.7em;
+  text-transform: uppercase;
+`;
+
+const ArrowRight = styled(ArrowRightIcon)`
+  width: 20px;
+  padding: 1px 3px 0 3px;
+`;
+
+const Actions = styled.span`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+`;
 
 const DeleteButton = withProps<{ onClick: () => void }>()(styled(DeleteIcon))`
-  fill: ${colors.primary};
+  width: 20px;
   &:hover {
     fill: ${colors.danger};
     transition: fill ${animations.halfTime};
   }
 `;
-
-// const Primary = styled.div`
-//   flex: 1;
-//   display: flex;
-//   align-items: center;
-//   justify-content: space-between;
-// `;
-
-// const TitleAndAuthor = styled.div`
-//   display: flex;
-//   flex: 1;
-//   align-items: baseline;
-//   margin-bottom: 0.3rem;
-//   max-width: 40em;
-//   white-space: nowrap;
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-// `;
-
-// const Title = styled.span`
-//   display: inline-block;
-//   max-width: 70%;
-//   height: 1.4em;
-//   margin-right: 0.7rem;
-//   font: bold 1.1em ${fonts.serif};
-//   white-space: nowrap;
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-//   &:hover {
-//     text-shadow: 1px 1px 0 ${colors.secondary}, -1px 1px 0 ${colors.secondary},
-//       2px 0 0 ${colors.secondary}, -2px 0 0 ${colors.secondary};
-//     box-shadow: inset 0 -3px 0 0 ${colors.secondary}, inset 0 -5px 0 0 ${colors.accent2};
-//   }
-// `;
-
-// const Author = styled.span`
-//   font-size: 0.8em;
-//   color: ${colors.primaryFade};
-//   max-width: 30%;
-//   white-space: nowrap;
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-// `;
-
-// const Secondary = styled.div`
-//   margin-top: -0.2rem;
-// `;
-
-// const Languages = styled.span`
-//   display: inline-flex;
-//   align-items: center;
-//   font-style: italic;
-//   font-size: 0.8em;
-//   color: ${colors.primaryFade};
-
-//   > .mdi-icon {
-//     margin: 0 0.1rem;
-//     transform: scale(0.7);
-//     fill: ${colors.primaryFade};
-//     fill-opacity: 0.8;
-//   }
-// `;
-
-// // TODO: Rework without absolute positioning
-// const DeleteButton = withProps<{ onClick: () => void }>()(styled(DeleteIcon))`
-//   position: absolute;
-//   top: 50%;
-//   transform: translateY(-50%);
-//   right: 1rem;
-//   fill: ${colors.primaryFade};
-//   margin-left: 2rem;
-//   &:hover {
-//     fill: ${colors.danger};
-//     transition: fill ${animations.halfTime};
-//   }
-// `;
-
-// const Progress = styled.span`
-//   display: inline;
-//   padding: 0.2rem 0.3rem;
-//   border-radius: 3px;
-//   font-size: 0.7em;
-//   color: ${colors.primaryFade};
-//   border: 1px solid ${colors.primaryFade};
-//   margin-right: 0.8rem;
-// `;

@@ -20,11 +20,12 @@ export const TextList = observer(function _TextList({ appStore }: TextListProps)
 
 const Root = styled.div`
   position: relative;
-  padding: 1rem 0;
+  padding: 1rem 2.5%;
   background: transparent;
   display: grid;
-  grid-template-columns: 200px 200px 200px 200px;
-  grid-gap: 40px;
+  grid-template-columns: repeat(4, [col] 22.75%);
+  grid-gap: 3%;
+  grid-auto-rows: min-content;
   width: 100%;
   height: 100%;
   overflow-x: hidden;
