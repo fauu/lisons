@@ -13,7 +13,6 @@ import styled from "styled-components";
 
 import { animations } from "~/app/data/style";
 import { AppStore } from "~/app/stores";
-import { withProps } from "~/util/styleUtils";
 
 import { HeaderButton } from "~/reader/components";
 import { UiColorVariant } from "~/reader/model";
@@ -84,8 +83,8 @@ export const Header = observer(function _Header({
   );
 });
 
-const Root = withProps<{ variant: UiColorVariant }>()(styled.div)`
-  color: ${p => (p.variant === "Light" ? "#ffffffaa" : "#000000aa")};
+const Root = styled.div`
+  color: ${(p: { variant: UiColorVariant }) => (p.variant === "Light" ? "#ffffffaa" : "#000000aa")};
   display: flex;
   align-items: center;
   height: 2.25rem;
@@ -107,7 +106,7 @@ const TextTitle = styled.span`
   font-size: 0.95em;
 `;
 
-const SectionInfo = withProps<{ variant: UiColorVariant }>()(styled.div)`
+const SectionInfo = styled.div`
   flex: 1;
   padding-left: 1rem;
   margin-right: 0.4rem;
@@ -124,7 +123,8 @@ const SectionInfo = withProps<{ variant: UiColorVariant }>()(styled.div)`
   }
   > .mdi-icon {
     fill-opacity: 0.8;
-    fill: ${p => (p.variant === "Light" ? "#ffffffaa" : "#000000aa")};
+    fill: ${(p: { variant: UiColorVariant }) =>
+      p.variant === "Light" ? "#ffffffaa" : "#000000aa"};
     transition: opacity ${animations.std};
   }
 `;
@@ -140,9 +140,10 @@ const SectionName = styled.div`
   transition: opacity ${animations.std};
 `;
 
-const Actions = withProps<{ variant: UiColorVariant }>()(styled.div)`
+const Actions = styled.div`
   display: flex;
-  background: ${p => (p.variant === "Light" ? "#ffffff09" : "#00000009")};
+  background: ${(p: { variant: UiColorVariant }) =>
+    p.variant === "Light" ? "#ffffff09" : "#00000009"};
   height: 100%;
   align-items: center;
   padding: 0 0.5rem;

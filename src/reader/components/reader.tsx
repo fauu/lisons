@@ -8,7 +8,7 @@ import { animations } from "~/app/data/style";
 import { ReaderStyleSettings } from "~/app/model";
 import { AppStore, SettingsStore } from "~/app/stores";
 import { formatPercentage } from "~/util/formatUtils";
-import { hexToRgb, isColorDark, withProps } from "~/util/styleUtils";
+import { hexToRgb, isColorDark } from "~/util/styleUtils";
 
 import { Header, Sidebar, Toc, UiColorVariantContext } from "~/reader/components";
 import { UiColorVariant } from "~/reader/model";
@@ -170,12 +170,12 @@ interface TextAreaProps {
   isContentRtl: boolean;
   areTranslationsRtl: boolean;
 }
-const Body = withProps<TextAreaProps>()(styled.div)`
+const Body = styled.div`
   position: relative;
   flex: 1;
   z-index: 2;
   box-shadow: 0 0 10px 0 #000;
-  background: ${p => p.userStyle.background};
+  background: ${(p: TextAreaProps) => p.userStyle.background};
   color: ${p => p.userStyle.textColor};
   overflow: hidden;
   transition: all ${animations.std};
@@ -228,16 +228,16 @@ interface TextNavButtonProps {
   visible: boolean;
   variant: UiColorVariant;
 }
-const TextNavButton = withProps<TextNavButtonProps>()(styled.div)`
-  visibility: ${p => (p.visible ? "visible" : "hidden")};
+const TextNavButton = styled.div`
+  visibility: ${(p: TextNavButtonProps) => (p.visible ? "visible" : "hidden")};
   min-width: 3rem;
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: background ${animations.std};
+  transition: background-color ${animations.std};
   &:hover {
-    background: ${p => (p.variant === "Light" ? "#ffffff05" : "#00000005")};
+    background-color: ${p => (p.variant === "Light" ? "#ffffff05" : "#00000005")};
     > .mdi-icon {
       opacity: 1;
     }
@@ -258,7 +258,7 @@ const NextPageButton = TextNavButton.extend`
   margin-left: 1em;
 `;
 
-const TextProgress = withProps<{ variant: UiColorVariant }>()(styled.div)`
+const TextProgress = styled.div`
   position: absolute;
   height: 3rem;
   width: 100%;
@@ -267,7 +267,7 @@ const TextProgress = withProps<{ variant: UiColorVariant }>()(styled.div)`
   justify-content: center;
   align-items: center;
   font-size: 1.4rem;
-  color: ${p => (p.variant === "Light" ? "#ffffffaa" : "#000000aa")};
+  color: ${(p: { variant: UiColorVariant }) => (p.variant === "Light" ? "#ffffffaa" : "#000000aa")};
   z-index: 5;
 `;
 
@@ -275,17 +275,17 @@ const ProgressWrapper = styled.div`
   padding: 0 1.25rem;
 `;
 
-const SecondaryTextNavButtonWrapper = withProps<{ left?: boolean }>()(styled.div)`
+const SecondaryTextNavButtonWrapper = styled.div`
   flex: 1;
   display: flex;
   align-items: center;
-  ${p => (p.left ? "justify-content: flex-end" : "")}
+  ${(p: { left?: boolean }) => (p.left ? "justify-content: flex-end" : "")};
 `;
 
-const SecondaryTextNavButton = withProps<{ variant: UiColorVariant; onClick: any }>()(styled.div)`
+const SecondaryTextNavButton = styled.div`
   transform: scale(1.3);
   opacity: 0.5;
-  fill: ${p => (p.variant === "Light" ? "#ffffff66" : "#00000066")};
+  fill: ${(p: { variant: UiColorVariant }) => (p.variant === "Light" ? "#ffffff66" : "#00000066")};
   transition: opacity ${animations.std};
   &:hover {
     opacity: 1;
@@ -294,6 +294,7 @@ const SecondaryTextNavButton = withProps<{ variant: UiColorVariant; onClick: any
     margin-right: 0.6rem;
   }
 `;
+
 // @ts-ignore
 const SkipBackwardButton = SecondaryTextNavButton.withComponent(SkipBackwardIcon);
 // @ts-ignore

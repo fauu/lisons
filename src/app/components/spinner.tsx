@@ -1,8 +1,6 @@
 import * as React from "react";
 import styled, { keyframes } from "styled-components";
 
-import { withProps } from "~/util/styleUtils";
-
 // http://tobiasahlin.com/spinkit/
 export interface SpinnerProps {
   color: string | "Light" | "Dark";
@@ -34,7 +32,7 @@ const skCubeGridDelay = keyframes`
   }
 `;
 
-const SkCubeGrid = withProps<{ color: string }>()(styled.div)`
+const SkCubeGrid = styled.div`
   width: 40px;
   height: 40px;
   margin: auto;

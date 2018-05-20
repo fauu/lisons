@@ -5,7 +5,6 @@ import * as noiseTexture from "~/res/images/noise-texture.png";
 
 import { animations } from "~/app/data/style";
 import { TextSectionInfo } from "~/app/model";
-import { withProps } from "~/util/styleUtils";
 
 import { UiColorVariant } from "~/reader/model";
 
@@ -57,7 +56,7 @@ const Root = styled.div`
   letter-spacing: -0.03em;
 `;
 
-const Wrapper = withProps<{ variant: UiColorVariant }>()(styled.div)`
+const Wrapper = styled.div`
   z-index: 9001;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   background: transparent;
@@ -68,39 +67,42 @@ const Wrapper = withProps<{ variant: UiColorVariant }>()(styled.div)`
     width: 10px;
   }
   &::-webkit-scrollbar-track {
-    background: ${p => (p.variant === "Light" ? "#888888bb" : "#ccccccbb")};
+    background: ${(p: { variant: UiColorVariant }) =>
+      p.variant === "Light" ? "#888888bb" : "#ccccccbb"};
   }
   &::-webkit-scrollbar-thumb {
     background: ${p => (p.variant === "Light" ? "#cccccc55" : "#88888855")};
   }
 `;
 
-const SectionList = withProps<{ variant: UiColorVariant }>()(styled.ul)`
+const SectionList = styled.ul`
   margin: 0;
   padding: 0;
   list-style-type: none;
-  color: ${p => (p.variant === "Light" ? "#f9f9f9" : "#333")};
+  color: ${(p: { variant: UiColorVariant }) => (p.variant === "Light" ? "#f9f9f9" : "#333")};
   border: 1px solid ${p => (p.variant === "Light" ? "#ffffff17" : "#00000017")};
   background: ${p => (p.variant === "Light" ? "#22222255" : "#ffffff55")};
   backdrop-filter: blur(15px);
   background-image: url('${noiseTexture}');
 `;
 
-const SectionLink = withProps<{ isActive: boolean; variant: UiColorVariant; onClick: any }>()(
-  styled.li
-)`
+interface SectionLinkProps {
+  isActive: boolean;
+  variant: UiColorVariant;
+}
+const SectionLink = styled.li`
   min-width: 10rem;
   padding: 0.7rem;
-  transition: background ${animations.std};
-  ${p => (p.isActive ? "font-weight: bold;" : "")}
+  transition: background-color ${animations.std};
+  ${(p: SectionLinkProps) => (p.isActive ? "font-weight: bold" : "")};
   ${p =>
     p.isActive
-      ? "box-shadow: inset 0px 11px 8px -10px rgba(0, 0, 0, 0.16), inset 0px -11px 8px -10px rgba(0, 0, 0, 0.16);"
-      : ""}
+      ? "box-shadow: inset 0px 11px 8px -10px rgba(0, 0, 0, 0.16), inset 0px -11px 8px -10px rgba(0, 0, 0, 0.16)"
+      : ""};
   background: ${p =>
     p.isActive ? (p.variant === "Light" ? "#ffffff11" : "#ffffff66") : "transparent"};
   &:hover {
-    background: ${p => (p.variant === "Light" ? "#ffffff11" : "#ffffff66")};
+    background-color: ${p => (p.variant === "Light" ? "#ffffff11" : "#ffffff66")};
   }
   &:not(:last-child) {
     border-bottom: 1px solid ${p => (p.variant === "Light" ? "#ffffff17" : "#00000017")};

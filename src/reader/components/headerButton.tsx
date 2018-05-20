@@ -3,8 +3,6 @@ import { MdiReactIconComponentType } from "mdi-react";
 import * as React from "react";
 import styled from "styled-components";
 
-import { withProps } from "~/util/styleUtils";
-
 import { UiColorVariantContext } from "~/reader/components";
 import { UiColorVariant } from "~/reader/model";
 
@@ -34,7 +32,7 @@ export class HeaderButton extends React.Component<HeaderButtonProps, HeaderButto
               onClick={this.props.onClick}
               onMouseEnter={debounce(this.handleMouseEnter, HeaderButton.tipDelayMs)}
               onMouseLeave={this.handleMouseLeave}
-              colorVariant={colorVariant}
+              variant={colorVariant}
             >
               <this.props.Icon />
             </Button>
@@ -63,13 +61,14 @@ export class HeaderButton extends React.Component<HeaderButtonProps, HeaderButto
   };
 }
 
-const Button = withProps<{ colorVariant: UiColorVariant }>()(styled.span)`
+const Button = styled.span`
   &:not(:last-child) {
     margin-right: 0.6rem;
   }
   .mdi-icon {
     fill-opacity: 0.6;
-    fill: ${p => (p.colorVariant === "Light" ? "#ffffffaa" : "#000000aa")};
+    fill: ${(p: { variant: UiColorVariant }) =>
+      p.variant === "Light" ? "#ffffffaa" : "#000000aa"};
     transition: fill-opacity 0.2s ease;
   }
   &:hover .mdi-icon {
@@ -78,7 +77,7 @@ const Button = withProps<{ colorVariant: UiColorVariant }>()(styled.span)`
 `;
 
 // TODO: DRY (translation tip)
-const Tip = withProps<{ visible: boolean }>()(styled.span)`
+const Tip = styled.span`
   background-color: #000;
   color: #fff;
   position: absolute;
@@ -88,7 +87,7 @@ const Tip = withProps<{ visible: boolean }>()(styled.span)`
   border-radius: 3px;
   color: #fefefe;
   padding: 0.14em 0.3em;
-  -webkit-transition: all 0.2s ease-out;
-  display: ${p => (p.visible ? "initial" : "none")};
+  transition: all 0.2s ease-out;
+  display: ${(p: { visible: boolean }) => (p.visible ? "initial" : "none")};
   pointer-events: none;
 `;

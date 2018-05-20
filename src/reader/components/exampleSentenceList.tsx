@@ -4,7 +4,6 @@ import styled from "styled-components";
 
 import { animations, colors } from "~/app/data/style";
 import { ExampleSentences, LanguageFlag } from "~/app/model";
-import { withProps } from "~/util/styleUtils";
 
 export interface ExampleSentenceListProps {
   sentences: ExampleSentences;
@@ -100,15 +99,15 @@ const Element = styled.li`
   }
 `;
 
-const Sentence = withProps<{ rtl: boolean }>()(styled.div)`
+const Sentence = styled.div`
   font-weight: bold;
-  ${p => (p.rtl ? "text-align: right;" : "")}
-  ${p => (p.rtl ? "direction: rtl;" : "")}
+  ${(p: { rtl: boolean }) => (p.rtl ? "text-align: right" : "")};
+  ${p => (p.rtl ? "direction: rtl" : "")};
 `;
 
-const Translation = withProps<{ rtl: boolean }>()(styled.div)`
+const Translation = styled.div`
   margin-top: 0.5rem;
   color: ${colors.secondaryFade};
-  ${p => (p.rtl ? "text-align: right;" : "")}
-  ${p => (p.rtl ? "direction: rtl;" : "")}
+  ${(p: { rtl: boolean }) => (p.rtl ? "text-align: right" : "")};
+  ${p => (p.rtl ? "direction: rtl" : "")};
 `;

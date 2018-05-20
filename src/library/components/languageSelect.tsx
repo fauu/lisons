@@ -3,7 +3,6 @@ import styled from "styled-components";
 
 import { languages } from "~/app/data/languages";
 import { colors } from "~/app/data/style";
-import { withProps } from "~/util/styleUtils";
 
 export interface LanguageSelectProps {
   value: string;
@@ -23,7 +22,7 @@ export function LanguageSelect({ value, invalid, onChange }: LanguageSelectProps
 }
 
 // TODO: DRY
-const Select = withProps<LanguageSelectProps>()(styled.select)`
+const Select = styled.select`
   width: 100%;
-  border: 2px solid ${p => (p.invalid ? colors.danger : colors.primary)} !important;
+  border: 2px solid ${(p: LanguageSelectProps) => (p.invalid ? colors.danger : colors.primary)} !important;
 `;

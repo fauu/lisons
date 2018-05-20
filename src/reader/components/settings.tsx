@@ -8,7 +8,6 @@ import { defaultSettings } from "~/app/data/defaultSettings";
 import { colors } from "~/app/data/style";
 import { ReaderStyleSettings } from "~/app/model";
 import { SettingsStore } from "~/app/stores";
-import { withProps } from "~/util/styleUtils";
 
 import { SidebarStore } from "~/reader/stores";
 
@@ -229,13 +228,13 @@ const Option = styled.option`
   padding: 0.5rem;
 `;
 
-const Button = withProps<{ warning?: boolean }>()(styled.button)`
+const Button = styled.button`
   width: 100%;
   min-height: 41px;
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid;
   border-radius: 3px;
-  color: #${p => (p.warning ? "f7ca28" : "fefefe")};
+  color: ${(p: { warning?: boolean }) => (p.warning ? "#f7ca28" : "#fefefe")};
   border-color: ${p => (p.warning ? "rgba(247, 202, 40, 0.5)" : "rgba(255, 255, 255, 0.2)")};
   padding: 0.5rem 0.6rem;
   transition: all 0.05s ease-out;

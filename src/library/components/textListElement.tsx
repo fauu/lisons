@@ -8,7 +8,6 @@ import { LibraryEntry } from "~/app/model";
 import { AppStore } from "~/app/stores";
 import { getUserDataPath } from "~/util/fileUtils";
 import { formatPercentage } from "~/util/formatUtils";
-import { withProps } from "~/util/styleUtils";
 
 // TODO: Figure out how to handle this better
 const userDataPath = getUserDataPath();
@@ -60,7 +59,7 @@ const Root = styled.div`
   }
 `;
 
-const Cover = withProps<{ coverPath?: string }>()(styled.div)`
+const Cover = styled.div`
   position: relative;
   height: 100%;
   display: flex;
@@ -68,7 +67,8 @@ const Cover = withProps<{ coverPath?: string }>()(styled.div)`
   justify-content: center;
   text-align: center;
   background-color: ${colors.primaryFade3};
-  background-image: ${p => (p.coverPath ? `url('file://${p.coverPath}')` : "none")};
+  background-image: ${(p: { coverPath?: string }) =>
+    p.coverPath ? `url('file://${p.coverPath}')` : "none"};
   background-size: cover;
 
   > div:last-child {
@@ -143,7 +143,7 @@ const Actions = styled.span`
   justify-content: flex-end;
 `;
 
-const DeleteButton = withProps<{ onClick: () => void }>()(styled(DeleteIcon))`
+const DeleteButton = styled<any, any>(DeleteIcon)`
   width: 20px;
   &:hover {
     fill: ${colors.danger};
