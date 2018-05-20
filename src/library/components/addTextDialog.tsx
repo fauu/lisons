@@ -10,7 +10,6 @@ import { Spinner } from "~/app/components";
 import { animations, colors, fonts } from "~/app/data/style";
 import { Language } from "~/app/model";
 import { SettingsStore } from "~/app/stores";
-import { withProps } from "~/util/styleUtils";
 
 import { LanguageSelect } from "~/library/components";
 import { AddTextFormData, TextFileMetadata } from "~/library/model";
