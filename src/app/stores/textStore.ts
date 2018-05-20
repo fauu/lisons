@@ -4,7 +4,7 @@ import * as path from "path";
 import { LibraryEntry, ParsedText, Text, TextInfo, TextProgress } from "~/app/model";
 import { TextRepository } from "~/app/textRepository";
 
-import { exists, getUserDataPath, readFile, writeFile } from "~/util/fileUtils";
+import { deleteFile, exists, getUserDataPath, readFile, writeFile } from "~/util/fileUtils";
 import { flowed } from "~/util/mobxUtils";
 
 export class TextStore {
@@ -32,6 +32,14 @@ export class TextStore {
   public addToLibrary(entry: LibraryEntry): void {
     this.library.set(entry.id, entry);
     this.syncLibrary();
+  }
+
+  // TODO: Magic strings out
+  @action
+  public deleteFromLibrary(id: string): void {
+    this.library.delete(id);
+    this.syncLibrary();
+    deleteFile(path.join(getUserDataPath(), "texts", id));
   }
 
   // XXX: ...or to a repository/service (especially the I/O)?

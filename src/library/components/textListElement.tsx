@@ -4,14 +4,14 @@ import * as path from "path";
 import * as React from "react";
 import styled from "styled-components";
 
-// @ts-ignore
+import * as noiseTexture from "~/res/images/noise-texture.png";
+
 import { animations, colors, fonts } from "~/app/data/style";
 import { LibraryEntry } from "~/app/model";
 import { AppStore } from "~/app/stores";
 import { getUserDataPath } from "~/util/fileUtils";
 // @ts-ignore
 import { formatPercentage } from "~/util/formatUtils";
-// @ts-ignore
 import { withProps } from "~/util/styleUtils";
 
 // TODO: Figure out how to handle this better
@@ -28,17 +28,24 @@ export function TextListElement({ appStore, entry }: TextListElementProps): JSX.
   // const progress = text.progress && text.progress.percentage > 0 && text.progress.percentage;
   return (
     <Root key={entry.id}>
-      <Main coverPath={entry.coverPath && path.join(userDataPath, entry.coverPath)}>
-        <AuthorAndTitle>
-          <Author>{entry.author}</Author>
-          <Title>{entry.title}</Title>
-        </AuthorAndTitle>
-      </Main>
-      <Aux>
-        {entry.contentLanguage}
-        <ArrowRightIcon />
-        {entry.translationLanguage}
-      </Aux>
+      <Cover coverPath={entry.coverPath && path.join(userDataPath, entry.coverPath)}>
+        {!entry.coverPath && (
+          <AuthorAndTitle>
+            <Author>{entry.author}</Author>
+            <Title>{entry.title}</Title>
+          </AuthorAndTitle>
+        )}
+        <Bar>
+          <Languages>
+            {entry.contentLanguage}
+            &rarr;
+            {entry.translationLanguage}
+          </Languages>
+          <Actions>
+            <DeleteButton onClick={() => appStore.textStore.deleteFromLibrary(entry.id)} />
+          </Actions>
+        </Bar>
+      </Cover>
       {/* <Primary>
         <TitleAndAuthor>
           <Title onClick={() => appStore.showReaderScreen(text.id)}>{text.title}</Title>
@@ -61,27 +68,30 @@ export function TextListElement({ appStore, entry }: TextListElementProps): JSX.
 }
 
 const Root = styled.div`
-  height: 330px;
+  height: 300px;
+  animation: ${animations.fadeInBottom} ${animations.doubleTime};
 `;
 
-const Main = withProps<{ coverPath?: string }>()(styled.div)`
-  height: 300px;
-  background-color: ${colors.primaryFade3};
-  background-image: ${p => (p.coverPath ? `url('file://${p.coverPath}')` : "none")};
-  background-size: cover;
+const Cover = withProps<{ coverPath?: string }>()(styled.div)`
+  position: relative;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
+  background-color: ${colors.primaryFade3};
+  background-image: ${p => (p.coverPath ? `url('file://${p.coverPath}')` : "none")};
+  background-size: cover;
 
-  > * {
-    display: ${p => (p.coverPath ? "none" : "initial")}
+  > div:last-child {
+    display: none;
   }
-`;
 
-const Aux = styled.div`
-  height: 30px;
-  background-color: ${colors.primaryFade};
+  &:hover {
+    > div:last-child {
+      display: initial;
+    }
+  }
 `;
 
 const AuthorAndTitle = styled.div`
@@ -96,6 +106,32 @@ const Title = styled.div`
   margin-bottom: 0.1rem;
   font-weight: bold;
   font-size: 1.1em;
+`;
+
+const Bar = styled.div`
+  position: absolute;
+  bottom: 0;
+  height: 30px;
+  width: 100%;
+  background: #22222255;
+  backdrop-filter: blur(15px);
+  background-image: url('${noiseTexture}');
+  color: ${colors.secondary};
+  line-height: 30px;
+  display: flex;
+  justify-content: space-between;
+`;
+
+const Languages = styled.span``;
+
+const Actions = styled.span``;
+
+const DeleteButton = withProps<{ onClick: () => void }>()(styled(DeleteIcon))`
+  fill: ${colors.primary};
+  &:hover {
+    fill: ${colors.danger};
+    transition: fill ${animations.halfTime};
+  }
 `;
 
 // const Primary = styled.div`

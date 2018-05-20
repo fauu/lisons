@@ -11,7 +11,6 @@ export interface TextListProps {
 }
 export const TextList = observer(function _TextList({ appStore }: TextListProps): JSX.Element {
   const entries = appStore.textStore.library.values();
-  console.log(entries);
   return (
     <Root>
       {Array.from(entries).map(e => <TextListElement key={e.id} appStore={appStore} entry={e} />)}

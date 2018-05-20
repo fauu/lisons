@@ -1,13 +1,13 @@
 import * as React from "react";
 import styled from "styled-components";
 
+import * as noiseTexture from "~/res/images/noise-texture.png";
+
 import { animations } from "~/app/data/style";
 import { TextSectionInfo } from "~/app/model";
 import { withProps } from "~/util/styleUtils";
 
 import { UiColorVariant } from "~/reader/model";
-
-import * as noiseTexture from "~/res/images/noise-texture.png";
 
 export interface TocProps {
   readonly sections: TextSectionInfo[];
