@@ -5,10 +5,8 @@ import { LibraryStore } from "~/library/stores";
 import { ReaderStore } from "~/reader/stores";
 import { flowed } from "~/util/mobxUtils";
 
-import { Database } from "~/app/database";
 import { AppScreen } from "~/app/model";
 import { SettingsStore, TextStore } from "~/app/stores";
-import { TextRepository } from "~/app/textRepository";
 import { xhr } from "~/app/xhr";
 
 export class AppStore {
@@ -19,8 +17,6 @@ export class AppStore {
   @observable public activeScreen?: AppScreen;
   @observable public isFullScreen: boolean = false;
   @observable private _newestVersion?: string;
-  private _db!: Database;
-  private _textRepository!: TextRepository;
   private _settingsStore!: SettingsStore;
   private _textStore!: TextStore;
   private _libraryStore!: LibraryStore;
@@ -31,11 +27,9 @@ export class AppStore {
   }
 
   public async init(): Promise<void> {
-    this._db = new Database();
-    this._textRepository = new TextRepository(this._db);
     this._settingsStore = new SettingsStore();
     this._settingsStore.init();
-    this._textStore = new TextStore(this._textRepository);
+    this._textStore = new TextStore();
     this._libraryStore = new LibraryStore(this._textStore);
     this._textStore.loadLibrary();
     this._readerStore = new ReaderStore(this._textStore);
@@ -47,8 +41,9 @@ export class AppStore {
     this.fetchCurrentVersion();
   }
 
+  // @ts-ignore
   public async showReaderScreen(textId: number): Promise<void> {
-    const text = await this._textRepository.loadOneWithContent(textId);
+    const text = undefined; // Loading text was here
     if (text) {
       this._readerStore.setText(text);
       this.setActiveScreen("Reader");

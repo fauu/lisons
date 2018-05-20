@@ -2283,10 +2283,6 @@ detect-node@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.3.tgz#a2033c09cc8e158d37748fbde7507832bd6ce127"
 
-dexie@3.0.0-alpha.2:
-  version "3.0.0-alpha.2"
-  resolved "https://registry.yarnpkg.com/dexie/-/dexie-3.0.0-alpha.2.tgz#ad86fef82987950ece0ebd6d7a48a084d0df6283"
-
 diff@^3.2.0, diff@^3.3.1, diff@^3.5.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/diff/-/diff-3.5.0.tgz#800c0dd1e0a8bfbc95835c202ad220fe317e5a12"

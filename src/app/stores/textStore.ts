@@ -2,7 +2,6 @@ import { action, observable, ObservableMap, toJS } from "mobx";
 import * as path from "path";
 
 import { LibraryEntry, ParsedText, Text, TextInfo, TextProgress } from "~/app/model";
-import { TextRepository } from "~/app/textRepository";
 
 import { deleteFile, exists, getUserDataPath, readFile, writeFile } from "~/util/fileUtils";
 import { flowed } from "~/util/mobxUtils";
@@ -17,8 +16,6 @@ export class TextStore {
     undefined,
     { deep: false }
   );
-
-  public constructor(private _textRepository: TextRepository) {}
 
   @flowed
   public *loadLibrary(): IterableIterator<Promise<any>> {
@@ -53,29 +50,20 @@ export class TextStore {
 
   @flowed
   public *loadAll(): IterableIterator<Promise<Text[]>> {
-    const texts: Text[] = yield this._textRepository.loadAll();
-    texts.forEach(t => this.texts.set(t.id, t));
+    console.log("to be removed");
   }
 
-  public async add(info: TextInfo, parsed: ParsedText): Promise<void> {
-    const newText = await this._textRepository.save(info, parsed);
-    this.setText(newText);
+  public async add(_info: TextInfo, _parsed: ParsedText): Promise<void> {
+    console.log("to be removed");
   }
 
   @flowed
-  public *delete(id: number): IterableIterator<Promise<void>> {
-    yield this._textRepository.delete(id);
-    this.texts.delete(id);
+  public *delete(_id: number): IterableIterator<Promise<void>> {
+    console.log("to be removed");
   }
 
   // TODO: Make progress observable and sync automatically?
-  public async setTextProgress(id: number, progress: TextProgress): Promise<void> {
-    const updatedText = this._textRepository.updateProgress(id, progress);
-    this.setText(await updatedText);
-  }
-
-  @action
-  private setText(text: Text): void {
-    this.texts.set(text.id, text);
+  public async setTextProgress(_id: number, _progress: TextProgress): Promise<void> {
+    console.log("to be removed");
   }
 }
