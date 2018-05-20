@@ -5,7 +5,7 @@ import { withProps } from "~/util/styleUtils";
 
 // http://tobiasahlin.com/spinkit/
 export interface SpinnerProps {
-  readonly color: string | "Light" | "Dark";
+  color: string | "Light" | "Dark";
 }
 export function Spinner({ color }: SpinnerProps): JSX.Element {
   return (

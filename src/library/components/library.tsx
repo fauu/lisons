@@ -10,7 +10,7 @@ import { AppStore } from "~/app/stores";
 import { AddTextDialog, TextList } from "~/library/components";
 
 export interface LibraryProps {
-  readonly appStore: AppStore;
+  appStore: AppStore;
 }
 export const Library = observer(function _Library({ appStore }: LibraryProps): JSX.Element {
   const isEmpty = appStore.textStore.library.size === 0;

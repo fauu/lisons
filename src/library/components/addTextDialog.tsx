@@ -18,8 +18,8 @@ import { AddTextDialogStore } from "~/library/stores";
 import { languageFromCode6393 } from "~/util/languageUtils";
 
 export interface AddTextDialogProps {
-  readonly settingsStore: SettingsStore;
-  readonly addTextDialogStore: AddTextDialogStore;
+  settingsStore: SettingsStore;
+  addTextDialogStore: AddTextDialogStore;
 }
 @observer
 export class AddTextDialog extends React.Component<AddTextDialogProps> {

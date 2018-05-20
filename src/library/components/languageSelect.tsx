@@ -6,9 +6,9 @@ import { colors } from "~/app/data/style";
 import { withProps } from "~/util/styleUtils";
 
 export interface LanguageSelectProps {
-  readonly value: string;
-  readonly invalid: boolean;
-  readonly onChange: (e: any) => void;
+  value: string;
+  invalid: boolean;
+  onChange: (e: any) => void;
 }
 export function LanguageSelect({ value, invalid, onChange }: LanguageSelectProps): JSX.Element {
   return (

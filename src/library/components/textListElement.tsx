@@ -14,8 +14,8 @@ import { withProps } from "~/util/styleUtils";
 const userDataPath = getUserDataPath();
 
 export interface TextListElementProps {
-  readonly appStore: AppStore;
-  readonly entry: LibraryEntry;
+  appStore: AppStore;
+  entry: LibraryEntry;
 }
 
 // TODO: Rename to TextGridElement etc.

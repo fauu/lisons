@@ -19,8 +19,8 @@ import { HeaderButton } from "~/reader/components";
 import { UiColorVariant } from "~/reader/model";
 
 export interface HeaderProps {
-  readonly appStore: AppStore;
-  readonly variant: UiColorVariant;
+  appStore: AppStore;
+  variant: UiColorVariant;
 }
 export const Header = observer(function _Header({
   appStore,

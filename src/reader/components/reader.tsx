@@ -17,7 +17,7 @@ import { ReaderStore, SidebarStore } from "~/reader/stores";
 import * as noiseTexture from "~/res/images/noise-texture.png";
 
 export interface ReaderProps {
-  readonly appStore: AppStore;
+  appStore: AppStore;
 }
 @observer
 export class Reader extends React.Component<ReaderProps> {
@@ -165,10 +165,10 @@ const Root = styled.div`
 `;
 
 interface TextAreaProps {
-  readonly userStyle: ReaderStyleSettings;
-  readonly animateSelection: boolean;
-  readonly isContentRtl: boolean;
-  readonly areTranslationsRtl: boolean;
+  userStyle: ReaderStyleSettings;
+  animateSelection: boolean;
+  isContentRtl: boolean;
+  areTranslationsRtl: boolean;
 }
 const Body = withProps<TextAreaProps>()(styled.div)`
   position: relative;
@@ -225,8 +225,8 @@ const TextWithNavigation = styled.div`
 `;
 
 interface TextNavButtonProps {
-  readonly visible: boolean;
-  readonly variant: UiColorVariant;
+  visible: boolean;
+  variant: UiColorVariant;
 }
 const TextNavButton = withProps<TextNavButtonProps>()(styled.div)`
   visibility: ${p => (p.visible ? "visible" : "hidden")};

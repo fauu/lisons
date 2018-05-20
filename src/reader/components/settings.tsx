@@ -13,9 +13,9 @@ import { withProps } from "~/util/styleUtils";
 import { SidebarStore } from "~/reader/stores";
 
 interface RangeInputProps {
-  readonly min: number;
-  readonly max: number;
-  readonly step: number;
+  min: number;
+  max: number;
+  step: number;
 }
 type SelectInputOptions = Array<[string, string]>;
 type FormModelElementOptions = RangeInputProps | SelectInputOptions | {};
@@ -41,8 +41,8 @@ const formModel: FormModelElement[] = [
 
 // TODO: Rename to 'StyleCustomizer' or sth?
 export interface SettingsProps {
-  readonly sidebarStore: SidebarStore;
-  readonly settingsStore: SettingsStore;
+  sidebarStore: SidebarStore;
+  settingsStore: SettingsStore;
 }
 @observer
 export class Settings extends React.Component<SettingsProps> {

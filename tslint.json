@@ -1,6 +1,5 @@
 {
   "rulesDirectory": ["node_modules/tslint-microsoft-contrib", "tslint-rules/"],
-  "defaultSeverity": "error",
   "extends": ["tslint:latest", "tslint-react", "tslint-config-prettier"],
   "jsRules": {},
   "rules": {
@@ -20,7 +19,6 @@
     "ordered-imports": [true],
     "promise-must-complete": true,
     "react-proper-lifecycle-methods": true,
-    "react-readonly-props-and-state": true,
     "typedef": [true, "call-signature", "parameter"],
     "variable-name": [
       true,

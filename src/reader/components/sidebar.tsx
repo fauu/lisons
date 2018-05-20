@@ -14,8 +14,8 @@ import { SidebarStore } from "~/reader/stores";
 import * as noiseTexture from "~/res/images/noise-texture.png";
 
 export interface SidebarProps {
-  readonly sidebarStore: SidebarStore;
-  readonly settingsStore: SettingsStore;
+  sidebarStore: SidebarStore;
+  settingsStore: SettingsStore;
 }
 export const Sidebar = observer(function _Sidebar({
   sidebarStore,

@@ -7,7 +7,7 @@ import { AppStore } from "~/app/stores";
 import { TextListElement } from "~/library/components";
 
 export interface TextListProps {
-  readonly appStore: AppStore;
+  appStore: AppStore;
 }
 export const TextList = observer(function _TextList({ appStore }: TextListProps): JSX.Element {
   const entries = appStore.textStore.library.values();

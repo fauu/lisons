@@ -10,11 +10,11 @@ import { withProps } from "~/util/styleUtils";
 import { UiColorVariant } from "~/reader/model";
 
 export interface TocProps {
-  readonly sections: TextSectionInfo[];
-  readonly currentSection: TextSectionInfo;
-  readonly variant: UiColorVariant;
-  readonly onAnyClick: () => void;
-  readonly onSectionLinkClick: (startElementNo: number) => void;
+  sections: TextSectionInfo[];
+  currentSection: TextSectionInfo;
+  variant: UiColorVariant;
+  onAnyClick: () => void;
+  onSectionLinkClick: (startElementNo: number) => void;
 }
 export function Toc({
   sections,

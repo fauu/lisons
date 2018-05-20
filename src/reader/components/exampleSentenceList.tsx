@@ -7,7 +7,7 @@ import { ExampleSentences, LanguageFlag } from "~/app/model";
 import { withProps } from "~/util/styleUtils";
 
 export interface ExampleSentenceListProps {
-  readonly sentences: ExampleSentences;
+  sentences: ExampleSentences;
 }
 export function ExampleSentenceList({ sentences }: ExampleSentenceListProps): JSX.Element {
   const sentencesRtl = (sentences.data[0].sentenceLanguage.flags & LanguageFlag.Rtl) > 0;

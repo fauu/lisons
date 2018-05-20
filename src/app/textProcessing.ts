@@ -257,48 +257,40 @@ const parseTocContent = (content: Element): string | undefined => {
 };
 
 const parseTocNavPoint = (navPoint: Element): TextSectionTreeNode | undefined => {
-  let label;
-  let contentFilePath;
-  let contentFragmentId;
-  const children = [];
+  const textSectionTreeNode: Partial<TextSectionTreeNode> = {};
+  textSectionTreeNode.children = [];
   for (const childEl of navPoint.children) {
     switch (childEl.tagName.toLowerCase()) {
       case "navlabel":
-        label = parseTocNavLabel(childEl);
+        textSectionTreeNode.label = parseTocNavLabel(childEl);
         break;
       case "content":
         const src = parseTocContent(childEl);
         if (src) {
-          // XXX: Prettier plugin messes this up, '// prettier-ignore' doesn't help
-          // [contentFilePath, contentFragmentId] = src.split("#")
-          const splitSrc = src.split("#");
-          contentFilePath = splitSrc[0];
-          if (splitSrc.length === 2) {
-            contentFragmentId = splitSrc[1];
-          } else if (splitSrc.length > 2) {
-            console.warn(`Encountered more than one '#' in <content> src: '${src}'`);
-          }
+          [textSectionTreeNode.contentFilePath, textSectionTreeNode.contentFragmentId] = src.split(
+            "#"
+          );
         }
         break;
       case "navpoint":
         const childNavPoint = parseTocNavPoint(childEl);
         if (childNavPoint) {
-          children.push(childNavPoint);
+          textSectionTreeNode.children.push(childNavPoint);
         }
         break;
       default:
         console.warn(`Encountered unexpected element '${childEl.tagName}' inside <navPoint>`);
     }
   }
-  if (!label) {
+  if (!textSectionTreeNode.label) {
     console.warn("<navLabel> missing in <navPoint>");
     return;
   }
-  if (!contentFilePath) {
+  if (!textSectionTreeNode.contentFilePath) {
     console.warn("<content> src missing in <navPoint>");
     return;
   }
-  return { label, contentFilePath, contentFragmentId, children };
+  return textSectionTreeNode as TextSectionTreeNode;
 };
 
 const parseTocNavMap = async (navMap: Element): Promise<TextSectionTree> => {

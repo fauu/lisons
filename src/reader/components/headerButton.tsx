@@ -9,13 +9,13 @@ import { UiColorVariantContext } from "~/reader/components";
 import { UiColorVariant } from "~/reader/model";
 
 export interface HeaderButtonProps {
-  readonly tip: string;
-  readonly Icon: MdiReactIconComponentType;
-  readonly onClick: () => void;
+  tip: string;
+  Icon: MdiReactIconComponentType;
+  onClick: () => void;
 }
 export interface HeaderButtonState {
-  readonly isTipVisible: boolean;
-  readonly wasTipCancelled: boolean;
+  isTipVisible: boolean;
+  wasTipCancelled: boolean;
 }
 export class HeaderButton extends React.Component<HeaderButtonProps, HeaderButtonState> {
   private static readonly tipDelayMs = 500;
