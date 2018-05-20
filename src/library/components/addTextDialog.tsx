@@ -294,13 +294,15 @@ export class AddTextDialog extends React.Component<AddTextDialogProps> {
 
 const fieldMargin = "1.3rem";
 
-const Form = withProps<{ disabled: boolean }>()(styled.form)`
+const Form = styled<{ disabled: boolean }, any>("form")`
   position: relative;
   margin-top: 1rem;
   font-size: 0.95em;
-  ${p => (p.disabled ? "* { pointer-events: none }" : "")}
-
-  input, select, button, textarea {
+  ${p => (p.disabled ? "* { pointer-events: none; }" : ";")};
+  input,
+  select,
+  button,
+  textarea {
     display: block;
     padding: 0.6rem;
     margin-top: 0.5rem;
@@ -377,7 +379,8 @@ const PasteFieldHeader = styled.div`
 `;
 
 // TODO: DRY (sidebar header ActionButton)
-const ClearButton = withProps<any>()(styled(CloseIcon))`
+// const Form = styled<{ disabled: boolean }, any>("form")`
+const ClearButton = styled<any, any>(CloseIcon)`
   fill: rgba(0, 0, 0, 0.5);
   transition: fill 0.2s ease;
   &:hover {

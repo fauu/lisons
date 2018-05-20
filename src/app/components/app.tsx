@@ -140,9 +140,6 @@ const Wrapper = styled.div`
     opacity: 1;
     transition: opacity ${animations.stdTime} ease-in ${animations.stdTime};
   }
-  /* .fade-wait-height {
-    transition: height ${animations.stdTime} ease-in-out;
-  } */
 
   :not(input):not(textarea),
   :not(input):not(textarea):hover,
