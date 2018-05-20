@@ -1,6 +1,4 @@
-import { remote } from "electron";
 import { CloseIcon } from "mdi-react";
-import { action, autorun, observable, reaction } from "mobx";
 import { observer } from "mobx-react";
 import * as path from "path";
 import * as React from "react";
@@ -8,179 +6,30 @@ import styled from "styled-components";
 
 import { Spinner } from "~/app/components";
 import { animations, colors, fonts } from "~/app/data/style";
-import { Language } from "~/app/model";
-import { SettingsStore } from "~/app/stores";
 
 import { LanguageSelect } from "~/library/components";
-import { AddTextFormData, TextFileMetadata } from "~/library/model";
 import { AddTextDialogStore } from "~/library/stores";
-import { languageFromCode6393 } from "~/util/languageUtils";
+
+type FormEventHandler<T> = React.EventHandler<React.FormEvent<T>>;
 
 export interface AddTextDialogProps {
-  settingsStore: SettingsStore;
-  addTextDialogStore: AddTextDialogStore;
+  store: AddTextDialogStore;
+  onLoadFileButtonClick: FormEventHandler<HTMLButtonElement>;
+  onDiscardSelectedFileButtonClick: FormEventHandler<HTMLButtonElement>;
+  onPastedTextChange: FormEventHandler<HTMLTextAreaElement>;
+  onClearPasteTextAreaButtonClick: FormEventHandler<HTMLButtonElement>;
+  onAuthorChange: FormEventHandler<HTMLInputElement>;
+  onTitleChange: FormEventHandler<HTMLInputElement>;
+  onAddTextButtonClick: FormEventHandler<HTMLButtonElement>;
+  onContentLanguageChange: any;
+  onTranslationLanguageChange: any;
 }
 @observer
 export class AddTextDialog extends React.Component<AddTextDialogProps> {
-  private static readonly defaultContentLanguage = languageFromCode6393("fra")!;
-  private static readonly defaultTranslationLanguage = languageFromCode6393("eng")!;
-
-  @observable
-  private formData: AddTextFormData = {
-    filePath: "",
-    pastedText: "",
-    title: "",
-    author: "",
-    contentLanguage: AddTextDialog.defaultContentLanguage,
-    translationLanguage: AddTextDialog.defaultTranslationLanguage
-  };
-  @observable private isPickingFile: boolean = false;
-  private settingsStore!: SettingsStore;
-  private addTextDialogStore!: AddTextDialogStore;
-
-  public componentWillMount(): void {
-    this.settingsStore = this.props.settingsStore;
-    this.addTextDialogStore = this.props.addTextDialogStore;
-  }
-
-  // TODO: See if disposers should be used for some of these and other reactions and autoruns
-  public componentDidMount(): void {
-    this.clearForm();
-    reaction(
-      () => this.addTextDialogStore.detectedTextLanguage,
-      language => this.handleDetectedTextLanguageChange(language)
-    );
-    reaction(
-      () => this.addTextDialogStore.fileMetadata,
-      metadata => this.handleTextFileMetadataChange(metadata)
-    );
-    reaction(
-      () => this.formData.filePath,
-      filePath => this.addTextDialogStore.handleSelectedFilePathChange(filePath)
-    );
-    reaction(() => this.formData.pastedText, text => this.addTextDialogStore.setPastedText(text));
-    autorun(() => {
-      this.addTextDialogStore.handleSelectedLanguagesChange([
-        this.formData.contentLanguage,
-        this.formData.translationLanguage
-      ]);
-    });
-  }
-
-  public componentWillUnmount(): void {
-    this.clearForm();
-  }
-
-  private clearForm(): void {
-    this.updateFormData({
-      filePath: "",
-      pastedText: "",
-      title: "",
-      author: "",
-      contentLanguage: AddTextDialog.defaultContentLanguage,
-      translationLanguage:
-        languageFromCode6393(this.settingsStore.settings.defaultTranslationLanguage) ||
-        AddTextDialog.defaultTranslationLanguage
-    });
-    this.addTextDialogStore.discardText();
-  }
-
-  @action
-  private updateFormData(slice: any): void {
-    Object.assign(this.formData, slice);
-  }
-
-  @action
-  private setPickingFile(value: boolean): void {
-    this.isPickingFile = value;
-  }
-
-  private handlePastedTextChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
-    const pastedText = e.currentTarget.value;
-    if (!pastedText) {
-      this.clearForm();
-    } else {
-      this.updateFormData({ pastedText });
-    }
-  };
-
-  private handleTitleChange = (e: React.FormEvent<HTMLInputElement>) => {
-    this.updateFormData({ title: e.currentTarget.value });
-  };
-
-  private handleAuthorChange = (e: React.FormEvent<HTMLInputElement>) => {
-    this.updateFormData({ author: e.currentTarget.value });
-  };
-
-  private handleContentLanguageChange = (e: any) => {
-    this.updateFormData({ contentLanguage: languageFromCode6393(e.target.value) });
-  };
-
-  private handleTranslationLanguageChange = (e: any) => {
-    this.updateFormData({ translationLanguage: languageFromCode6393(e.target.value) });
-  };
-
-  private handleLoadFileButtonClick = (e: React.FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    this.setPickingFile(true);
-    remote.dialog.showOpenDialog(
-      {
-        properties: ["openFile"]
-      },
-      filePaths => {
-        this.setPickingFile(false);
-        if (!filePaths) {
-          return;
-        }
-        const filePath = filePaths.toString();
-        this.updateFormData({
-          title: path.basename(filePath, path.extname(filePath)),
-          filePath
-        });
-      }
-    );
-  };
-
-  private handleDiscardSelectedFileButtonClick = (e: React.FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    this.clearForm();
-  };
-
-  private handleClearPasteTextAreaButtonClick = (e: React.FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    this.clearForm();
-  };
-
-  private handleAddTextButtonClick = async (e: React.FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    await this.addTextDialogStore.saveText(this.formData);
-    this.settingsStore.set({
-      defaultTranslationLanguage: this.formData.translationLanguage
-    });
-    this.clearForm();
-  };
-
-  private handleTextFileMetadataChange(metadata?: TextFileMetadata): void {
-    if (!metadata) {
-      return;
-    }
-    const { author, title } = metadata;
-    if (author) {
-      this.updateFormData({ author });
-    }
-    if (title) {
-      this.updateFormData({ title });
-    }
-  }
-
-  private handleDetectedTextLanguageChange = (lang?: Language): void => {
-    this.formData.contentLanguage = lang ? lang : AddTextDialog.defaultContentLanguage;
-  };
-
   public render(): JSX.Element {
-    const { isSavingText, fileStatus } = this.addTextDialogStore;
-    const filePath = this.formData.filePath;
-    const showFinalFields = fileStatus === "Valid" || this.formData.pastedText;
+    const { isSavingText, fileStatus } = this.props.store;
+    const { filePath, pastedText } = this.props.store.formData;
+    const showFinalFields = fileStatus === "Valid" || pastedText;
     return (
       <Form disabled={isSavingText}>
         {isSavingText && (
@@ -188,7 +37,7 @@ export class AddTextDialog extends React.Component<AddTextDialogProps> {
             <Spinner color={"Dark"} />
           </SavingIndicatorOverlay>
         )}
-        {!this.formData.pastedText && this.renderFileField()}
+        {!pastedText && this.renderFileField()}
         {!filePath && this.renderPasteField()}
         {showFinalFields && this.renderFinalFields()}
         {fileStatus === "Invalid" && <InvalidFileMsg>This file cannot be added.</InvalidFileMsg>}
@@ -197,16 +46,17 @@ export class AddTextDialog extends React.Component<AddTextDialogProps> {
   }
 
   private renderFileField(): JSX.Element {
-    const { fileStatus } = this.addTextDialogStore;
+    const { fileStatus, isPickingFile } = this.props.store;
+    const { filePath } = this.props.store.formData;
     return (
       <FileField>
-        <Button onClick={this.handleLoadFileButtonClick} disabled={this.isPickingFile}>
+        <Button onClick={this.props.onLoadFileButtonClick} disabled={isPickingFile}>
           {fileStatus === "NotSelected" ? "Choose .epub or .txt file" : "Change my choice"}
         </Button>
-        {this.formData.filePath && (
+        {filePath && (
           <SelectedFileGroup>
-            <SelectedFileName>{path.basename(this.formData.filePath)}</SelectedFileName>
-            <ClearButton onClick={this.handleDiscardSelectedFileButtonClick} />
+            <SelectedFileName>{path.basename(filePath)}</SelectedFileName>
+            <ClearButton onClick={this.props.onDiscardSelectedFileButtonClick} />
           </SelectedFileGroup>
         )}
       </FileField>
@@ -214,60 +64,52 @@ export class AddTextDialog extends React.Component<AddTextDialogProps> {
   }
 
   private renderPasteField(): JSX.Element {
+    const { pastedText } = this.props.store.formData;
     return (
       <PasteField>
         <PasteFieldHeader>
-          {this.formData.pastedText ? (
-            <span>Content:</span>
-          ) : (
-            <span>…or paste from clipboard:</span>
-          )}
-          {this.formData.pastedText && (
-            <ClearButton onClick={this.handleClearPasteTextAreaButtonClick} />
-          )}
+          {pastedText ? <span>Content:</span> : <span>…or paste from clipboard:</span>}
+          {pastedText && <ClearButton onClick={this.props.onClearPasteTextAreaButtonClick} />}
         </PasteFieldHeader>
-        <TextArea
-          rows={5}
-          onChange={this.handlePastedTextChange}
-          value={this.formData.pastedText}
-        />
+        <TextArea rows={5} onChange={this.props.onPastedTextChange} value={pastedText} />
       </PasteField>
     );
   }
 
   private renderFinalFields(): JSX.Element {
-    const { isLanguageConfigurationValid, tatoebaTranslationCount } = this.addTextDialogStore;
+    const { isLanguageConfigurationValid, tatoebaTranslationCount } = this.props.store;
+    const { author, title, contentLanguage, translationLanguage } = this.props.store.formData;
     return (
       <FinalFields>
         <Field>
           Author:
-          <TextInput type="text" onChange={this.handleAuthorChange} value={this.formData.author} />
+          <TextInput type="text" onChange={this.props.onAuthorChange} value={author} />
         </Field>
         <Field>
           Title:
-          <TextInput type="text" onChange={this.handleTitleChange} value={this.formData.title} />
+          <TextInput type="text" onChange={this.props.onTitleChange} value={title} />
         </Field>
         <FieldGroup>
           <Field>
             Text language:
             <LanguageSelect
               invalid={!isLanguageConfigurationValid}
-              onChange={this.handleContentLanguageChange}
-              value={this.formData.contentLanguage.code6393}
+              onChange={this.props.onContentLanguageChange}
+              value={contentLanguage.code6393}
             />
           </Field>
           <Field>
             Translation language:
             <LanguageSelect
               invalid={!isLanguageConfigurationValid}
-              onChange={this.handleTranslationLanguageChange}
-              value={this.formData.translationLanguage.code6393}
+              onChange={this.props.onTranslationLanguageChange}
+              value={translationLanguage.code6393}
             />
           </Field>
         </FieldGroup>
         {tatoebaTranslationCount && this.renderTatoebaTranslationCount()}
         <AddTextButton
-          onClick={this.handleAddTextButtonClick}
+          onClick={this.props.onAddTextButtonClick}
           disabled={!isLanguageConfigurationValid}
         >
           Add
@@ -277,7 +119,7 @@ export class AddTextDialog extends React.Component<AddTextDialogProps> {
   }
 
   private renderTatoebaTranslationCount(): JSX.Element {
-    const { state, value } = this.addTextDialogStore.tatoebaTranslationCount as any;
+    const { state, value } = this.props.store.tatoebaTranslationCount as any;
     return (
       <Message>
         {state === "fulfilled" && (

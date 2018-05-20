@@ -30,7 +30,7 @@ export class AppStore {
     this._settingsStore = new SettingsStore();
     this._settingsStore.init();
     this._textStore = new TextStore();
-    this._libraryStore = new LibraryStore(this._textStore);
+    this._libraryStore = new LibraryStore(this._settingsStore, this._textStore);
     this._textStore.loadLibrary();
     this._readerStore = new ReaderStore(this._textStore);
     if (AppStore.startInReader) {

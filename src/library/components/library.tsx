@@ -15,7 +15,7 @@ export interface LibraryProps {
 export const Library = observer(function _Library({ appStore }: LibraryProps): JSX.Element {
   const isEmpty = appStore.textStore.library.size === 0;
   const addTextDialogStore = appStore.libraryStore.addTextDialogStore;
-  const { settingsStore, isNewVersionAvailable } = appStore;
+  const { isNewVersionAvailable } = appStore;
   return (
     <Root>
       <LogoWrapper>
@@ -31,7 +31,22 @@ export const Library = observer(function _Library({ appStore }: LibraryProps): J
         <AddTextColumn>
           <ColumnHeader>Add text:</ColumnHeader>
           <AddTextColumnContent>
-            <AddTextDialog {...{ addTextDialogStore, settingsStore }} />
+            <AddTextDialog
+              store={addTextDialogStore}
+              onLoadFileButtonClick={addTextDialogStore.handleLoadFileButtonClick}
+              onDiscardSelectedFileButtonClick={
+                addTextDialogStore.handleDiscardSelectedFileButtonClick
+              }
+              onPastedTextChange={addTextDialogStore.handlePastedTextChange}
+              onClearPasteTextAreaButtonClick={
+                addTextDialogStore.handleClearPasteTextAreaButtonClick
+              }
+              onAuthorChange={addTextDialogStore.handleAuthorChange}
+              onTitleChange={addTextDialogStore.handleTitleChange}
+              onAddTextButtonClick={addTextDialogStore.handleAddTextButtonClick}
+              onContentLanguageChange={addTextDialogStore.handleContentLanguageChange}
+              onTranslationLanguageChange={addTextDialogStore.handleTranslationLanguageChange}
+            />
           </AddTextColumnContent>
         </AddTextColumn>
       </Body>

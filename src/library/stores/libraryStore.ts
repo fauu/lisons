@@ -1,17 +1,16 @@
-import { TextStore } from "~/app/stores";
+import { SettingsStore, TextStore } from "~/app/stores";
 
 import { AddTextDialogStore } from "~/library/stores";
 
 export class LibraryStore {
   private _addTextDialogStore!: AddTextDialogStore;
 
-  // @ts-ignore
-  public constructor(private _textStore: TextStore) {
+  public constructor(private _settingsStore: SettingsStore, private _textStore: TextStore) {
     this.init();
   }
 
   public init(): void {
-    this._addTextDialogStore = new AddTextDialogStore(this._textStore);
+    this._addTextDialogStore = new AddTextDialogStore(this._settingsStore, this._textStore);
   }
 
   public get addTextDialogStore(): AddTextDialogStore {
