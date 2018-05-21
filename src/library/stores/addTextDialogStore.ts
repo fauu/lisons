@@ -2,6 +2,7 @@ import * as crypto from "crypto";
 import { remote } from "electron";
 import * as iconv from "iconv-lite";
 import jschardet = require("jschardet");
+import { debounce } from "lodash";
 import { action, autorun, computed, observable, reaction, runInAction } from "mobx";
 import { IPromiseBasedObservable } from "mobx-utils";
 import * as path from "path";
@@ -28,6 +29,7 @@ export class AddTextDialogStore {
   private static readonly defaultContentLanguage = languageFromCode6393("fra")!;
   private static readonly defaultTranslationLanguage = languageFromCode6393("eng")!;
   private static readonly languageDetectionSampleLength = 5000;
+  private static readonly pastedTextLanguageDetectionDelayMs = 1000;
 
   @observable public detectedTextLanguage?: Language;
   @observable public fileMetadata?: TextFileMetadata;
@@ -48,14 +50,11 @@ export class AddTextDialogStore {
 
   @observable private fileBuffer?: Buffer;
   @observable private isProcessingFile: boolean = false;
-  @observable private pastedText?: string;
 
   private filePlaintext?: string;
 
-  // TODO: Disposers?
+  // TODO: Dispose reactions when AddTextDialog unmounts and recreate them when it mounts again?
   public constructor(private settingsStore: SettingsStore, private textStore: TextStore) {
-    // reaction(() => this.pastedText, text => this.handlePastedTextChange(text), { delay: 1000 });
-
     this.clearForm();
     reaction(
       () => this.detectedTextLanguage,
@@ -99,10 +98,10 @@ export class AddTextDialogStore {
     let coverPath;
     let chunkMap;
     let sectionTree;
-    if (this.pastedText || this.filePlaintext) {
+    if (this.formData.pastedText || this.filePlaintext) {
       chunkMap = await storePlaintextContent(
         newTextPath,
-        this.pastedText || this.filePlaintext!,
+        this.formData.pastedText || this.filePlaintext!,
         formData.contentLanguage
       );
     } else {
@@ -198,7 +197,6 @@ export class AddTextDialogStore {
     this.fileMetadata = undefined;
     this.filePlaintext = undefined;
     this.isProcessingFile = false;
-    this.pastedText = undefined;
   }
 
   public handleDiscardSelectedFileButtonClick = () => {
@@ -211,13 +209,20 @@ export class AddTextDialogStore {
       this.clearForm();
     } else {
       this.updateFormData({ pastedText });
-      this.pastedText = pastedText; // XXX: Probably won't be needed anymore
+      this.detectPastedTextLanguage(pastedText);
+    }
+  };
+
+  private detectPastedTextLanguage = debounce(
+    action((pastedText: string) => {
       this.detectedTextLanguage =
         pastedText && pastedText !== ""
           ? detectLanguage(pastedText.substr(0, AddTextDialogStore.languageDetectionSampleLength))
           : undefined;
-    }
-  };
+      console.log("called debounced action");
+    }),
+    AddTextDialogStore.pastedTextLanguageDetectionDelayMs
+  );
 
   public handleClearPasteTextAreaButtonClick = () => {
     this.clearForm();
