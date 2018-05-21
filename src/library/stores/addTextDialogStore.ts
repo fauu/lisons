@@ -3,7 +3,7 @@ import { remote } from "electron";
 import * as iconv from "iconv-lite";
 import jschardet = require("jschardet");
 import { debounce } from "lodash";
-import { action, autorun, computed, observable, reaction, runInAction } from "mobx";
+import { action, computed, observable, reaction, runInAction } from "mobx";
 import { IPromiseBasedObservable } from "mobx-utils";
 import * as path from "path";
 
@@ -31,8 +31,6 @@ export class AddTextDialogStore {
   private static readonly languageDetectionSampleLength = 5000;
   private static readonly pastedTextLanguageDetectionDelayMs = 1000;
 
-  @observable public detectedTextLanguage?: Language;
-  @observable public fileMetadata?: TextFileMetadata;
   @observable
   public formData: AddTextFormData = {
     filePath: "",
@@ -42,32 +40,24 @@ export class AddTextDialogStore {
     contentLanguage: AddTextDialogStore.defaultContentLanguage,
     translationLanguage: AddTextDialogStore.defaultTranslationLanguage
   };
-  @observable public isLanguageConfigurationValid: boolean = true;
   @observable public isPickingFile: boolean = false;
   @observable public isSavingText: boolean = false;
 
-  public tatoebaTranslationCount?: IPromiseBasedObservable<number>;
-
+  @observable private fileMetadata?: TextFileMetadata;
+  @observable private detectedLanguage?: Language;
   @observable private fileBuffer?: Buffer;
   @observable private isProcessingFile: boolean = false;
 
+  public tatoebaTranslationCount?: IPromiseBasedObservable<number>;
+
   private filePlaintext?: string;
 
-  // TODO: Dispose reactions when AddTextDialog unmounts and recreate them when it mounts again?
+  // TODO: Dispose of reactions when AddTextDialog unmounts and recreate them when it mounts again?
   public constructor(private settingsStore: SettingsStore, private textStore: TextStore) {
     this.clearForm();
-    reaction(
-      () => this.detectedTextLanguage,
-      language => this.handleDetectedTextLanguageChange(language)
-    );
+    reaction(() => this.detectedLanguage, language => this.handleDetectedLanguageChange(language));
     reaction(() => this.fileMetadata, metadata => this.handleTextFileMetadataChange(metadata));
     reaction(() => this.formData.filePath, filePath => this.handleSelectedFilePathChange(filePath));
-    autorun(() => {
-      this.handleSelectedLanguagesChange([
-        this.formData.contentLanguage,
-        this.formData.translationLanguage
-      ]);
-    });
   }
 
   @computed
@@ -81,6 +71,11 @@ export class AddTextDialogStore {
     } else {
       return "Valid";
     }
+  }
+
+  @computed
+  public get isLanguageConfigurationValid(): boolean {
+    return this.formData.contentLanguage !== this.formData.translationLanguage;
   }
 
   @action
@@ -161,7 +156,7 @@ export class AddTextDialogStore {
   }
 
   @action
-  private updateFormData(slice: any): void {
+  private updateFormData(slice: Partial<AddTextFormData>): void {
     Object.assign(this.formData, slice);
   }
 
@@ -180,28 +175,22 @@ export class AddTextDialogStore {
   }
 
   @action
-  private handleSelectedLanguagesChange = ([contentLanguage, translationLanguage]: [
-    Language,
-    Language
-  ]) => {
-    this.isLanguageConfigurationValid = contentLanguage.code6393 !== translationLanguage.code6393;
-    // this.tatoebaTranslationCount = this.isLanguageConfigurationValid
-    //   ? fromPromise(getSentenceCount(contentLanguage, translationLanguage))
-    //   : undefined
-  };
-
-  @action
   private discardText(): void {
-    this.detectedTextLanguage = undefined;
+    this.detectedLanguage = undefined;
     this.fileBuffer = undefined;
     this.fileMetadata = undefined;
     this.filePlaintext = undefined;
     this.isProcessingFile = false;
   }
 
-  public handleDiscardSelectedFileButtonClick = () => {
-    this.updateFormData({ filePath: "" });
-  };
+  private detectPastedTextLanguage = debounce(
+    action((pastedText: string) => {
+      this.detectedLanguage = pastedText
+        ? detectLanguage(pastedText.substr(0, AddTextDialogStore.languageDetectionSampleLength))
+        : undefined;
+    }),
+    AddTextDialogStore.pastedTextLanguageDetectionDelayMs
+  );
 
   @action
   public handlePastedTextChange = (pastedText: string) => {
@@ -213,35 +202,28 @@ export class AddTextDialogStore {
     }
   };
 
-  private detectPastedTextLanguage = debounce(
-    action((pastedText: string) => {
-      this.detectedTextLanguage =
-        pastedText && pastedText !== ""
-          ? detectLanguage(pastedText.substr(0, AddTextDialogStore.languageDetectionSampleLength))
-          : undefined;
-      console.log("called debounced action");
-    }),
-    AddTextDialogStore.pastedTextLanguageDetectionDelayMs
-  );
-
   public handleClearPasteTextAreaButtonClick = () => {
     this.clearForm();
   };
 
-  public handleTitleChange = (newTitle: string) => {
-    this.updateFormData({ title: newTitle });
+  public handleDiscardSelectedFileButtonClick = () => {
+    this.updateFormData({ filePath: "" });
   };
 
-  public handleAuthorChange = (newAuthor: string) => {
-    this.updateFormData({ author: newAuthor });
+  public handleTitleChange = (title: string) => {
+    this.updateFormData({ title });
   };
 
-  public handleContentLanguageChange = (newLanguageCode6393: string) => {
-    this.updateFormData({ contentLanguage: languageFromCode6393(newLanguageCode6393) });
+  public handleAuthorChange = (author: string) => {
+    this.updateFormData({ author });
   };
 
-  public handleTranslationLanguageChange = (newLanguageCode6393: string) => {
-    this.updateFormData({ translationLanguage: languageFromCode6393(newLanguageCode6393) });
+  public handleContentLanguageChange = (languageCode6393: string) => {
+    this.updateFormData({ contentLanguage: languageFromCode6393(languageCode6393) });
+  };
+
+  public handleTranslationLanguageChange = (languageCode6393: string) => {
+    this.updateFormData({ translationLanguage: languageFromCode6393(languageCode6393) });
   };
 
   public handleLoadFileButtonClick = action(() => {
@@ -271,27 +253,6 @@ export class AddTextDialogStore {
     });
   };
 
-  private handleTextFileMetadataChange = (metadata?: TextFileMetadata) => {
-    if (!metadata) {
-      return;
-    }
-    const { author, title } = metadata;
-    if (author) {
-      this.updateFormData({ author });
-    }
-    if (title) {
-      this.updateFormData({ title });
-    }
-
-    if (metadata && metadata.language) {
-      this.detectedTextLanguage = languageFromCodeGt(metadata.language.substr(0, 2));
-    } else if (this.filePlaintext) {
-      this.detectedTextLanguage = detectLanguage(
-        this.filePlaintext.substr(0, AddTextDialogStore.languageDetectionSampleLength)
-      );
-    }
-  };
-
   private handleSelectedFilePathChange = (filePath: string) => {
     if (filePath) {
       this.processFile(filePath);
@@ -300,7 +261,25 @@ export class AddTextDialogStore {
     }
   };
 
-  private handleDetectedTextLanguageChange = (lang?: Language) => {
+  private handleTextFileMetadataChange = (metadata?: TextFileMetadata) => {
+    if (!metadata) {
+      return;
+    }
+    this.updateFormData({
+      author: metadata.author || this.formData.author,
+      title: metadata.title || this.formData.title
+    });
+
+    if (metadata.language) {
+      this.detectedLanguage = languageFromCodeGt(metadata.language.substr(0, 2));
+    } else if (this.filePlaintext) {
+      this.detectedLanguage = detectLanguage(
+        this.filePlaintext.substr(0, AddTextDialogStore.languageDetectionSampleLength)
+      );
+    }
+  };
+
+  private handleDetectedLanguageChange = (lang?: Language) => {
     this.formData.contentLanguage = lang ? lang : AddTextDialogStore.defaultContentLanguage;
   };
 }
