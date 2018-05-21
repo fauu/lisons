@@ -31,22 +31,7 @@ export const Library = observer(function _Library({ appStore }: LibraryProps): J
         <AddTextColumn>
           <ColumnHeader>Add text:</ColumnHeader>
           <AddTextColumnContent>
-            <AddTextDialog
-              store={addTextDialogStore}
-              onLoadFileButtonClick={addTextDialogStore.handleLoadFileButtonClick}
-              onDiscardSelectedFileButtonClick={
-                addTextDialogStore.handleDiscardSelectedFileButtonClick
-              }
-              onPastedTextChange={addTextDialogStore.handlePastedTextChange}
-              onClearPasteTextAreaButtonClick={
-                addTextDialogStore.handleClearPasteTextAreaButtonClick
-              }
-              onAuthorChange={addTextDialogStore.handleAuthorChange}
-              onTitleChange={addTextDialogStore.handleTitleChange}
-              onAddTextButtonClick={addTextDialogStore.handleAddTextButtonClick}
-              onContentLanguageChange={addTextDialogStore.handleContentLanguageChange}
-              onTranslationLanguageChange={addTextDialogStore.handleTranslationLanguageChange}
-            />
+            <AddTextDialog store={addTextDialogStore} />
           </AddTextColumnContent>
         </AddTextColumn>
       </Body>

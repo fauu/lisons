@@ -4,15 +4,13 @@ import { action, computed, observable } from "mobx";
 import { defaultSettings } from "~/app/data/defaultSettings";
 import { Settings } from "~/app/model";
 import { loadSettings, saveSettings } from "~/app/settings";
-import { flowed } from "~/util/mobxUtils";
 
 export class SettingsStore {
   @observable.deep private _settings: Settings = defaultSettings;
 
-  @flowed
-  public *init(): IterableIterator<Promise<Settings>> {
-    const loadedSettings = yield loadSettings();
-    this._settings = loadedSettings;
+  public async init(): Promise<void> {
+    const loadedSettings = await loadSettings();
+    this.setSettings(loadedSettings);
   }
 
   @action
@@ -21,6 +19,12 @@ export class SettingsStore {
     saveSettings(this._settings);
   }
 
+  @action
+  private setSettings(settings: Settings): void {
+    this._settings = settings;
+  }
+
+  // XXX: Why is this needed again?
   @computed
   public get settings(): Settings {
     return this._settings;

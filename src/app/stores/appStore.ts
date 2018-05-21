@@ -3,7 +3,6 @@ import { action, observable } from "mobx";
 
 import { LibraryStore } from "~/library/stores";
 import { ReaderStore } from "~/reader/stores";
-import { flowed } from "~/util/mobxUtils";
 
 import { AppScreen } from "~/app/model";
 import { SettingsStore, TextStore } from "~/app/stores";
@@ -61,16 +60,15 @@ export class AppStore {
     win.setFullScreen(this.isFullScreen);
   }
 
-  @flowed
-  private *fetchCurrentVersion(): IterableIterator<Promise<{ version: string }>> {
+  private async fetchCurrentVersion(): Promise<void> {
     let websiteData = { version: "0.0" };
     try {
       const url = `${AppStore.websiteUrl}${AppStore.websiteDataPath}`;
-      websiteData = yield xhr<{ version: string }>(url, undefined, true);
+      websiteData = await xhr<{ version: string }>(url, undefined, true);
     } catch (e) {
       console.error("Error fetching website data:", e);
     }
-    this._newestVersion = websiteData && websiteData.version;
+    this.setNewestVersion(websiteData && websiteData.version);
   }
 
   public get isNewVersionAvailable(): boolean {
@@ -96,5 +94,10 @@ export class AppStore {
   @action
   private setActiveScreen(value: AppScreen): void {
     this.activeScreen = value;
+  }
+
+  @action
+  private setNewestVersion(version: string): void {
+    this._newestVersion = version;
   }
 }

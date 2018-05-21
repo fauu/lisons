@@ -3,7 +3,6 @@ import { action, observable } from "mobx";
 
 import { ExampleSentences, Language } from "~/app/model";
 import { emphasizePhrase } from "~/util/exampleSentenceUtils";
-import { flowed } from "~/util/mobxUtils";
 import { hasSpace } from "~/util/stringUtils";
 
 import { deeplTranslate, isLanguageConfigurationSupportedByDeepl } from "~/reader/deeplTranslate";
@@ -55,13 +54,12 @@ export class SidebarStore {
       : SidebarStore.sources.tatoeba;
   }
 
-  @flowed
-  public *update(
+  public async update(
     selectedText: string,
     contentLanguage: Language,
     translationLanguage: Language,
     translationCallback: (translation: string) => void
-  ): IterableIterator<Promise<[Translation | undefined, Translation | undefined]>> {
+  ): Promise<void> {
     if (!selectedText) {
       this.setResourcesNotLoading();
       return;
@@ -74,10 +72,11 @@ export class SidebarStore {
       this.fetchExampleSentences(selectedText, contentLanguage, translationLanguage);
     }
 
-    const [googleTranslation, deeplTranslation]: [
-      Translation | undefined,
-      Translation | undefined
-    ] = yield this.fetchTranslations(selectedText, contentLanguage, translationLanguage);
+    const [googleTranslation, deeplTranslation] = await this.fetchTranslations(
+      selectedText,
+      contentLanguage,
+      translationLanguage
+    );
     const mainTranslation = deeplTranslation || googleTranslation;
     if (mainTranslation) {
       translationCallback(mainTranslation.full);
@@ -85,8 +84,8 @@ export class SidebarStore {
     this.setMainTranslationLoading(false);
 
     if (this.isVisible) {
-      this.dictionaryEntries = (googleTranslation && googleTranslation.dictionaryEntries) || [];
-      this.dictionaryEntriesState = "Loaded";
+      this.setDictionaryEntries((googleTranslation && googleTranslation.dictionaryEntries) || []);
+      this.setDictionaryEntriesState("Loaded");
     }
   }
 
@@ -126,8 +125,18 @@ export class SidebarStore {
   }
 
   @action
+  private setExampleSentences(sentences: ExampleSentences): void {
+    this.exampleSentences = sentences;
+  }
+
+  @action
   private setExampleSentencesState(value: ResourceState): void {
     this.exampleSentencesState = value;
+  }
+
+  @action
+  private setDictionaryEntries(entries: DictionaryEntry[]): void {
+    this.dictionaryEntries = entries;
   }
 
   @action
@@ -135,23 +144,22 @@ export class SidebarStore {
     this.dictionaryEntriesState = value;
   }
 
-  @flowed
-  private *fetchExampleSentences(
+  private async fetchExampleSentences(
     phrase: string,
     contentLanguage: Language,
     translationLanguage: Language
-  ): IterableIterator<Promise<ExampleSentences>> {
+  ): Promise<void> {
     this.setExampleSentencesState("Loading");
-    const exampleSentences: ExampleSentences = yield this.sources.sentencesSource.fetchSentences(
+    const exampleSentences = await this.sources.sentencesSource.fetchSentences(
       phrase,
       contentLanguage,
       translationLanguage
     );
-    this.exampleSentences = {
+    this.setExampleSentences({
       ...exampleSentences,
       data: exampleSentences.data.map(s => emphasizePhrase(phrase, s))
-    };
-    this.exampleSentencesState = "Loaded";
+    });
+    this.setExampleSentencesState("Loaded");
   }
 
   private async fetchTranslations(

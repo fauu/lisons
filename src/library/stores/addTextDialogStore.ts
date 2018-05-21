@@ -20,7 +20,6 @@ import {
   writeStringToFile
 } from "~/util/fileUtils";
 import { languageFromCode6393, languageFromCodeGt } from "~/util/languageUtils";
-import { flowed } from "~/util/mobxUtils";
 import { detectLanguage } from "~/util/textUtils";
 
 import { AddTextFormData, TextFileMetadata, TextFileStatus } from "~/library/model";
@@ -32,7 +31,17 @@ export class AddTextDialogStore {
 
   @observable public detectedTextLanguage?: Language;
   @observable public fileMetadata?: TextFileMetadata;
+  @observable
+  public formData: AddTextFormData = {
+    filePath: "",
+    pastedText: "",
+    title: "",
+    author: "",
+    contentLanguage: AddTextDialogStore.defaultContentLanguage,
+    translationLanguage: AddTextDialogStore.defaultTranslationLanguage
+  };
   @observable public isLanguageConfigurationValid: boolean = true;
+  @observable public isPickingFile: boolean = false;
   @observable public isSavingText: boolean = false;
 
   public tatoebaTranslationCount?: IPromiseBasedObservable<number>;
@@ -43,145 +52,9 @@ export class AddTextDialogStore {
 
   private filePlaintext?: string;
 
-  // #region Moved stuff
-  // TODO: Re-add delay for pasted text processing
-
-  @observable
-  public formData: AddTextFormData = {
-    filePath: "",
-    pastedText: "",
-    title: "",
-    author: "",
-    contentLanguage: AddTextDialogStore.defaultContentLanguage,
-    translationLanguage: AddTextDialogStore.defaultTranslationLanguage
-  };
-  @observable public isPickingFile: boolean = false;
-
-  @action
-  private updateFormData(slice: any): void {
-    Object.assign(this.formData, slice);
-  }
-
-  private clearForm(): void {
-    this.updateFormData({
-      filePath: "",
-      pastedText: "",
-      title: "",
-      author: "",
-      contentLanguage: AddTextDialogStore.defaultContentLanguage,
-      translationLanguage:
-        languageFromCode6393(this.settingsStore.settings.defaultTranslationLanguage) ||
-        AddTextDialogStore.defaultTranslationLanguage
-    });
-    this.discardText();
-  }
-
-  @action
-  private setPickingFile(value: boolean): void {
-    this.isPickingFile = value;
-  }
-
-  public handlePastedTextChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
-    const pastedText = e.currentTarget.value;
-    if (!pastedText) {
-      this.clearForm();
-    } else {
-      this.updateFormData({ pastedText });
-      this.setPastedText(pastedText); // XXX: Probably won't be needed anymore
-      this.detectedTextLanguage =
-        pastedText && pastedText !== ""
-          ? detectLanguage(pastedText.substr(0, AddTextDialogStore.languageDetectionSampleLength))
-          : undefined;
-    }
-  };
-
-  public handleTitleChange = (e: React.FormEvent<HTMLInputElement>) => {
-    this.updateFormData({ title: e.currentTarget.value });
-  };
-
-  public handleAuthorChange = (e: React.FormEvent<HTMLInputElement>) => {
-    this.updateFormData({ author: e.currentTarget.value });
-  };
-
-  public handleContentLanguageChange = (e: any) => {
-    this.updateFormData({ contentLanguage: languageFromCode6393(e.target.value) });
-  };
-
-  public handleTranslationLanguageChange = (e: any) => {
-    this.updateFormData({ translationLanguage: languageFromCode6393(e.target.value) });
-  };
-
-  public handleLoadFileButtonClick = (e: React.FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    this.setPickingFile(true);
-    remote.dialog.showOpenDialog(
-      {
-        properties: ["openFile"]
-      },
-      filePaths => {
-        this.setPickingFile(false);
-        if (!filePaths) {
-          return;
-        }
-        const filePath = filePaths.toString();
-        this.updateFormData({
-          title: path.basename(filePath, path.extname(filePath)),
-          filePath
-        });
-      }
-    );
-  };
-
-  public handleDiscardSelectedFileButtonClick = (e: React.FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    this.clearForm();
-  };
-
-  public handleClearPasteTextAreaButtonClick = (e: React.FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    this.clearForm();
-  };
-
-  public handleAddTextButtonClick = async (e: React.FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    await this.saveText(this.formData);
-    this.settingsStore.set({
-      defaultTranslationLanguage: this.formData.translationLanguage
-    });
-    this.clearForm();
-  };
-
-  private handleTextFileMetadataChange(metadata?: TextFileMetadata): void {
-    if (!metadata) {
-      return;
-    }
-    const { author, title } = metadata;
-    if (author) {
-      this.updateFormData({ author });
-    }
-    if (title) {
-      this.updateFormData({ title });
-    }
-
-    if (metadata && metadata.language) {
-      this.detectedTextLanguage = languageFromCodeGt(metadata.language.substr(0, 2));
-    } else if (this.filePlaintext) {
-      this.detectedTextLanguage = detectLanguage(
-        this.filePlaintext.substr(0, AddTextDialogStore.languageDetectionSampleLength)
-      );
-    }
-  }
-
-  private handleDetectedTextLanguageChange = (lang?: Language): void => {
-    this.formData.contentLanguage = lang ? lang : AddTextDialogStore.defaultContentLanguage;
-  };
-
-  // #endregion
-
   // TODO: Disposers?
   public constructor(private settingsStore: SettingsStore, private textStore: TextStore) {
     // reaction(() => this.pastedText, text => this.handlePastedTextChange(text), { delay: 1000 });
-    // reaction(() => this.fileMetadata, metadata => this.handleTextFileMetadataChange(metadata));
 
     this.clearForm();
     reaction(
@@ -211,29 +84,28 @@ export class AddTextDialogStore {
     }
   }
 
-  @flowed
-  public *saveText(formData: AddTextFormData): IterableIterator<Promise<any>> {
-    this.isSavingText = true;
+  public async saveText(formData: AddTextFormData): Promise<void> {
+    this.setSavingText(true);
 
     const id = crypto.randomBytes(16).toString("hex");
     const userDataPath = getUserDataPath();
     const textsDirName = "texts";
     const textsPath = path.join(userDataPath, textsDirName);
-    yield ensurePathExists(textsPath);
+    await ensurePathExists(textsPath);
     const newTextPath = path.join(textsPath, id);
-    yield ensurePathExists(newTextPath);
+    await ensurePathExists(newTextPath);
 
     let coverPath;
     let chunkMap;
     let sectionTree;
     if (this.pastedText || this.filePlaintext) {
-      chunkMap = yield storePlaintextContent(
+      chunkMap = await storePlaintextContent(
         newTextPath,
         this.pastedText || this.filePlaintext!,
         formData.contentLanguage
       );
     } else {
-      [coverPath, chunkMap, sectionTree] = yield storeEpubContent(
+      [coverPath, chunkMap, sectionTree] = await storeEpubContent(
         newTextPath,
         this.fileBuffer!,
         formData.contentLanguage
@@ -246,7 +118,7 @@ export class AddTextDialogStore {
       chunkMap,
       sectionTree
     };
-    yield writeStringToFile(indexFilePath, JSON.stringify(indexContent));
+    await writeStringToFile(indexFilePath, JSON.stringify(indexContent));
     this.textStore.addToLibrary({
       id,
       title: formData.title,
@@ -255,18 +127,17 @@ export class AddTextDialogStore {
       translationLanguage: formData.translationLanguage.code6393,
       coverPath: coverPath ? path.join(`texts/${id}`, coverPath) : undefined
     });
-    this.discardText();
-    this.isSavingText = false;
+    this.clearForm();
+    this.setSavingText(false);
   }
 
   // TODO: Cleanup
-  @flowed
-  public *processFile(filePath: string): IterableIterator<Promise<any>> {
-    this.isProcessingFile = true;
+  public async processFile(filePath: string): Promise<void> {
+    this.setProcessingFile(true);
     try {
-      this.fileBuffer = yield readFile(filePath);
+      this.setFileBuffer(await readFile(filePath));
       if (this.fileBuffer) {
-        this.fileMetadata = yield metadataFromEpub(this.fileBuffer);
+        this.setFileMetadata(await metadataFromEpub(this.fileBuffer));
       }
       this.isProcessingFile = false;
       return;
@@ -274,28 +145,82 @@ export class AddTextDialogStore {
       // skip
     }
     const isFilePlaintext = this.fileBuffer
-      ? yield isBufferText(this.fileBuffer, yield fileSize(filePath))
+      ? await isBufferText(this.fileBuffer, await fileSize(filePath))
       : false;
     if (this.fileBuffer && isFilePlaintext) {
       this.filePlaintext = isUtf8(this.fileBuffer)
         ? this.fileBuffer.toString()
         : iconv.decode(this.fileBuffer, jschardet.detect(this.fileBuffer).encoding).toString();
-      this.fileMetadata = {};
+      this.setFileMetadata({});
     }
-    this.isProcessingFile = false;
+    this.setProcessingFile(false);
     return;
   }
 
   @action
-  public handleSelectedLanguagesChange([contentLanguage, translationLanguage]: [
+  private updateFormData(slice: any): void {
+    Object.assign(this.formData, slice);
+  }
+
+  private clearForm(): void {
+    this.updateFormData({
+      filePath: "",
+      pastedText: "",
+      title: "",
+      author: "",
+      contentLanguage: AddTextDialogStore.defaultContentLanguage,
+      translationLanguage:
+        languageFromCode6393(this.settingsStore.settings.defaultTranslationLanguage) ||
+        AddTextDialogStore.defaultTranslationLanguage
+    });
+    this.discardText();
+  }
+
+  @action
+  private setPickingFile(value: boolean): void {
+    this.isPickingFile = value;
+  }
+
+  @action
+  private setProcessingFile(value: boolean): void {
+    this.isProcessingFile = value;
+  }
+
+  @action
+  private setSavingText(value: boolean): void {
+    this.isSavingText = value;
+  }
+
+  @action
+  public setPastedText(value?: string): void {
+    this.pastedText = value;
+  }
+
+  @action
+  private setDetectedTextLanguage(language?: Language): void {
+    this.detectedTextLanguage = language;
+  }
+
+  @action
+  private setFileMetadata(metadata: TextFileMetadata): void {
+    this.fileMetadata = metadata;
+  }
+
+  @action
+  private setFileBuffer(buffer: Buffer): void {
+    this.fileBuffer = buffer;
+  }
+
+  @action
+  public handleSelectedLanguagesChange = ([contentLanguage, translationLanguage]: [
     Language,
     Language
-  ]): void {
+  ]) => {
     this.isLanguageConfigurationValid = contentLanguage.code6393 !== translationLanguage.code6393;
     // this.tatoebaTranslationCount = this.isLanguageConfigurationValid
     //   ? fromPromise(getSentenceCount(contentLanguage, translationLanguage))
     //   : undefined
-  }
+  };
 
   @action
   public discardText(): void {
@@ -307,16 +232,101 @@ export class AddTextDialogStore {
     this.pastedText = undefined;
   }
 
-  @action
-  public setPastedText(value?: string): void {
-    this.pastedText = value;
-  }
-
-  public handleSelectedFilePathChange(filePath: string): void {
+  public handleSelectedFilePathChange = (filePath: string) => {
     if (filePath) {
       this.processFile(filePath);
     } else {
       this.discardText();
     }
-  }
+  };
+
+  public handleDiscardSelectedFileButtonClick = () => {
+    this.updateFormData({ filePath: "" });
+  };
+
+  public handlePastedTextChange = (pastedText: string) => {
+    if (!pastedText) {
+      this.clearForm();
+    } else {
+      this.updateFormData({ pastedText });
+      this.setPastedText(pastedText); // XXX: Probably won't be needed anymore
+      this.setDetectedTextLanguage(
+        pastedText && pastedText !== ""
+          ? detectLanguage(pastedText.substr(0, AddTextDialogStore.languageDetectionSampleLength))
+          : undefined
+      );
+    }
+  };
+
+  public handleClearPasteTextAreaButtonClick = () => {
+    this.clearForm();
+  };
+
+  public handleTitleChange = (newTitle: string) => {
+    this.updateFormData({ title: newTitle });
+  };
+
+  public handleAuthorChange = (newAuthor: string) => {
+    this.updateFormData({ author: newAuthor });
+  };
+
+  public handleContentLanguageChange = (newLanguageCode6393: string) => {
+    this.updateFormData({ contentLanguage: languageFromCode6393(newLanguageCode6393) });
+  };
+
+  public handleTranslationLanguageChange = (newLanguageCode6393: string) => {
+    this.updateFormData({ translationLanguage: languageFromCode6393(newLanguageCode6393) });
+  };
+
+  public handleLoadFileButtonClick = () => {
+    this.setPickingFile(true);
+    remote.dialog.showOpenDialog(
+      {
+        properties: ["openFile"]
+      },
+      filePaths => {
+        this.setPickingFile(false);
+        if (!filePaths) {
+          return;
+        }
+        const filePath = filePaths.toString();
+        this.updateFormData({
+          title: path.basename(filePath, path.extname(filePath)),
+          filePath
+        });
+      }
+    );
+  };
+
+  public handleAddTextButtonClick = () => {
+    this.saveText(this.formData);
+    this.settingsStore.set({
+      defaultTranslationLanguage: this.formData.translationLanguage
+    });
+  };
+
+  private handleTextFileMetadataChange = (metadata?: TextFileMetadata) => {
+    if (!metadata) {
+      return;
+    }
+    const { author, title } = metadata;
+    if (author) {
+      this.updateFormData({ author });
+    }
+    if (title) {
+      this.updateFormData({ title });
+    }
+
+    if (metadata && metadata.language) {
+      this.detectedTextLanguage = languageFromCodeGt(metadata.language.substr(0, 2));
+    } else if (this.filePlaintext) {
+      this.detectedTextLanguage = detectLanguage(
+        this.filePlaintext.substr(0, AddTextDialogStore.languageDetectionSampleLength)
+      );
+    }
+  };
+
+  private handleDetectedTextLanguageChange = (lang?: Language) => {
+    this.formData.contentLanguage = lang ? lang : AddTextDialogStore.defaultContentLanguage;
+  };
 }

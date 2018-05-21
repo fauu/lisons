@@ -1,10 +1,9 @@
-import { action, observable, ObservableMap, toJS } from "mobx";
+import { action, observable, ObservableMap, runInAction, toJS } from "mobx";
 import * as path from "path";
 
 import { LibraryEntry, ParsedText, Text, TextInfo, TextProgress } from "~/app/model";
 
 import { deleteFile, exists, getUserDataPath, readFile, writeFile } from "~/util/fileUtils";
-import { flowed } from "~/util/mobxUtils";
 
 export class TextStore {
   private static readonly libraryPath = path.join(getUserDataPath(), "library.json");
@@ -17,10 +16,10 @@ export class TextStore {
     { deep: false }
   );
 
-  @flowed
-  public *loadLibrary(): IterableIterator<Promise<any>> {
-    if (yield exists(TextStore.libraryPath)) {
-      this.library.replace(JSON.parse((yield readFile(TextStore.libraryPath)).toString()));
+  public async loadLibrary(): Promise<any> {
+    if (await exists(TextStore.libraryPath)) {
+      const loadedLibrary = JSON.parse((await readFile(TextStore.libraryPath)).toString());
+      runInAction(() => this.library.replace(loadedLibrary));
     }
   }
 
@@ -48,8 +47,7 @@ export class TextStore {
     );
   }
 
-  @flowed
-  public *loadAll(): IterableIterator<Promise<Text[]>> {
+  public async loadAll(): Promise<void> {
     console.log("to be removed");
   }
 
@@ -57,8 +55,7 @@ export class TextStore {
     console.log("to be removed");
   }
 
-  @flowed
-  public *delete(_id: number): IterableIterator<Promise<void>> {
+  public async delete(_id: number): Promise<void> {
     console.log("to be removed");
   }
 
