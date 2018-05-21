@@ -2,7 +2,7 @@ import * as crypto from "crypto";
 import { remote } from "electron";
 import * as iconv from "iconv-lite";
 import jschardet = require("jschardet");
-import { action, autorun, computed, observable, reaction } from "mobx";
+import { action, autorun, computed, observable, reaction, runInAction } from "mobx";
 import { IPromiseBasedObservable } from "mobx-utils";
 import * as path from "path";
 
@@ -84,8 +84,9 @@ export class AddTextDialogStore {
     }
   }
 
+  @action
   public async saveText(formData: AddTextFormData): Promise<void> {
-    this.setSavingText(true);
+    this.isSavingText = true;
 
     const id = crypto.randomBytes(16).toString("hex");
     const userDataPath = getUserDataPath();
@@ -128,16 +129,19 @@ export class AddTextDialogStore {
       coverPath: coverPath ? path.join(`texts/${id}`, coverPath) : undefined
     });
     this.clearForm();
-    this.setSavingText(false);
+    runInAction(() => (this.isSavingText = false));
   }
 
   // TODO: Cleanup
+  @action
   public async processFile(filePath: string): Promise<void> {
-    this.setProcessingFile(true);
+    this.isProcessingFile = true;
     try {
-      this.setFileBuffer(await readFile(filePath));
+      const fileBuffer = await readFile(filePath);
+      runInAction(() => (this.fileBuffer = fileBuffer));
       if (this.fileBuffer) {
-        this.setFileMetadata(await metadataFromEpub(this.fileBuffer));
+        const fileMetadata = await metadataFromEpub(this.fileBuffer);
+        runInAction(() => (this.fileMetadata = fileMetadata));
       }
       this.isProcessingFile = false;
       return;
@@ -151,9 +155,9 @@ export class AddTextDialogStore {
       this.filePlaintext = isUtf8(this.fileBuffer)
         ? this.fileBuffer.toString()
         : iconv.decode(this.fileBuffer, jschardet.detect(this.fileBuffer).encoding).toString();
-      this.setFileMetadata({});
+      runInAction(() => (this.fileMetadata = {}));
     }
-    this.setProcessingFile(false);
+    runInAction(() => (this.isProcessingFile = false));
     return;
   }
 
@@ -177,42 +181,7 @@ export class AddTextDialogStore {
   }
 
   @action
-  private setPickingFile(value: boolean): void {
-    this.isPickingFile = value;
-  }
-
-  @action
-  private setProcessingFile(value: boolean): void {
-    this.isProcessingFile = value;
-  }
-
-  @action
-  private setSavingText(value: boolean): void {
-    this.isSavingText = value;
-  }
-
-  @action
-  public setPastedText(value?: string): void {
-    this.pastedText = value;
-  }
-
-  @action
-  private setDetectedTextLanguage(language?: Language): void {
-    this.detectedTextLanguage = language;
-  }
-
-  @action
-  private setFileMetadata(metadata: TextFileMetadata): void {
-    this.fileMetadata = metadata;
-  }
-
-  @action
-  private setFileBuffer(buffer: Buffer): void {
-    this.fileBuffer = buffer;
-  }
-
-  @action
-  public handleSelectedLanguagesChange = ([contentLanguage, translationLanguage]: [
+  private handleSelectedLanguagesChange = ([contentLanguage, translationLanguage]: [
     Language,
     Language
   ]) => {
@@ -223,7 +192,7 @@ export class AddTextDialogStore {
   };
 
   @action
-  public discardText(): void {
+  private discardText(): void {
     this.detectedTextLanguage = undefined;
     this.fileBuffer = undefined;
     this.fileMetadata = undefined;
@@ -232,29 +201,21 @@ export class AddTextDialogStore {
     this.pastedText = undefined;
   }
 
-  public handleSelectedFilePathChange = (filePath: string) => {
-    if (filePath) {
-      this.processFile(filePath);
-    } else {
-      this.discardText();
-    }
-  };
-
   public handleDiscardSelectedFileButtonClick = () => {
     this.updateFormData({ filePath: "" });
   };
 
+  @action
   public handlePastedTextChange = (pastedText: string) => {
     if (!pastedText) {
       this.clearForm();
     } else {
       this.updateFormData({ pastedText });
-      this.setPastedText(pastedText); // XXX: Probably won't be needed anymore
-      this.setDetectedTextLanguage(
+      this.pastedText = pastedText; // XXX: Probably won't be needed anymore
+      this.detectedTextLanguage =
         pastedText && pastedText !== ""
           ? detectLanguage(pastedText.substr(0, AddTextDialogStore.languageDetectionSampleLength))
-          : undefined
-      );
+          : undefined;
     }
   };
 
@@ -278,14 +239,14 @@ export class AddTextDialogStore {
     this.updateFormData({ translationLanguage: languageFromCode6393(newLanguageCode6393) });
   };
 
-  public handleLoadFileButtonClick = () => {
-    this.setPickingFile(true);
+  public handleLoadFileButtonClick = action(() => {
+    this.isPickingFile = true;
     remote.dialog.showOpenDialog(
       {
         properties: ["openFile"]
       },
-      filePaths => {
-        this.setPickingFile(false);
+      action(filePaths => {
+        this.isPickingFile = false;
         if (!filePaths) {
           return;
         }
@@ -294,9 +255,9 @@ export class AddTextDialogStore {
           title: path.basename(filePath, path.extname(filePath)),
           filePath
         });
-      }
+      })
     );
-  };
+  });
 
   public handleAddTextButtonClick = () => {
     this.saveText(this.formData);
@@ -323,6 +284,14 @@ export class AddTextDialogStore {
       this.detectedTextLanguage = detectLanguage(
         this.filePlaintext.substr(0, AddTextDialogStore.languageDetectionSampleLength)
       );
+    }
+  };
+
+  private handleSelectedFilePathChange = (filePath: string) => {
+    if (filePath) {
+      this.processFile(filePath);
+    } else {
+      this.discardText();
     }
   };
 
