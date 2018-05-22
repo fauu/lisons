@@ -196,7 +196,7 @@ export class AddTextDialogStore {
     runInAction(() => (this.isSavingText = false));
     this.clearForm();
     this.settingsStore.set({
-      defaultTranslationLanguage: this.formData.translationLanguage
+      defaultTranslationLanguage: this.formData.translationLanguage.code6393
     });
   });
 

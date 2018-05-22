@@ -1,78 +1,80 @@
 import * as React from "react";
 import styled, { keyframes } from "styled-components";
 
+import { colors } from "~/app/data/style";
+
 // http://tobiasahlin.com/spinkit/
 export interface SpinnerProps {
   color: string | "Light" | "Dark";
 }
 export function Spinner({ color }: SpinnerProps): JSX.Element {
   return (
-    <SkCubeGrid color={color} className="spinner">
+    <SkFoldingCube color={color} className="spinner">
       <div className="sk-cube sk-cube1" />
       <div className="sk-cube sk-cube2" />
-      <div className="sk-cube sk-cube3" />
       <div className="sk-cube sk-cube4" />
-      <div className="sk-cube sk-cube5" />
-      <div className="sk-cube sk-cube6" />
-      <div className="sk-cube sk-cube7" />
-      <div className="sk-cube sk-cube8" />
-      <div className="sk-cube sk-cube9" />
-    </SkCubeGrid>
+      <div className="sk-cube sk-cube3" />
+    </SkFoldingCube>
   );
 }
 
-const skCubeGridDelay = keyframes`
-  0%,
-  70%,
-  100% {
-    transform: scale3D(1, 1, 1);
+const skFoldCubeAngle = keyframes`
+  0%, 10% {
+    transform: perspective(140px) rotateX(-180deg);
+    opacity: 0;
   }
-  35% {
-    transform: scale3D(0, 0, 1);
+  25%, 75% {
+    transform: perspective(140px) rotateX(0deg);
+    opacity: 1;
+  }
+  90%, 100% {
+    transform: perspective(140px) rotateY(180deg);
+    opacity: 0;
   }
 `;
 
-const SkCubeGrid = styled.div`
-  width: 60px;
-  height: 60px;
-  margin: auto;
+const SkFoldingCube = styled.div`
+  margin: 20px auto;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  transform: rotateZ(45deg);
+
   .sk-cube {
-    width: 33.3%;
-    height: 33.3%;
-    background-color: ${p =>
-      p.color === "Light"
-        ? "rgba(255, 255, 255, 0.5)"
-        : p.color === "Dark"
-          ? "rgba(0, 0, 0, 0.2)"
-          : p.color};
     float: left;
-    animation: ${skCubeGridDelay} 1.3s infinite ease-in-out;
+    width: 50%;
+    height: 50%;
+    position: relative;
+    transform: scale(1.1);
   }
-  .sk-cube1 {
-    animation-delay: 0.2s;
+  .sk-cube:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: ${p =>
+      p.color === "Light" ? colors.secondaryFade : p.color === "Dark" ? colors.primary : p.color};
+    animation: ${skFoldCubeAngle} 2.4s infinite linear both;
+    transform-origin: 100% 100%;
   }
   .sk-cube2 {
-    animation-delay: 0.3s;
+    transform: scale(1.1) rotateZ(90deg);
   }
   .sk-cube3 {
-    animation-delay: 0.4s;
+    transform: scale(1.1) rotateZ(180deg);
   }
   .sk-cube4 {
-    animation-delay: 0.1s;
+    transform: scale(1.1) rotateZ(270deg);
   }
-  .sk-cube5 {
-    animation-delay: 0.2s;
-  }
-  .sk-cube6 {
+  .sk-cube2:before {
     animation-delay: 0.3s;
   }
-  .sk-cube7 {
-    animation-delay: 0s;
+  .sk-cube3:before {
+    animation-delay: 0.6s;
   }
-  .sk-cube8 {
-    animation-delay: 0.1s;
-  }
-  .sk-cube9 {
-    animation-delay: 0.2s;
+  .sk-cube4:before {
+    animation-delay: 0.9s;
   }
 `;

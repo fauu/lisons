@@ -39,14 +39,12 @@ export class AppStore {
     this.libraryStore = new LibraryStore(this.settingsStore, this.textStore);
     this.readerStore = new ReaderStore(this.textStore);
     await this.textStore.loadFromDisk();
-    setTimeout(() => {
-      if (AppStore.startInReader) {
-        // this.showReaderScreen(parseInt(this._textStore.texts.keys()[0], 10));
-      } else {
-        this.showLibraryScreen();
-      }
-      this.fetchCurrentVersion();
-    }, 50000);
+    if (AppStore.startInReader) {
+      // this.showReaderScreen(parseInt(this._textStore.texts.keys()[0], 10));
+    } else {
+      this.showLibraryScreen();
+    }
+    this.fetchCurrentVersion();
   }
 
   @action
