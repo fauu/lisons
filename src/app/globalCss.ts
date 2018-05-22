@@ -16,12 +16,12 @@ injectGlobal`
   html {
     font-size: 62.5%;
 
-    @media (min-width: 1920px) {
-      font-size: 1.1em;
+    @media (max-width: 1600px) {
+      font-size: 50%;
     }
-    @media (min-width: 2560px) {
+    /* @media (min-width: 2560px) {
       font-size: 1.2em;
-    }
+    } */
   }
 
   body {

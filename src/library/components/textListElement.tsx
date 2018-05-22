@@ -45,7 +45,7 @@ export function TextListElement({ appStore, entry }: TextListElementProps): JSX.
 }
 
 const Root = styled.div`
-  height: 300px;
+  height: 100%;
   animation: ${animations.fadeInBottom} ${animations.doubleTime};
   border: 2px solid ${colors.primary};
   border-radius: ${sizes.borderRadius};
@@ -70,6 +70,7 @@ const Cover = styled.div`
   background-image: ${(p: { coverPath?: string }) =>
     p.coverPath ? `url('file://${p.coverPath}')` : "none"};
   background-size: cover;
+  background-position: center center;
 
   > div:last-child {
     display: none;

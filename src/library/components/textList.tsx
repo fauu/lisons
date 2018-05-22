@@ -24,12 +24,17 @@ const Root = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  padding: 1.25% 2.5%;
+  padding: 0.5rem 1rem;
   background: transparent;
   display: grid;
-  grid-template-columns: repeat(4, [col] 22.75%);
-  grid-gap: 3%;
-  grid-auto-rows: min-content;
+  grid-gap: 3rem;
+  grid-template-columns: repeat(auto-fill, 12vw);
+  grid-auto-rows: calc(12vw * 3 / 2);
+  @media (min-width: 1800px) {
+    grid-template-columns: repeat(auto-fill, 9.5vw);
+    grid-auto-rows: calc(9.5vw * 3 / 2);
+  }
+  justify-content: space-around;
   overflow-x: hidden;
   overflow-y: scroll;
   &::-webkit-scrollbar {
