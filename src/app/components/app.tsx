@@ -1,7 +1,3 @@
-// TODO:
-//   - Migrate components away from componentWillMount:
-//     https://github.com/mobxjs/mobx-react/issues/447
-
 import { configure } from "mobx";
 import { observer } from "mobx-react";
 import * as React from "react";
@@ -23,10 +19,9 @@ configure({ computedRequiresReaction: true, enforceActions: true });
 @hot(module)
 @observer
 export class App extends React.Component {
-  private appStore!: AppStore;
+  private appStore: AppStore = new AppStore();
 
-  public componentWillMount(): void {
-    this.appStore = new AppStore();
+  public componentDidMount(): void {
     document.addEventListener("keydown", this.handleKeyDown);
   }
 

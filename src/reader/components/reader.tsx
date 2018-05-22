@@ -6,13 +6,12 @@ import styled from "styled-components";
 
 import { animations } from "~/app/data/style";
 import { ReaderStyleSettings } from "~/app/model";
-import { AppStore, SettingsStore } from "~/app/stores";
+import { AppStore } from "~/app/stores";
 import { formatPercentage } from "~/util/formatUtils";
 import { hexToRgb, isColorDark } from "~/util/styleUtils";
 
 import { Header, Sidebar, Toc, UiColorVariantContext } from "~/reader/components";
 import { UiColorVariant } from "~/reader/model";
-import { ReaderStore, SidebarStore } from "~/reader/stores";
 
 import * as noiseTexture from "~/res/images/noise-texture.png";
 
@@ -21,45 +20,36 @@ export interface ReaderProps {
 }
 @observer
 export class Reader extends React.Component<ReaderProps> {
-  private appStore!: AppStore;
-  private settingsStore!: SettingsStore;
-  private readerStore!: ReaderStore;
-  private sidebarStore!: SidebarStore;
-
-  public componentWillMount(): void {
-    this.appStore = this.props.appStore;
-    this.settingsStore = this.appStore.settingsStore;
-    this.readerStore = this.appStore.readerStore;
-    this.sidebarStore = this.readerStore.sidebarStore;
-  }
-
   public componentWillUnmount(): void {
-    this.sidebarStore.setResourcesNotLoading();
-    this.readerStore.clear();
+    const readerStore = this.props.appStore.readerStore;
+    readerStore.sidebarStore.setResourcesNotLoading();
+    readerStore.clear();
   }
 
   public componentDidMount(): void {
-    this.readerStore.initTextView().attach("text-view");
-    this.readerStore.scrollText("LastKnownPosition");
+    const readerStore = this.props.appStore.readerStore;
+    readerStore.initTextView().attach("text-view");
+    readerStore.scrollText("LastKnownPosition");
   }
 
   @computed
   private get uiColorVariant(): UiColorVariant {
-    return isColorDark(hexToRgb(this.settingsStore.settings.readerStyle.background))
-      ? "Light"
-      : "Dark";
+    const settings = this.props.appStore.settingsStore.settings;
+    return isColorDark(hexToRgb(settings.readerStyle.background)) ? "Light" : "Dark";
   }
 
   private handleTocAnyClick = () => {
-    this.readerStore.setTocVisible(false);
+    this.props.appStore.readerStore.setTocVisible(false);
   };
 
   private handleTocSectionLinkClick = (startElementNo: number) => {
-    this.readerStore.scrollText(startElementNo);
+    this.props.appStore.readerStore.scrollText(startElementNo);
   };
 
   public render(): JSX.Element | null {
-    const readerStore = this.readerStore;
+    const appStore = this.props.appStore;
+    const { readerStore, settingsStore } = appStore;
+    const sidebarStore = readerStore.sidebarStore;
     const text = readerStore.text;
     if (!text) {
       return null;
@@ -73,7 +63,7 @@ export class Reader extends React.Component<ReaderProps> {
       showPrevPage,
       showNextPage
     } = readerStore;
-    const userStyle = this.settingsStore.settings.readerStyle;
+    const userStyle = settingsStore.settings.readerStyle;
     const variant = this.uiColorVariant;
     const isOnlyPage = isFirstPage && isLastPage;
     const isRtl = text!.isRtl;
@@ -81,12 +71,12 @@ export class Reader extends React.Component<ReaderProps> {
       <Root>
         <Body
           userStyle={userStyle}
-          animateSelection={this.sidebarStore.isMainTranslationLoading}
+          animateSelection={sidebarStore.isMainTranslationLoading}
           isContentRtl={isRtl}
           areTranslationsRtl={text!.areTranslationsRtl}
         >
           <UiColorVariantContext.Provider value={variant}>
-            <Header appStore={this.appStore} variant={variant} />
+            <Header {...{ appStore, variant }} />
             {readingProgress && !isOnlyPage && this.renderTextProgress()}
             <TextWithNavigation>
               {isTocOpen && (
@@ -116,9 +106,7 @@ export class Reader extends React.Component<ReaderProps> {
             </TextWithNavigation>
           </UiColorVariantContext.Provider>
         </Body>
-        {this.sidebarStore.isVisible && (
-          <Sidebar sidebarStore={this.sidebarStore} settingsStore={this.settingsStore} />
-        )}
+        {sidebarStore.isVisible && <Sidebar {...{ sidebarStore, settingsStore }} />}
       </Root>
     );
   }
@@ -131,7 +119,7 @@ export class Reader extends React.Component<ReaderProps> {
       isLastPage,
       skipBackward,
       skipForward
-    } = this.readerStore;
+    } = this.props.appStore.readerStore;
     const variant = this.uiColorVariant;
     const isRtl = text!.isRtl;
     const showLeftButton = (isRtl && !isLastPage) || (!isRtl && !isFirstPage);

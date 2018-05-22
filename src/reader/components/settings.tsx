@@ -49,16 +49,10 @@ export class Settings extends React.Component<SettingsProps> {
 
   @observable private formData: ReaderStyleSettings = defaultSettings.readerStyle;
 
-  private settingsStore!: SettingsStore;
-  private sidebarStore!: SidebarStore;
-
-  public componentWillMount(): void {
-    this.settingsStore = this.props.settingsStore;
-    this.sidebarStore = this.props.sidebarStore;
-    Object.assign(this.formData, this.settingsStore.settings.readerStyle);
-  }
-
   public componentDidMount(): void {
+    // XXX: Moved this from componentWillMount without testing it -- might break stuff
+    Object.assign(this.formData, this.props.settingsStore.settings.readerStyle);
+
     reaction(
       () => this.formData,
       readerStyle => {
@@ -67,9 +61,8 @@ export class Settings extends React.Component<SettingsProps> {
     );
   }
 
-  // tslint:disable-next-line:member-ordering
   private commit = debounce((readerStyle: ReaderStyleSettings) => {
-    this.settingsStore.set({ readerStyle });
+    this.props.settingsStore.set({ readerStyle });
   }, Settings.commitDebounceMs);
 
   private handleFieldChange = (fieldName: string) =>
@@ -81,7 +74,7 @@ export class Settings extends React.Component<SettingsProps> {
     });
 
   private handleDoneButtonClick = (e: React.FormEvent<HTMLButtonElement>) => {
-    this.sidebarStore.setSettingsTabActive(false);
+    this.props.sidebarStore.setSettingsTabActive(false);
     e.preventDefault();
   };
 
@@ -105,7 +98,7 @@ export class Settings extends React.Component<SettingsProps> {
         </FormMain>
         <Button
           warning
-          disabled={this.settingsStore.areReaderSettingsDefault}
+          disabled={this.props.settingsStore.areReaderSettingsDefault}
           onClick={this.handleResetButtonClick}
         >
           Reset to defaults
