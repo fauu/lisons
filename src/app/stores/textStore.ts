@@ -1,5 +1,5 @@
 import * as crypto from "crypto";
-import { action, computed, observable, ObservableMap, runInAction, toJS } from "mobx";
+import { action, computed, observable, ObservableMap, runInAction } from "mobx";
 import * as path from "path";
 
 import {
@@ -24,20 +24,25 @@ export class TextStore {
   private static readonly textsIndexPath = path.join(getUserDataPath(), "library.json");
   private static readonly textsDirPath = path.join(getUserDataPath(), "texts");
 
-  public texts: ObservableMap<string, TextIndexEntry> = observable.map<string, TextIndexEntry>(
+  private _index: ObservableMap<string, TextIndexEntry> = observable.map<string, TextIndexEntry>(
     undefined,
     { deep: false }
   );
 
   @computed
+  public get indexIterator(): IterableIterator<TextIndexEntry> {
+    return this._index.values();
+  }
+
+  @computed
   public get isEmpty(): boolean {
-    return this.texts.size === 0;
+    return this._index.size === 0;
   }
 
   public async loadFromDisk(): Promise<any> {
     if (await exists(TextStore.textsIndexPath)) {
       const loadedLibrary = JSON.parse((await readFile(TextStore.textsIndexPath)).toString());
-      runInAction(() => this.texts.replace(loadedLibrary));
+      runInAction(() => this._index.replace(loadedLibrary));
     }
   }
 
@@ -88,13 +93,13 @@ export class TextStore {
       translationLanguage: formData.translationLanguage.code6393,
       coverPath: coverPath ? path.join(`texts/${id}`, coverPath) : undefined
     };
-    runInAction(() => this.texts.set(id, newTextIndexEntry));
+    runInAction(() => this._index.set(id, newTextIndexEntry));
     this.syncToDisk();
   }
 
   @action
   public deleteById(id: string): void {
-    this.texts.delete(id);
+    this._index.delete(id);
     this.syncToDisk();
     deleteFile(path.join(TextStore.textsDirPath, id));
   }
@@ -104,6 +109,6 @@ export class TextStore {
   }
 
   private syncToDisk(): void {
-    writeFile<string>(TextStore.textsIndexPath, JSON.stringify(this.texts.toJSON()));
+    writeFile<string>(TextStore.textsIndexPath, JSON.stringify(this._index.toJSON()));
   }
 }

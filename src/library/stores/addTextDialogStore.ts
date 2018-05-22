@@ -24,7 +24,7 @@ export class AddTextDialogStore {
   private static readonly pastedTextLanguageDetectionDelayMs = 1000;
 
   @observable
-  public formData: AddTextFormData = {
+  private _formData: AddTextFormData = {
     filePath: "",
     pastedText: "",
     title: "",
@@ -32,8 +32,8 @@ export class AddTextDialogStore {
     contentLanguage: AddTextDialogStore.defaultContentLanguage,
     translationLanguage: AddTextDialogStore.defaultTranslationLanguage
   };
-  @observable public isPickingFile: boolean = false;
-  @observable public isSavingText: boolean = false;
+  @observable private _isPickingFile: boolean = false;
+  @observable private _isSavingText: boolean = false;
 
   @observable private fileMetadata?: TextFileMetadata;
   @observable private detectedLanguage?: Language;
@@ -49,7 +49,10 @@ export class AddTextDialogStore {
     this.clearForm();
     reaction(() => this.detectedLanguage, language => this.handleDetectedLanguageChange(language));
     reaction(() => this.fileMetadata, metadata => this.handleTextFileMetadataChange(metadata));
-    reaction(() => this.formData.filePath, filePath => this.handleSelectedFilePathChange(filePath));
+    reaction(
+      () => this._formData.filePath,
+      filePath => this.handleSelectedFilePathChange(filePath)
+    );
   }
 
   @computed
@@ -67,7 +70,7 @@ export class AddTextDialogStore {
 
   @computed
   public get isLanguageConfigurationValid(): boolean {
-    return this.formData.contentLanguage !== this.formData.translationLanguage;
+    return this._formData.contentLanguage !== this._formData.translationLanguage;
   }
 
   // TODO: Cleanup
@@ -101,7 +104,7 @@ export class AddTextDialogStore {
 
   @action
   private updateFormData(slice: Partial<AddTextFormData>): void {
-    Object.assign(this.formData, slice);
+    Object.assign(this._formData, slice);
   }
 
   private clearForm(): void {
@@ -171,13 +174,13 @@ export class AddTextDialogStore {
   };
 
   public handleLoadFileButtonClick = action(() => {
-    this.isPickingFile = true;
+    this._isPickingFile = true;
     remote.dialog.showOpenDialog(
       {
         properties: ["openFile"]
       },
       action(filePaths => {
-        this.isPickingFile = false;
+        this._isPickingFile = false;
         if (!filePaths) {
           return;
         }
@@ -191,12 +194,12 @@ export class AddTextDialogStore {
   });
 
   public handleAddTextButtonClick = action(async () => {
-    this.isSavingText = true;
-    await this.textStore.add(this.formData, this.filePlaintext, this.fileBuffer);
-    runInAction(() => (this.isSavingText = false));
+    this._isSavingText = true;
+    await this.textStore.add(this._formData, this.filePlaintext, this.fileBuffer);
+    runInAction(() => (this._isSavingText = false));
     this.clearForm();
     this.settingsStore.set({
-      defaultTranslationLanguage: this.formData.translationLanguage.code6393
+      defaultTranslationLanguage: this._formData.translationLanguage.code6393
     });
   });
 
@@ -213,8 +216,8 @@ export class AddTextDialogStore {
       return;
     }
     this.updateFormData({
-      author: metadata.author || this.formData.author,
-      title: metadata.title || this.formData.title
+      author: metadata.author || this._formData.author,
+      title: metadata.title || this._formData.title
     });
 
     if (metadata.language) {
@@ -227,6 +230,21 @@ export class AddTextDialogStore {
   };
 
   private handleDetectedLanguageChange = (lang?: Language) => {
-    this.formData.contentLanguage = lang ? lang : AddTextDialogStore.defaultContentLanguage;
+    this._formData.contentLanguage = lang ? lang : AddTextDialogStore.defaultContentLanguage;
   };
+
+  @computed
+  public get formData(): AddTextFormData {
+    return this._formData;
+  }
+
+  @computed
+  public get isPickingFile(): boolean {
+    return this._isPickingFile;
+  }
+
+  @computed
+  public get isSavingText(): boolean {
+    return this._isSavingText;
+  }
 }

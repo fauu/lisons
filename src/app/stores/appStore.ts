@@ -13,15 +13,18 @@ export class AppStore {
   private static readonly websiteDataPath = "/data.json";
   private static readonly startInReader = false;
 
-  @observable public activeScreen?: AppScreen;
-  @observable public isFullScreen: boolean = false;
+  @observable private _activeScreen?: AppScreen;
+  @observable private _isFullScreen: boolean = false;
 
   @observable private latestVersion = VERSION;
 
-  public settingsStore!: SettingsStore;
-  public textStore!: TextStore;
-  public libraryStore!: LibraryStore;
-  public readerStore!: ReaderStore;
+  // Domain stores
+  private _settingsStore!: SettingsStore;
+  private _textStore!: TextStore;
+
+  // UI stores
+  private _libraryStore!: LibraryStore;
+  private _readerStore!: ReaderStore;
 
   public constructor() {
     this.init();
@@ -33,12 +36,13 @@ export class AppStore {
   }
 
   public async init(): Promise<void> {
-    this.settingsStore = new SettingsStore();
-    this.settingsStore.init();
-    this.textStore = new TextStore();
-    this.libraryStore = new LibraryStore(this.settingsStore, this.textStore);
-    this.readerStore = new ReaderStore(this.textStore);
-    await this.textStore.loadFromDisk();
+    this._settingsStore = new SettingsStore();
+    this._settingsStore.init();
+    this._textStore = new TextStore();
+    this._libraryStore = new LibraryStore(this._settingsStore, this._textStore);
+    this._libraryStore.init();
+    this._readerStore = new ReaderStore(this._textStore);
+    await this._textStore.loadFromDisk();
     if (AppStore.startInReader) {
       // this.showReaderScreen(parseInt(this._textStore.texts.keys()[0], 10));
     } else {
@@ -51,21 +55,21 @@ export class AppStore {
   public async showReaderScreen(_textId: number): Promise<void> {
     const text = undefined; // Loading text was here
     if (text) {
-      this.readerStore.setText(text);
-      this.activeScreen = "Reader";
+      this._readerStore.setText(text);
+      this._activeScreen = "Reader";
     }
   }
 
   @action
   public showLibraryScreen(): void {
-    this.activeScreen = "Library";
+    this._activeScreen = "Library";
   }
 
   @action
   public toggleFullScreen(): void {
     const win = remote.getCurrentWindow();
-    this.isFullScreen = !win.isFullScreen();
-    win.setFullScreen(this.isFullScreen);
+    this._isFullScreen = !win.isFullScreen();
+    win.setFullScreen(this._isFullScreen);
   }
 
   private async fetchCurrentVersion(): Promise<void> {
@@ -76,5 +80,29 @@ export class AppStore {
     } catch (e) {
       console.error("Error fetching website data:", e);
     }
+  }
+
+  public get activeScreen(): AppScreen | undefined {
+    return this._activeScreen;
+  }
+
+  public get isFullScreen(): boolean {
+    return this._isFullScreen;
+  }
+
+  public get settingsStore(): SettingsStore {
+    return this._settingsStore;
+  }
+
+  public get textStore(): TextStore {
+    return this._textStore;
+  }
+
+  public get libraryStore(): LibraryStore {
+    return this._libraryStore;
+  }
+
+  public get readerStore(): ReaderStore {
+    return this._readerStore;
   }
 }

@@ -8,6 +8,11 @@ import { loadSettings, saveSettings } from "~/app/settings";
 export class SettingsStore {
   @observable.deep private _settings: Settings = defaultSettings;
 
+  @computed
+  public get areReaderSettingsDefault(): boolean {
+    return isEqual(this._settings.readerStyle, defaultSettings.readerStyle);
+  }
+
   public async init(): Promise<void> {
     const loadedSettings = await loadSettings();
     runInAction(() => (this._settings = loadedSettings));
@@ -19,14 +24,8 @@ export class SettingsStore {
     saveSettings(this._settings);
   }
 
-  // TODO: Remove the getter if not needed, make settings public
   @computed
   public get settings(): Settings {
     return this._settings;
-  }
-
-  @computed
-  public get areReaderSettingsDefault(): boolean {
-    return isEqual(this._settings.readerStyle, defaultSettings.readerStyle);
   }
 }
