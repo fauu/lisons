@@ -1,5 +1,5 @@
 import isEqual = require("lodash/isEqual");
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 import { defaultSettings } from "~/app/data/defaultSettings";
 import { Settings } from "~/app/model";
@@ -10,21 +10,16 @@ export class SettingsStore {
 
   public async init(): Promise<void> {
     const loadedSettings = await loadSettings();
-    this.setSettings(loadedSettings);
+    runInAction(() => (this._settings = loadedSettings));
   }
 
   @action
-  public set(slice: any): void {
+  public set(slice: Partial<Settings>): void {
     Object.assign(this._settings, slice);
     saveSettings(this._settings);
   }
 
-  @action
-  private setSettings(settings: Settings): void {
-    this._settings = settings;
-  }
-
-  // XXX: Why is this needed again?
+  // TODO: Remove the getter if not needed, make settings public
   @computed
   public get settings(): Settings {
     return this._settings;

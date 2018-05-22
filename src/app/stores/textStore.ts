@@ -104,10 +104,6 @@ export class TextStore {
   }
 
   private syncToDisk(): void {
-    writeFile<string>(
-      path.join(TextStore.textsIndexPath),
-      // TODO: Check if this.library.toJSON works here
-      JSON.stringify(toJS(this.texts))
-    );
+    writeFile<string>(TextStore.textsIndexPath, JSON.stringify(this.texts.toJSON()));
   }
 }

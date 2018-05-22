@@ -33,12 +33,12 @@ const skCubeGridDelay = keyframes`
 `;
 
 const SkCubeGrid = styled.div`
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   margin: auto;
   .sk-cube {
-    width: 33%;
-    height: 33%;
+    width: 33.3%;
+    height: 33.3%;
     background-color: ${p =>
       p.color === "Light"
         ? "rgba(255, 255, 255, 0.5)"

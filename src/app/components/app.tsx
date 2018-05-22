@@ -22,7 +22,7 @@ configure({ computedRequiresReaction: true, enforceActions: true });
 
 @hot(module)
 @observer
-export class App extends React.Component<{}> {
+export class App extends React.Component {
   private appStore!: AppStore;
 
   public componentWillMount(): void {
@@ -51,7 +51,7 @@ export class App extends React.Component<{}> {
       default:
         return (
           <LoadingScreen key={"loading"}>
-            <Spinner color={"Light"} />}
+            <Spinner color={"Light"} />
           </LoadingScreen>
         );
     }

@@ -1,5 +1,5 @@
 import { remote } from "electron";
-import { action, observable } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 import { LibraryStore } from "~/library/stores";
 import { ReaderStore } from "~/reader/stores";
@@ -15,42 +15,52 @@ export class AppStore {
 
   @observable public activeScreen?: AppScreen;
   @observable public isFullScreen: boolean = false;
-  @observable private _newestVersion?: string;
-  private _settingsStore!: SettingsStore;
-  private _textStore!: TextStore;
-  private _libraryStore!: LibraryStore;
-  private _readerStore!: ReaderStore;
+
+  @observable private latestVersion = VERSION;
+
+  public settingsStore!: SettingsStore;
+  public textStore!: TextStore;
+  public libraryStore!: LibraryStore;
+  public readerStore!: ReaderStore;
 
   public constructor() {
     this.init();
   }
 
-  public async init(): Promise<void> {
-    this._settingsStore = new SettingsStore();
-    this._settingsStore.init();
-    this._textStore = new TextStore();
-    this._libraryStore = new LibraryStore(this._settingsStore, this._textStore);
-    this._textStore.loadFromDisk();
-    this._readerStore = new ReaderStore(this._textStore);
-    if (AppStore.startInReader) {
-      // this.showReaderScreen(parseInt(this._textStore.texts.keys()[0], 10));
-    } else {
-      this.showLibraryScreen();
-    }
-    this.fetchCurrentVersion();
+  @computed
+  public get isNewVersionAvailable(): boolean {
+    return this.latestVersion !== undefined && this.latestVersion !== VERSION;
   }
 
-  // @ts-ignore
-  public async showReaderScreen(textId: number): Promise<void> {
+  public async init(): Promise<void> {
+    this.settingsStore = new SettingsStore();
+    this.settingsStore.init();
+    this.textStore = new TextStore();
+    this.libraryStore = new LibraryStore(this.settingsStore, this.textStore);
+    this.readerStore = new ReaderStore(this.textStore);
+    await this.textStore.loadFromDisk();
+    setTimeout(() => {
+      if (AppStore.startInReader) {
+        // this.showReaderScreen(parseInt(this._textStore.texts.keys()[0], 10));
+      } else {
+        this.showLibraryScreen();
+      }
+      this.fetchCurrentVersion();
+    }, 50000);
+  }
+
+  @action
+  public async showReaderScreen(_textId: number): Promise<void> {
     const text = undefined; // Loading text was here
     if (text) {
-      this._readerStore.setText(text);
-      this.setActiveScreen("Reader");
+      this.readerStore.setText(text);
+      this.activeScreen = "Reader";
     }
   }
 
+  @action
   public showLibraryScreen(): void {
-    this.setActiveScreen("Library");
+    this.activeScreen = "Library";
   }
 
   @action
@@ -61,43 +71,12 @@ export class AppStore {
   }
 
   private async fetchCurrentVersion(): Promise<void> {
-    let websiteData = { version: "0.0" };
     try {
       const url = `${AppStore.websiteUrl}${AppStore.websiteDataPath}`;
-      websiteData = await xhr<{ version: string }>(url, undefined, true);
+      const websiteData = await xhr<{ version: string }>(url, undefined, true);
+      runInAction(() => (this.latestVersion = websiteData && websiteData.version));
     } catch (e) {
       console.error("Error fetching website data:", e);
     }
-    this.setNewestVersion(websiteData && websiteData.version);
-  }
-
-  public get isNewVersionAvailable(): boolean {
-    return this._newestVersion !== undefined && this._newestVersion !== VERSION;
-  }
-
-  public get settingsStore(): SettingsStore {
-    return this._settingsStore;
-  }
-
-  public get textStore(): TextStore {
-    return this._textStore;
-  }
-
-  public get libraryStore(): LibraryStore {
-    return this._libraryStore;
-  }
-
-  public get readerStore(): ReaderStore {
-    return this._readerStore;
-  }
-
-  @action
-  private setActiveScreen(value: AppScreen): void {
-    this.activeScreen = value;
-  }
-
-  @action
-  private setNewestVersion(version: string): void {
-    this._newestVersion = version;
   }
 }
