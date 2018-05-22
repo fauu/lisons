@@ -30,10 +30,10 @@ export class AppStore {
     this._settingsStore.init();
     this._textStore = new TextStore();
     this._libraryStore = new LibraryStore(this._settingsStore, this._textStore);
-    this._textStore.loadLibrary();
+    this._textStore.loadFromDisk();
     this._readerStore = new ReaderStore(this._textStore);
     if (AppStore.startInReader) {
-      this.showReaderScreen(parseInt(this._textStore.texts.keys()[0], 10));
+      // this.showReaderScreen(parseInt(this._textStore.texts.keys()[0], 10));
     } else {
       this.showLibraryScreen();
     }

@@ -1,4 +1,3 @@
-import * as crypto from "crypto";
 import { remote } from "electron";
 import * as iconv from "iconv-lite";
 import jschardet = require("jschardet");
@@ -9,21 +8,14 @@ import * as path from "path";
 
 import { isUtf8 } from "~/vendor/is-utf8";
 
-import { Language } from "~/app/model";
+import { AddTextFormData, Language } from "~/app/model";
 import { SettingsStore, TextStore } from "~/app/stores";
-import { metadataFromEpub, storeEpubContent, storePlaintextContent } from "~/app/textProcessing";
-import {
-  ensurePathExists,
-  fileSize,
-  getUserDataPath,
-  isBufferText,
-  readFile,
-  writeStringToFile
-} from "~/util/fileUtils";
+import { metadataFromEpub } from "~/app/textProcessing";
+import { fileSize, isBufferText, readFile } from "~/util/fileUtils";
 import { languageFromCode6393, languageFromCodeGt } from "~/util/languageUtils";
 import { detectLanguage } from "~/util/textUtils";
 
-import { AddTextFormData, TextFileMetadata, TextFileStatus } from "~/library/model";
+import { TextFileMetadata, TextFileStatus } from "~/library/model";
 
 export class AddTextDialogStore {
   private static readonly defaultContentLanguage = languageFromCode6393("fra")!;
@@ -76,54 +68,6 @@ export class AddTextDialogStore {
   @computed
   public get isLanguageConfigurationValid(): boolean {
     return this.formData.contentLanguage !== this.formData.translationLanguage;
-  }
-
-  @action
-  public async saveText(formData: AddTextFormData): Promise<void> {
-    this.isSavingText = true;
-
-    const id = crypto.randomBytes(16).toString("hex");
-    const userDataPath = getUserDataPath();
-    const textsDirName = "texts";
-    const textsPath = path.join(userDataPath, textsDirName);
-    await ensurePathExists(textsPath);
-    const newTextPath = path.join(textsPath, id);
-    await ensurePathExists(newTextPath);
-
-    let coverPath;
-    let chunkMap;
-    let sectionTree;
-    if (this.formData.pastedText || this.filePlaintext) {
-      chunkMap = await storePlaintextContent(
-        newTextPath,
-        this.formData.pastedText || this.filePlaintext!,
-        formData.contentLanguage
-      );
-    } else {
-      [coverPath, chunkMap, sectionTree] = await storeEpubContent(
-        newTextPath,
-        this.fileBuffer!,
-        formData.contentLanguage
-      );
-    }
-
-    const indexFileName = "index.json";
-    const indexFilePath = path.join(newTextPath, indexFileName);
-    const indexContent = {
-      chunkMap,
-      sectionTree
-    };
-    await writeStringToFile(indexFilePath, JSON.stringify(indexContent));
-    this.textStore.addToLibrary({
-      id,
-      title: formData.title,
-      author: formData.author,
-      contentLanguage: formData.contentLanguage.code6393,
-      translationLanguage: formData.translationLanguage.code6393,
-      coverPath: coverPath ? path.join(`texts/${id}`, coverPath) : undefined
-    });
-    this.clearForm();
-    runInAction(() => (this.isSavingText = false));
   }
 
   // TODO: Cleanup
@@ -246,12 +190,15 @@ export class AddTextDialogStore {
     );
   });
 
-  public handleAddTextButtonClick = () => {
-    this.saveText(this.formData);
+  public handleAddTextButtonClick = action(async () => {
+    this.isSavingText = true;
+    await this.textStore.add(this.formData, this.filePlaintext, this.fileBuffer);
+    runInAction(() => (this.isSavingText = false));
+    this.clearForm();
     this.settingsStore.set({
       defaultTranslationLanguage: this.formData.translationLanguage
     });
-  };
+  });
 
   private handleSelectedFilePathChange = (filePath: string) => {
     if (filePath) {

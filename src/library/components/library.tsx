@@ -13,7 +13,7 @@ export interface LibraryProps {
   appStore: AppStore;
 }
 export const Library = observer(function _Library({ appStore }: LibraryProps): JSX.Element {
-  const isEmpty = appStore.textStore.library.size === 0;
+  const isEmpty = appStore.textStore.isEmpty;
   const addTextDialogStore = appStore.libraryStore.addTextDialogStore;
   const { isNewVersionAvailable } = appStore;
   return (
@@ -29,7 +29,7 @@ export const Library = observer(function _Library({ appStore }: LibraryProps): J
           {isEmpty ? <span>Your library is empty.</span> : <TextList {...{ appStore }} />}
         </ReadColumn>
         <AddTextColumn>
-          <ColumnHeader>Add text:</ColumnHeader>
+          <ColumnHeader>Add text</ColumnHeader>
           <AddTextColumnContent>
             <AddTextDialog store={addTextDialogStore} />
           </AddTextColumnContent>

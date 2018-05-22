@@ -10,7 +10,7 @@ export interface TextListProps {
   appStore: AppStore;
 }
 export const TextList = observer(function _TextList({ appStore }: TextListProps): JSX.Element {
-  const entries = appStore.textStore.library.values();
+  const entries = appStore.textStore.texts.values();
   return (
     <Root>
       {Array.from(entries).map(e => <TextListElement key={e.id} appStore={appStore} entry={e} />)}

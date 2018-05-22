@@ -1,4 +1,4 @@
-export interface LibraryEntry {
+export interface TextIndexEntry {
   id: string;
   title: string;
   author: string;

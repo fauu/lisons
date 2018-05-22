@@ -4,7 +4,7 @@ import * as React from "react";
 import styled from "styled-components";
 
 import { animations, colors, fonts } from "~/app/data/style";
-import { LibraryEntry } from "~/app/model";
+import { TextIndexEntry } from "~/app/model";
 import { AppStore } from "~/app/stores";
 import { getUserDataPath } from "~/util/fileUtils";
 import { formatPercentage } from "~/util/formatUtils";
@@ -14,7 +14,7 @@ const userDataPath = getUserDataPath();
 
 export interface TextListElementProps {
   appStore: AppStore;
-  entry: LibraryEntry;
+  entry: TextIndexEntry;
 }
 
 // TODO: Rename to TextGridElement etc.
@@ -36,7 +36,7 @@ export function TextListElement({ appStore, entry }: TextListElementProps): JSX.
             {entry.translationLanguage}
           </Languages>
           <Actions>
-            <DeleteButton onClick={() => appStore.textStore.deleteFromLibrary(entry.id)} />
+            <DeleteButton onClick={() => appStore.textStore.deleteById(entry.id)} />
           </Actions>
         </Bar>
       </Cover>
