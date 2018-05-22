@@ -27,17 +27,6 @@ export const readFile = (path: string): Promise<Buffer> =>
     });
   });
 
-// TODO: Remove and replace all usages with writeFile
-export const writeStringToFile = (path: string, s: string): Promise<void> =>
-  new Promise<void>((resolve, reject) => {
-    fs.writeFile(path, s, err => {
-      if (err) {
-        return reject(err);
-      }
-      resolve();
-    });
-  });
-
 export const writeFile = <T>(path: string, data: T): Promise<void> =>
   new Promise<void>((resolve, reject) => {
     fs.writeFile(path, data, err => {

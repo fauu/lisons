@@ -83,14 +83,15 @@ const Cover = styled.div`
 `;
 
 const AuthorAndTitle = styled.div`
-  margin: 0 0.5rem;
+  margin: 0 1rem;
   font-family: ${fonts.serif};
 `;
 
-const Author = styled.div``;
+const Author = styled.div`
+  margin-bottom: 0.2rem;
+`;
 
 const Title = styled.div`
-  margin-bottom: 0.1rem;
   font-weight: bold;
 `;
 

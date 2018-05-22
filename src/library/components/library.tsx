@@ -87,7 +87,7 @@ const BetaIndicator = styled(BetaIcon)`
 `;
 
 const Main = styled.div`
-  margin-top: 2rem;
+  margin-top: 2.5rem;
   display: flex;
   flex: 1;
   color: ${colors.primary};

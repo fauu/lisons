@@ -1,5 +1,6 @@
 import { remote } from "electron";
 import { action, computed, observable, runInAction } from "mobx";
+import * as path from "path";
 
 import { LibraryStore } from "~/library/stores";
 import { ReaderStore } from "~/reader/stores";
@@ -11,7 +12,10 @@ import { xhr } from "~/app/xhr";
 export class AppStore {
   public static readonly websiteUrl = "https://fauu.github.io/lisons";
   private static readonly websiteDataPath = "/data.json";
+  private static readonly settingsFilename = "settings.json";
   private static readonly startInReader = false;
+
+  public readonly userDataPath = remote.app.getPath("userData");
 
   @observable private _activeScreen?: AppScreen;
   @observable private _isFullScreen: boolean = false;
@@ -36,7 +40,9 @@ export class AppStore {
   }
 
   public async init(): Promise<void> {
-    this._settingsStore = new SettingsStore();
+    this._settingsStore = new SettingsStore(
+      path.join(this.userDataPath, AppStore.settingsFilename)
+    );
     this._settingsStore.init();
     this._textStore = new TextStore();
     this._libraryStore = new LibraryStore(this._settingsStore, this._textStore);

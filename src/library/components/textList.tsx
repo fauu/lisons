@@ -2,6 +2,7 @@ import { observer } from "mobx-react";
 import * as React from "react";
 import styled from "styled-components";
 
+import { colors } from "~/app/data/style";
 import { AppStore } from "~/app/stores";
 
 import { TextListElement } from "~/library/components";
@@ -12,7 +13,7 @@ interface TextListProps {
 export const TextList = observer(function _TextList({ appStore }: TextListProps): JSX.Element {
   return (
     <Root>
-      {[...appStore.textStore.indexIterator].map(t => (
+      {appStore.textStore.allTextEntries.map(t => (
         <TextListElement key={t.id} appStore={appStore} entry={t} />
       ))}
     </Root>
@@ -23,7 +24,7 @@ const Root = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  padding: 2.5%;
+  padding: 1.25% 2.5%;
   background: transparent;
   display: grid;
   grid-template-columns: repeat(4, [col] 22.75%);
@@ -38,6 +39,6 @@ const Root = styled.div`
     display: none;
   }
   &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.05);
+    background: ${colors.primaryFade3};
   }
 `;

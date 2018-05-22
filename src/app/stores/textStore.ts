@@ -24,27 +24,25 @@ export class TextStore {
   private static readonly textsIndexPath = path.join(getUserDataPath(), "library.json");
   private static readonly textsDirPath = path.join(getUserDataPath(), "texts");
 
-  private _index: ObservableMap<string, TextIndexEntry> = observable.map<string, TextIndexEntry>(
+  private _entries: ObservableMap<string, TextIndexEntry> = observable.map<string, TextIndexEntry>(
     undefined,
     { deep: false }
   );
 
   @computed
-  public get indexIterator(): IterableIterator<TextIndexEntry> {
-    // FIXME: Texts disappear from library view when new added if this log statement is removed
-    console.log(Array.from(this._index.values()));
-    return this._index.values();
+  public get allTextEntries(): TextIndexEntry[] {
+    return Array.from(this._entries.values());
   }
 
   @computed
   public get isEmpty(): boolean {
-    return this._index.size === 0;
+    return this._entries.size === 0;
   }
 
   public async loadFromDisk(): Promise<any> {
     if (await exists(TextStore.textsIndexPath)) {
       const loadedLibrary = JSON.parse((await readFile(TextStore.textsIndexPath)).toString());
-      runInAction(() => this._index.replace(loadedLibrary));
+      runInAction(() => this._entries.replace(loadedLibrary));
     }
   }
 
@@ -95,13 +93,13 @@ export class TextStore {
       translationLanguage: formData.translationLanguage.code6393,
       coverPath: coverPath ? path.join(`texts/${id}`, coverPath) : undefined
     };
-    runInAction(() => this._index.set(id, newTextIndexEntry));
+    runInAction(() => this._entries.set(id, newTextIndexEntry));
     this.syncToDisk();
   }
 
   @action
   public deleteById(id: string): void {
-    this._index.delete(id);
+    this._entries.delete(id);
     this.syncToDisk();
     deleteFile(path.join(TextStore.textsDirPath, id));
   }
@@ -111,6 +109,6 @@ export class TextStore {
   }
 
   private syncToDisk(): void {
-    writeFile<string>(TextStore.textsIndexPath, JSON.stringify(this._index.toJSON()));
+    writeFile<string>(TextStore.textsIndexPath, JSON.stringify(this._entries.toJSON()));
   }
 }

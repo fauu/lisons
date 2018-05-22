@@ -1,12 +1,15 @@
 import isEqual = require("lodash/isEqual");
 import { action, computed, observable, runInAction } from "mobx";
 
+import { exists, readFile, writeFile } from "~/util/fileUtils";
+
 import { defaultSettings } from "~/app/data/defaultSettings";
 import { Settings } from "~/app/model";
-import { loadSettings, saveSettings } from "~/app/settings";
 
 export class SettingsStore {
   @observable.deep private _settings: Settings = defaultSettings;
+
+  public constructor(private filePath: string) {}
 
   @computed
   public get areReaderSettingsDefault(): boolean {
@@ -14,14 +17,28 @@ export class SettingsStore {
   }
 
   public async init(): Promise<void> {
-    const loadedSettings = await loadSettings();
+    const loadedSettings = await this.loadFromDisk();
     runInAction(() => (this._settings = loadedSettings));
   }
 
   @action
   public set(slice: Partial<Settings>): void {
     Object.assign(this._settings, slice);
-    saveSettings(this._settings);
+    this.syncToDisk(this._settings);
+  }
+
+  private async loadFromDisk(): Promise<Settings> {
+    const fileExists = await exists(this.filePath);
+    if (!fileExists) {
+      this.syncToDisk(defaultSettings);
+      return defaultSettings;
+    }
+    const rawSettings = (await readFile(this.filePath)).toString();
+    return JSON.parse(rawSettings);
+  }
+
+  private async syncToDisk(settings: Settings): Promise<void> {
+    writeFile<string>(this.filePath, JSON.stringify(settings));
   }
 
   @computed
