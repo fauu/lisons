@@ -10,7 +10,7 @@ import { animations, colors, fonts } from "~/app/data/style";
 import { LanguageSelect } from "~/library/components";
 import { AddTextDialogStore } from "~/library/stores";
 
-export interface AddTextDialogProps {
+interface AddTextDialogProps {
   store: AddTextDialogStore;
 }
 @observer

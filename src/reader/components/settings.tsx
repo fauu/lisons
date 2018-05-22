@@ -39,7 +39,7 @@ const formModel: FormModelElement[] = [
 ];
 
 // TODO: Rename to 'StyleCustomizer' or sth?
-export interface SettingsProps {
+interface SettingsProps {
   sidebarStore: SidebarStore;
   settingsStore: SettingsStore;
 }

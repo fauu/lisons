@@ -15,7 +15,7 @@ import { UiColorVariant } from "~/reader/model";
 
 import * as noiseTexture from "~/res/images/noise-texture.png";
 
-export interface ReaderProps {
+interface ReaderProps {
   appStore: AppStore;
 }
 @observer

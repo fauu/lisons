@@ -4,7 +4,7 @@ import styled, { keyframes } from "styled-components";
 import { colors } from "~/app/data/style";
 
 // http://tobiasahlin.com/spinkit/
-export interface SpinnerProps {
+interface SpinnerProps {
   color: string | "Light" | "Dark";
 }
 export function Spinner({ color }: SpinnerProps): JSX.Element {

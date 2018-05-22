@@ -17,7 +17,7 @@ import { AppStore } from "~/app/stores";
 import { HeaderButton } from "~/reader/components";
 import { UiColorVariant } from "~/reader/model";
 
-export interface HeaderProps {
+interface HeaderProps {
   appStore: AppStore;
   variant: UiColorVariant;
 }

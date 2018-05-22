@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { languages } from "~/app/data/languages";
 import { colors } from "~/app/data/style";
 
-export interface LanguageSelectProps {
+interface LanguageSelectProps {
   value: string;
   invalid: boolean;
   onChange: (e: any) => void;

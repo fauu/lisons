@@ -7,7 +7,7 @@ import { DictionaryEntry } from "~/reader/model";
 
 const variantCountLimit = 5;
 
-export interface DictionaryProps {
+interface DictionaryProps {
   entries: DictionaryEntry[];
 }
 export function Dictionary({ entries }: DictionaryProps): JSX.Element {

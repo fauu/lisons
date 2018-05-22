@@ -9,7 +9,7 @@ import { AppStore } from "~/app/stores";
 
 import { AddTextDialog, TextList } from "~/library/components";
 
-export interface LibraryProps {
+interface LibraryProps {
   appStore: AppStore;
 }
 export const Library = observer(function _Library({ appStore }: LibraryProps): JSX.Element {

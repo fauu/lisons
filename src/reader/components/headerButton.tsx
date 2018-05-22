@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { UiColorVariantContext } from "~/reader/components";
 import { UiColorVariant } from "~/reader/model";
 
-export interface HeaderButtonProps {
+interface HeaderButtonProps {
   tip: string;
   Icon: MdiReactIconComponentType;
   onClick: () => void;

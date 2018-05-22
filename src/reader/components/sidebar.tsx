@@ -13,7 +13,7 @@ import { SidebarStore } from "~/reader/stores";
 
 import * as noiseTexture from "~/res/images/noise-texture.png";
 
-export interface SidebarProps {
+interface SidebarProps {
   sidebarStore: SidebarStore;
   settingsStore: SettingsStore;
 }

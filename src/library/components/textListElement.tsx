@@ -12,7 +12,7 @@ import { formatPercentage } from "~/util/formatUtils";
 // TODO: Figure out how to handle this better
 const userDataPath = getUserDataPath();
 
-export interface TextListElementProps {
+interface TextListElementProps {
   appStore: AppStore;
   entry: TextIndexEntry;
 }

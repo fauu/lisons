@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { animations, colors } from "~/app/data/style";
 import { ExampleSentences, LanguageFlag } from "~/app/model";
 
-export interface ExampleSentenceListProps {
+interface ExampleSentenceListProps {
   sentences: ExampleSentences;
 }
 export function ExampleSentenceList({ sentences }: ExampleSentenceListProps): JSX.Element {

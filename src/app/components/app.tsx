@@ -1,4 +1,3 @@
-import { configure } from "mobx";
 import { observer } from "mobx-react";
 import * as React from "react";
 import { hot } from "react-hot-loader";
@@ -14,13 +13,13 @@ import "~/app/globalCss.ts";
 import { AppScreen } from "~/app/model";
 import { AppStore } from "~/app/stores";
 
-configure({ computedRequiresReaction: true, enforceActions: true });
+interface AppProps {
+  store: AppStore;
+}
 
 @hot(module)
 @observer
-export class App extends React.Component {
-  private appStore: AppStore = new AppStore();
-
+export class App extends React.Component<AppProps> {
   public componentDidMount(): void {
     document.addEventListener("keydown", this.handleKeyDown);
   }
@@ -30,19 +29,21 @@ export class App extends React.Component {
   }
 
   public render(): JSX.Element {
+    const activeScreen = this.props.store.activeScreen;
     return (
       <Wrapper id="app">
-        <FadeTransition>{this.renderScreen(this.appStore.activeScreen)}</FadeTransition>
+        <FadeTransition>{this.renderScreen(activeScreen)}</FadeTransition>
       </Wrapper>
     );
   }
 
   private renderScreen(screen?: AppScreen): JSX.Element {
+    const appStore = this.props.store;
     switch (screen) {
       case "Library":
-        return <Library appStore={this.appStore} key={screen} />;
+        return <Library appStore={appStore} key={screen} />;
       case "Reader":
-        return <Reader appStore={this.appStore} key={screen} />;
+        return <Reader appStore={appStore} key={screen} />;
       default:
         return (
           <LoadingScreen key={"loading"}>
@@ -55,13 +56,13 @@ export class App extends React.Component {
   // TODO: Keyboard-driven actions should share handlers with
   //       the corresponding mouse-driven actions
   private handleKeyDown = (e: KeyboardEvent): void => {
-    const appStore = this.appStore;
+    const appStore = this.props.store;
     const readerStore = appStore.readerStore;
     const sidebarStore = readerStore.sidebarStore;
-    const inReader = this.appStore.activeScreen === "Reader";
+    const isInReader = appStore.activeScreen === "Reader";
     switch (e.keyCode) {
       case KeyCode.LeftArrow:
-        if (inReader) {
+        if (isInReader) {
           if (e.altKey) {
             readerStore.skipBackward();
           } else {
@@ -70,7 +71,7 @@ export class App extends React.Component {
         }
         break;
       case KeyCode.RightArrow:
-        if (inReader) {
+        if (isInReader) {
           if (e.altKey) {
             readerStore.skipForward();
           } else {
@@ -79,12 +80,12 @@ export class App extends React.Component {
         }
         break;
       case KeyCode.B:
-        if (e.ctrlKey && inReader) {
+        if (e.ctrlKey && isInReader) {
           sidebarStore.setVisible(!sidebarStore.isVisible);
         }
         break;
       case KeyCode.Escape:
-        if (inReader) {
+        if (isInReader) {
           appStore.showLibraryScreen();
         }
         break;

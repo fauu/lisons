@@ -8,7 +8,7 @@ import { TextSectionInfo } from "~/app/model";
 
 import { UiColorVariant } from "~/reader/model";
 
-export interface TocProps {
+interface TocProps {
   sections: TextSectionInfo[];
   currentSection: TextSectionInfo;
   variant: UiColorVariant;
