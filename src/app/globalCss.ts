@@ -9,9 +9,12 @@ import * as ptSerif400 from "~/res/fonts/pt-serif/pt-serif-v8-cyrillic-ext_cyril
 
 // tslint:disable-next-line:no-unused-expression
 injectGlobal`
-  html, body {
-    margin: 0;
-    padding: 0;
+  *, *::after, *::before {
+    box-sizing: inherit;
+  }
+
+  html {
+    font-size: 62.5%;
 
     @media (min-width: 1920px) {
       font-size: 1.1em;
@@ -19,6 +22,12 @@ injectGlobal`
     @media (min-width: 2560px) {
       font-size: 1.2em;
     }
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
 
   @font-face {

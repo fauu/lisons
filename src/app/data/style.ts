@@ -18,6 +18,10 @@ export const fonts = {
   serif: "PT Serif"
 };
 
+export const sizes = {
+  borderRadius: "3px"
+};
+
 const time = "0.2s";
 const halfTime = "0.1s";
 const doubleTime = "0.4s";

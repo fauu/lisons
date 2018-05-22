@@ -4,7 +4,7 @@ import { observer } from "mobx-react";
 import * as React from "react";
 import styled from "styled-components";
 
-import { animations } from "~/app/data/style";
+import { animations, sizes } from "~/app/data/style";
 import { ReaderStyleSettings } from "~/app/model";
 import { AppStore } from "~/app/stores";
 import { formatPercentage } from "~/util/formatUtils";
@@ -194,7 +194,7 @@ const Body = styled.div`
       margin-top: -1.3em;
       background: ${p => p.userStyle.translationBgColor}88;
       border: 1px solid ${p => p.userStyle.translationBgColor}44;
-      border-radius: 3px;
+      border-radius: ${sizes.borderRadius};
       backdrop-filter: blur(15px);
       background-image: url('${noiseTexture}');
       color: ${p => p.userStyle.translationTextColor};

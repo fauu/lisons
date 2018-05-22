@@ -31,9 +31,9 @@ export class App extends React.Component<AppProps> {
   public render(): JSX.Element {
     const activeScreen = this.props.store.activeScreen;
     return (
-      <Wrapper id="app">
+      <Root id="app">
         <FadeTransition>{this.renderScreen(activeScreen)}</FadeTransition>
-      </Wrapper>
+      </Root>
     );
   }
 
@@ -96,22 +96,18 @@ export class App extends React.Component<AppProps> {
   };
 }
 
-const Wrapper = styled.div`
+const Root = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
   background: ${colors.primary};
-  font: 0.95em ${fonts.ui};
-  letter-spacing: -0.01em;
-  overflow: hidden;
+
+  /* TODO: Remove this after we're able to see that it doesn't break anything in Reader
   -webkit-user-select: none;
-  -webkit-app-region: drag;
+  -webkit-app-region: drag; */
 
-  * {
-    box-sizing: border-box;
-  }
-
-  /* FadeTransition hack */
+  /* FadeTransition hack
+     TODO: Come back to this when we're able to test Library<->Reader transitions again
   > div {
     display: block;
     height: 100%;
@@ -119,6 +115,28 @@ const Wrapper = styled.div`
       display: block;
       height: 100%;
     }
+  } */
+
+  &,
+  input,
+  textarea,
+  select,
+  button {
+    font: 2rem ${fonts.ui};
+    letter-spacing: -0.03rem;
+  }
+
+  :not(input):not(textarea),
+  :not(input):not(textarea):hover,
+  :not(input):not(textarea)::after,
+  :not(input):not(textarea)::before {
+    user-select: none;
+    cursor: default;
+  }
+  input:focus,
+  button:focus,
+  textarea:focus {
+    outline: none;
   }
 
   .fade-wait-leave {
@@ -135,20 +153,6 @@ const Wrapper = styled.div`
   .fade-wait-enter.fade-wait-enter-active {
     opacity: 1;
     transition: opacity ${animations.stdTime} ease-in ${animations.stdTime};
-  }
-
-  :not(input):not(textarea),
-  :not(input):not(textarea):hover,
-  :not(input):not(textarea)::after,
-  :not(input):not(textarea)::before {
-    -webkit-user-select: none;
-    user-select: none;
-    cursor: default;
-  }
-  input:focus,
-  button:focus,
-  textarea:focus {
-    outline: none;
   }
 `;
 

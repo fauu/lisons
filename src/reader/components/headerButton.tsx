@@ -3,6 +3,8 @@ import { MdiReactIconComponentType } from "mdi-react";
 import * as React from "react";
 import styled from "styled-components";
 
+import { sizes } from "~/app/data/style";
+
 import { UiColorVariantContext } from "~/reader/components";
 import { UiColorVariant } from "~/reader/model";
 
@@ -84,7 +86,7 @@ const Tip = styled.span`
   margin-top: 2em;
   background: #22222288;
   border: 1px solid #22222244;
-  border-radius: 3px;
+  border-radius: ${sizes.borderRadius};
   color: #fefefe;
   padding: 0.14em 0.3em;
   transition: all 0.2s ease-out;

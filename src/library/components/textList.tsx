@@ -21,14 +21,14 @@ export const TextList = observer(function _TextList({ appStore }: TextListProps)
 
 const Root = styled.div`
   position: relative;
-  padding: 1rem 2.5%;
+  width: 100%;
+  height: 100%;
+  padding: 2.5%;
   background: transparent;
   display: grid;
   grid-template-columns: repeat(4, [col] 22.75%);
   grid-gap: 3%;
   grid-auto-rows: min-content;
-  width: 100%;
-  height: 100%;
   overflow-x: hidden;
   overflow-y: scroll;
   &::-webkit-scrollbar {

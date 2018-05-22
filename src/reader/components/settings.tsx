@@ -5,7 +5,7 @@ import * as React from "react";
 import styled from "styled-components";
 
 import { defaultSettings } from "~/app/data/defaultSettings";
-import { colors } from "~/app/data/style";
+import { colors, sizes } from "~/app/data/style";
 import { ReaderStyleSettings } from "~/app/model";
 import { SettingsStore } from "~/app/stores";
 
@@ -174,7 +174,7 @@ const Input = styled.input`
   background: rgba(255, 255, 255, 0.12);
   color: #fefefe;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
+  border-radius: ${sizes.borderRadius};
   font-size: 0.95em;
   padding: 0.5rem;
   height: 41px;
@@ -206,7 +206,7 @@ const Select = styled.select`
   background: rgba(255, 255, 255, 0.12);
   color: #fefefe;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
+  border-radius: ${sizes.borderRadius};
   font-size: 0.95em;
   padding: 0.5rem;
   &:hover {
@@ -226,7 +226,7 @@ const Button = styled.button`
   min-height: 41px;
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid;
-  border-radius: 3px;
+  border-radius: ${sizes.borderRadius};
   color: ${(p: { warning?: boolean }) => (p.warning ? "#f7ca28" : "#fefefe")};
   border-color: ${p => (p.warning ? "rgba(247, 202, 40, 0.5)" : "rgba(255, 255, 255, 0.2)")};
   padding: 0.5rem 0.6rem;

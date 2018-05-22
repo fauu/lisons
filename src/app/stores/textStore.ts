@@ -31,6 +31,8 @@ export class TextStore {
 
   @computed
   public get indexIterator(): IterableIterator<TextIndexEntry> {
+    // FIXME: Texts disappear from library view when new added if this log statement is removed
+    console.log(Array.from(this._index.values()));
     return this._index.values();
   }
 

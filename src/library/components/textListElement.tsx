@@ -3,7 +3,7 @@ import * as path from "path";
 import * as React from "react";
 import styled from "styled-components";
 
-import { animations, colors, fonts } from "~/app/data/style";
+import { animations, colors, fonts, sizes } from "~/app/data/style";
 import { TextIndexEntry } from "~/app/model";
 import { AppStore } from "~/app/stores";
 import { getUserDataPath } from "~/util/fileUtils";
@@ -48,7 +48,7 @@ const Root = styled.div`
   height: 300px;
   animation: ${animations.fadeInBottom} ${animations.doubleTime};
   border: 2px solid ${colors.primary};
-  border-radius: 3px;
+  border-radius: ${sizes.borderRadius};
 
   transition: all 0.05s ${animations.stdFunction};
 
@@ -85,7 +85,6 @@ const Cover = styled.div`
 const AuthorAndTitle = styled.div`
   margin: 0 0.5rem;
   font-family: ${fonts.serif};
-  font-size: 1em;
 `;
 
 const Author = styled.div``;
@@ -93,20 +92,19 @@ const Author = styled.div``;
 const Title = styled.div`
   margin-bottom: 0.1rem;
   font-weight: bold;
-  font-size: 1.1em;
 `;
 
 const Bar = styled.div`
   position: absolute;
   bottom: 0;
-  height: 1.8rem;
   width: 100%;
-  padding: 0 0.3rem 0 0.5rem;
+  padding: 0.4rem 0.8rem;
   background: ${colors.secondary};
   color: ${colors.primary};
   border-top: 2px solid ${colors.accent};
   display: flex;
   justify-content: space-between;
+  font-size: 1.6rem;
   font-weight: bold;
 
   .mdi-icon {
@@ -119,7 +117,6 @@ const Progress = styled.span`
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  font-size: 0.7em;
 `;
 
 const Languages = styled.span`
@@ -127,13 +124,12 @@ const Languages = styled.span`
   text-align: center;
   display: flex;
   align-items: center;
-  font-size: 0.7em;
   text-transform: uppercase;
 `;
 
 const ArrowRight = styled(ArrowRightIcon)`
-  width: 20px;
-  padding: 1px 3px 0 3px;
+  width: 24px;
+  padding: 2px 3px 0 3px;
 `;
 
 const Actions = styled.span`

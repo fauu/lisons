@@ -5,7 +5,7 @@ import * as React from "react";
 import styled from "styled-components";
 
 import { Spinner } from "~/app/components";
-import { animations, colors, fonts } from "~/app/data/style";
+import { animations, colors, fonts, sizes } from "~/app/data/style";
 
 import { LanguageSelect } from "~/library/components";
 import { AddTextDialogStore } from "~/library/stores";
@@ -162,12 +162,10 @@ export class AddTextDialog extends React.Component<AddTextDialogProps> {
   };
 }
 
-const fieldMargin = "1.3rem";
+const fieldMargin = "1.8rem";
 
 const Form = styled.form`
   position: relative;
-  margin-top: 1rem;
-  font-size: 0.95em;
   ${(p: { disabled: boolean }) => (p.disabled ? "* { pointer-events: none; }" : ";")};
 
   input,
@@ -175,13 +173,12 @@ const Form = styled.form`
   button,
   textarea {
     display: block;
-    padding: 0.6rem;
-    margin-top: 0.5rem;
+    padding: 0.8rem 1rem;
+    margin-top: 0.8rem;
     color: ${colors.primary};
     background: ${colors.inputBg};
     border: 2px solid ${colors.primary};
-    border-radius: 3px;
-    font-size: 1em;
+    border-radius: ${sizes.borderRadius};
     transition: all 0.05s ${animations.stdFunction};
     &:disabled,
     &:hover:disabled {
@@ -214,7 +211,7 @@ const FieldGroup = styled.div`
   display: flex;
   justify-content: space-between;
   > label:nth-child(2) {
-    margin-left: 2rem;
+    margin-left: 3rem;
   }
 `;
 
@@ -225,12 +222,11 @@ const Field = styled.label`
 `;
 
 const Message = styled.div`
-  height: 1em;
+  height: 2rem;
   margin-bottom: ${fieldMargin};
 `;
 
 const MessageText = styled.span`
-  font-size: 0.9em;
   animation: ${animations.fadeIn} ${animations.std};
 `;
 
@@ -264,7 +260,7 @@ const ClearButton = styled<any, any>(CloseIcon)`
 const TextArea = styled.textarea`
   resize: none;
   margin-top: 0.7rem;
-  font: 1em ${fonts.serif};
+  font-family: ${fonts.serif} !important;
 `;
 
 const FinalFields = styled.div`
@@ -286,7 +282,7 @@ const AddTextButton = Button.extend`
   width: 100%;
   border: 3px solid ${colors.accent} !important;
   color: ${colors.accent} !important;
-  font-weight: bold;
+  font-weight: bold !important;
   transition: all 0.05s ${animations.stdFunction};
   &:hover {
     color: ${colors.accent2} !important;
@@ -299,8 +295,8 @@ const SelectedFileGroup = styled.span`
 `;
 
 const SelectedFileName = styled.span`
-  margin: 0 0.5rem 0 1rem;
-  max-width: 24.5rem;
+  margin: 0 0.5rem 0 2rem;
+  max-width: 40rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
