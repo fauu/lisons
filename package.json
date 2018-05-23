@@ -21,48 +21,10 @@
     "build:dev": "run-s clean-out webpack:dev",
     "build:prod": "run-s clean-out webpack:prod",
     "dev-server": "webpack-dev-server --config webpack.dev.js --progress",
-    "electron:dev": "cross-env NODE_ENV=dev electron .",
-    "dev-server-and-electron": "run-p dev-server electron:dev",
-    "dev": "run-s build:dev dev-server-and-electron",
-    "electron:prod": "electron .",
-    "prod": "run-s build:prod electron:prod",
-    "dist:linux": "electron-builder --linux --x64",
-    "dist:macos": "electron-builder --macos",
-    "dist:windows": "electron-builder --windows --x64",
-    "dist:all": "electron-builder --linux --macos --windows --x64 --publish never"
-  },
-  "build": {
-    "appId": "io.github.fauu.lisons",
-    "productName": "Lisons!",
-    "copyright": "Copyright © 2017—2018 Lisons authors",
-    "files": "out",
-    "extraFiles": "LICENSE.md",
-    "mac": {
-      "category": "public.app-category.education"
-    },
-    "linux": {
-      "description": "Desktop e-book reader for language learners.",
-      "synopsis": "A desktop e-book reader for language learners, which facilitates learning from reading by providing machine translations (DeepL, Google) as well as human-translated example sentences (Tatoeba, Reverso Context).",
-      "maintainer": "Piotr Grabowski <fau999@gmail.com>",
-      "vendor": "Piotr Grabowski <fau999@gmail.com>",
-      "target": [
-        "AppImage"
-      ],
-      "depends": [],
-      "category": "Education",
-      "packageCategory": "education"
-    },
-    "win": {
-      "target": "nsis"
-    },
-    "nsis": {
-      "oneClick": false,
-      "perMachine": true,
-      "allowToChangeInstallationDirectory": true
-    }
+    "dev": "run-s build:dev dev-server",
+    "prod": "run-s build:prod"
   },
   "devDependencies": {
-    "@types/electron-devtools-installer": "2.0.3",
     "@types/jszip": "3.1.3",
     "@types/kuromoji": "0.1.0",
     "@types/lodash": "4.14.109",
@@ -71,6 +33,7 @@
     "@types/react-css-transition-replace": "2.1.2",
     "@types/react-dom": "16.0.5",
     "@types/react-hot-loader": "4.1.0",
+    "add-asset-html-webpack-plugin": "^2.1.3",
     "babel-core": "6.26.3",
     "babel-loader": "7.1.4",
     "babel-polyfill": "6.26.0",
@@ -79,12 +42,10 @@
     "cache-loader": "1.2.2",
     "copy-webpack-plugin": "4.5.1",
     "cross-env": "5.1.5",
-    "electron": "2.0.1",
-    "electron-builder": "19.27.3",
     "file-loader": "1.1.11",
     "fork-ts-checker-webpack-plugin": "0.4.1",
     "happypack": "5.0.0",
-    "html-webpack-plugin": "3.2.0",
+    "html-webpack-plugin": "^3.2.0",
     "npm-run-all": "4.1.3",
     "prettier": "1.12.1",
     "rimraf": "2.6.2",
@@ -104,11 +65,8 @@
   },
   "dependencies": {
     "chinese-tokenizer": "2.0.0",
-    "electron-devtools-installer": "2.2.4",
-    "electron-localshortcut": "3.1.0",
     "franc-min": "3.1.1",
     "iconv-lite": "0.4.23",
-    "isbinaryfile": "3.0.2",
     "jschardet": "1.6.0",
     "jszip": "3.1.5",
     "kuromoji": "0.1.2",

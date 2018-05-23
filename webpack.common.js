@@ -1,59 +1,46 @@
-const path = require("path")
-const webpack = require("webpack")
-const CopyWebpackPlugin = require("copy-webpack-plugin")
-const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
-const HappyPack = require("happypack")
-const packageJson = require("./package.json")
+const path = require("path");
+const webpack = require("webpack");
+const AddAssetHtmlPlugin = require("add-asset-html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const HappyPack = require("happypack");
+const packageJson = require("./package.json");
 
-const outDirName = "out"
-const outPath = path.resolve(__dirname, outDirName)
-const srcDirName = "src"
-const srcPath = path.resolve(__dirname, srcDirName)
-const staticResPath = "./src/res/static"
-const browserIconPath = "./build/icons/128x128.png"
-const browserIconOutFilename = "icon.png"
-const htmlTemplatePath = path.join(srcDirName, "index.html")
-const rendererEntry = "./src/renderer.tsx"
+const outDirName = "out";
+const outPath = path.resolve(__dirname, outDirName);
+const srcDirName = "src";
+const srcPath = path.resolve(__dirname, srcDirName);
+const staticResPath = "./src/res/static";
+const browserIconPath = "./build/icons/128x128.png";
+const browserIconOutFilename = "icon.png";
+const htmlTemplatePath = path.join(srcDirName, "index.html");
+const entryFilename = "./src/index.tsx";
 const dllConfig = {
   dllRelativePath: "./dll",
   vendorBundleFilename: "vendor.bundle.js",
   vendorManifestFilename: "vendor-manifest.json"
-}
+};
 
-const mainConfig = {
-  target: "electron-main",
-  entry: { main: "./src/main.ts" },
-  output: {
-    filename: "main.bundle.js",
-    path: outPath
-  },
-  module: {
-    rules: [
-      {
-        test: /.ts$/,
-        use: ["cache-loader", "babel-loader", "ts-loader"],
-        include: srcPath
-      }
-    ]
-  },
-  resolve: {
-    extensions: [".js", ".ts", ".json"],
-    alias: {
-      "~": path.resolve("./src")
-    },
-    symlinks: false
-  },
-  plugins: [
-    new CopyWebpackPlugin([
-      { from: staticResPath },
-      { from: browserIconPath, to: browserIconOutFilename }
-    ])
-  ]
-}
+// module: {
+//   rules: [
+//     {
+//       test: /.ts$/,
+//       use: ["cache-loader", "babel-loader", "ts-loader"],
+//       include: srcPath
+//     }
+//   ]
+// },
 
-const rendererConfig = {
+// plugins: [
+//   new CopyWebpackPlugin([
+//     { from: staticResPath },
+//     { from: browserIconPath, to: browserIconOutFilename }
+//   ])
+// ]
+
+const config = {
   context: __dirname,
-  target: "electron-renderer",
   output: {
     filename: "renderer.bundle.js",
     path: outPath
@@ -94,16 +81,20 @@ const rendererConfig = {
       ]
     }),
     new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true, watch: ["./src"] }),
-    new webpack.NoEmitOnErrorsPlugin()
+    new webpack.NoEmitOnErrorsPlugin(),
+    new HtmlWebpackPlugin({
+      template: "./src/index.html",
+      filename: "./index.html"
+    }),
+    new AddAssetHtmlPlugin({ filepath: "./dll/vendor.bundle.js", includeSourcemap: false })
   ]
-}
+};
 
 module.exports = {
-  mainConfig,
-  rendererConfig,
+  config,
   outDirName,
   srcPath,
   htmlTemplatePath,
-  rendererEntry,
+  entryFilename,
   dllConfig
-}
+};
