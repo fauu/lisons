@@ -1,4 +1,3 @@
-import { shell } from "electron";
 import { BetaIcon } from "mdi-react";
 import { observer } from "mobx-react";
 import * as React from "react";
@@ -38,9 +37,7 @@ export const Library = observer(function _Library({ appStore }: LibraryProps): J
       <VersionPanel>
         {isNewVersionAvailable && (
           <span>
-            <NewVersionMessage onClick={() => shell.openExternal(AppStore.websiteUrl)}>
-              New version available!
-            </NewVersionMessage>
+            <NewVersionMessage>New version available!</NewVersionMessage>
             <Separator />
           </span>
         )}

@@ -1,17 +1,14 @@
-import { remote } from "electron";
 import * as iconv from "iconv-lite";
 import jschardet = require("jschardet");
 import { debounce } from "lodash";
 import { action, computed, observable, reaction, runInAction } from "mobx";
 import { IPromiseBasedObservable } from "mobx-utils";
-import * as path from "path";
 
 import { isUtf8 } from "~/vendor/is-utf8";
 
 import { AddTextFormData, Language } from "~/app/model";
 import { SettingsStore, TextStore } from "~/app/stores";
 import { metadataFromEpub } from "~/app/textProcessing";
-import { fileSize, isBufferText, readFile } from "~/util/fileUtils";
 import { languageFromCode6393, languageFromCodeGt } from "~/util/languageUtils";
 import { detectLanguage } from "~/util/textUtils";
 
@@ -75,11 +72,11 @@ export class AddTextDialogStore {
 
   // TODO: Cleanup
   @action
-  public async processFile(filePath: string): Promise<void> {
+  public async processFile(_filePath: string): Promise<void> {
     this.isProcessingFile = true;
     try {
-      const fileBuffer = await readFile(filePath);
-      runInAction(() => (this.fileBuffer = fileBuffer));
+      // const fileBuffer = await readFile(filePath);
+      // runInAction(() => (this.fileBuffer = fileBuffer));
       if (this.fileBuffer) {
         const fileMetadata = await metadataFromEpub(this.fileBuffer);
         runInAction(() => (this.fileMetadata = fileMetadata));
@@ -90,8 +87,9 @@ export class AddTextDialogStore {
       // skip
     }
     const isFilePlaintext = this.fileBuffer
-      ? await isBufferText(this.fileBuffer, await fileSize(filePath))
-      : false;
+      ? false
+      : // ? await isBufferText(this.fileBuffer, await fileSize(filePath))
+        false;
     if (this.fileBuffer && isFilePlaintext) {
       this.filePlaintext = isUtf8(this.fileBuffer)
         ? this.fileBuffer.toString()
@@ -175,22 +173,7 @@ export class AddTextDialogStore {
 
   public handleLoadFileButtonClick = action(() => {
     this._isPickingFile = true;
-    remote.dialog.showOpenDialog(
-      {
-        properties: ["openFile"]
-      },
-      action(filePaths => {
-        this._isPickingFile = false;
-        if (!filePaths) {
-          return;
-        }
-        const filePath = filePaths.toString();
-        this.updateFormData({
-          title: path.basename(filePath, path.extname(filePath)),
-          filePath
-        });
-      })
-    );
+    this._isPickingFile = true;
   });
 
   public handleAddTextButtonClick = action(async () => {

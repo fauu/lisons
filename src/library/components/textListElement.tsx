@@ -1,16 +1,11 @@
 import { ArrowRightIcon, DeleteIcon } from "mdi-react";
-import * as path from "path";
 import * as React from "react";
 import styled from "styled-components";
 
 import { animations, colors, fonts, sizes } from "~/app/data/style";
 import { TextIndexEntry } from "~/app/model";
 import { AppStore } from "~/app/stores";
-import { getUserDataPath } from "~/util/fileUtils";
 import { formatPercentage } from "~/util/formatUtils";
-
-// TODO: Figure out how to handle this better
-const userDataPath = getUserDataPath();
 
 interface TextListElementProps {
   appStore: AppStore;
@@ -21,7 +16,7 @@ interface TextListElementProps {
 export function TextListElement({ appStore, entry }: TextListElementProps): JSX.Element {
   return (
     <Root key={entry.id}>
-      <Cover coverPath={entry.coverPath && path.join(userDataPath, entry.coverPath)}>
+      <Cover coverPath={":-DDD"}>
         {!entry.coverPath && (
           <AuthorAndTitle>
             <Author>{entry.author}</Author>

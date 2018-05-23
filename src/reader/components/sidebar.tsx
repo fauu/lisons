@@ -1,4 +1,3 @@
-import { shell } from "electron";
 import { observer } from "mobx-react";
 import * as React from "react";
 import styled from "styled-components";
@@ -53,10 +52,7 @@ export const Sidebar = observer(function _Sidebar({
                 <Sources>
                   {sources.map(([category, source]) => (
                     <Source key={category}>
-                      {category}:{" "}
-                      <SourceLink onClick={() => shell.openExternal(source.url)}>
-                        {source.name}
-                      </SourceLink>
+                      {category}: <SourceLink>{source.name}</SourceLink>
                     </Source>
                   ))}
                 </Sources>

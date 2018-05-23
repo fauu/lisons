@@ -1,4 +1,3 @@
-import { shell } from "electron";
 import * as React from "react";
 import styled from "styled-components";
 
@@ -13,7 +12,7 @@ export function ExampleSentenceList({ sentences }: ExampleSentenceListProps): JS
   const translationsRtl = (sentences.data[0].translationsLanguage.flags & LanguageFlag.Rtl) > 0;
   return (
     <Root>
-      <SourceLink onClick={() => shell.openExternal(sentences.sourceUrl)}>
+      <SourceLink>
         View at <Domain>{sentences.sourceDomain}</Domain>
       </SourceLink>
       <List>

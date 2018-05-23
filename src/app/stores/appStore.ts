@@ -1,6 +1,4 @@
-import { remote } from "electron";
 import { action, computed, observable, runInAction } from "mobx";
-import * as path from "path";
 
 import { LibraryStore } from "~/library/stores";
 import { ReaderStore } from "~/reader/stores";
@@ -12,10 +10,8 @@ import { xhr } from "~/app/xhr";
 export class AppStore {
   public static readonly websiteUrl = "https://fauu.github.io/lisons";
   private static readonly websiteDataPath = "/data.json";
-  private static readonly settingsFilename = "settings.json";
+  // private static readonly settingsFilename = "settings.json";
   private static readonly startInReader = false;
-
-  public readonly userDataPath = remote.app.getPath("userData");
 
   @observable private _activeScreen?: AppScreen;
   @observable private _isFullScreen: boolean = false;
@@ -41,7 +37,8 @@ export class AppStore {
 
   public async init(): Promise<void> {
     this._settingsStore = new SettingsStore(
-      path.join(this.userDataPath, AppStore.settingsFilename)
+      // path.join(this.userDataPath, AppStore.settingsFilename)
+      ":-DDD"
     );
     this._settingsStore.init();
     this._textStore = new TextStore();
@@ -73,9 +70,10 @@ export class AppStore {
 
   @action
   public toggleFullScreen(): void {
-    const win = remote.getCurrentWindow();
-    this._isFullScreen = !win.isFullScreen();
-    win.setFullScreen(this._isFullScreen);
+    // FIXME
+    // const win = remote.getCurrentWindow();
+    // this._isFullScreen = !win.isFullScreen();
+    // win.setFullScreen(this._isFullScreen);
   }
 
   private async fetchCurrentVersion(): Promise<void> {

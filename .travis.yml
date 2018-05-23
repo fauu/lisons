@@ -31,10 +31,11 @@ before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
 
 after_success:
-  - find dist/*.AppImage -exec ./utilities/dropbox_uploader.sh upload {} / \; 
-  - find dist/*.dmg -exec ./utilities/dropbox_uploader.sh upload {} / \; 
-  - find dist/*.exe -exec ./utilities/dropbox_uploader.sh upload {} / \; 
+  - find dist/*.AppImage -exec ./utilities/dropbox_uploader.sh upload {} / \;
+  - find dist/*.dmg -exec ./utilities/dropbox_uploader.sh upload {} / \;
+  - find dist/*.exe -exec ./utilities/dropbox_uploader.sh upload {} / \;
 
 branches:
   except:
     - "/^v\\d+\\.\\d+\\.\\d+$/"
+    - "pwa"

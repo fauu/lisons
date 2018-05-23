@@ -1,6 +1,5 @@
 import { CloseIcon } from "mdi-react";
 import { observer } from "mobx-react";
-import * as path from "path";
 import * as React from "react";
 import styled from "styled-components";
 
@@ -44,7 +43,7 @@ export class AddTextDialog extends React.Component<AddTextDialogProps> {
         </Button>
         {filePath && (
           <SelectedFileGroup>
-            <SelectedFileName>{path.basename(filePath)}</SelectedFileName>
+            <SelectedFileName>:-DDD</SelectedFileName>
             <ClearButton onClick={this.handleDiscardSelectedFileButtonClick} />
           </SelectedFileGroup>
         )}

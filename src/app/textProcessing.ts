@@ -1,11 +1,8 @@
 import * as zip from "jszip";
-import * as path from "path";
 
 import { Language, TextChunkMap, TextSectionTree, TextSectionTreeNode } from "~/app/model";
-import { getWrapWordsInTagsFn } from "~/app/tokenization";
 
 import { TextFileMetadata } from "~/library/model";
-import { ensurePathExists, writeFile } from "~/util/fileUtils";
 
 interface OpfMetadata {
   title?: string;
@@ -13,24 +10,24 @@ interface OpfMetadata {
   language?: string;
 }
 
-interface OpfManifest {
-  items: OpfItem[];
-}
+// interface OpfManifest {
+//   items: OpfItem[];
+// }
 
-interface OpfItem {
-  id: string;
-  mediaType: string;
-  href: string;
-}
+// interface OpfItem {
+//   id: string;
+//   mediaType: string;
+//   href: string;
+// }
 
-interface OpfSpine {
-  toc?: string;
-  itemRefs: OpfItemRef[];
-}
+// interface OpfSpine {
+//   toc?: string;
+//   itemRefs: OpfItemRef[];
+// }
 
-interface OpfItemRef {
-  idRef: string;
-}
+// interface OpfItemRef {
+//   idRef: string;
+// }
 
 const { parseXml } = new class {
   private parser?: DOMParser;
@@ -46,23 +43,23 @@ const { parseXml } = new class {
 // TODO: Single dispatch fucntion for storePlaintextContent and storeEpubContent?
 
 export const storePlaintextContent = async (
-  textPath: string,
-  plaintext: string,
-  contentLanguage: Language
+  _textPath: string,
+  _plaintext: string,
+  _contentLanguage: Language
 ): Promise<TextChunkMap> => {
-  const [newContent, wordCount] = await getWrapWordsInTagsFn(contentLanguage)(plaintext);
-  writeFile<string>(
-    path.join(textPath, "content.html"),
-    `<html>
-      <head>
-        <meta charset='utf-8' />
-      </head>
-      <body>
-        ${newContent}
-      </body>
-     </html>`
-  );
-  return [{ id: "content", href: "content.html", wordCount, startWordNo: 0 }];
+  // const [newContent, wordCount] = await getWrapWordsInTagsFn(contentLanguage)(plaintext);
+  // writeFile<string>(
+  //   path.join(textPath, "content.html"),
+  //   `<html>
+  //     <head>
+  //       <meta charset='utf-8' />
+  //     </head>
+  //     <body>
+  //       ${newContent}
+  //     </body>
+  //    </html>`
+  // );
+  return [{ id: "content", href: "content.html", wordCount: 9, startWordNo: 0 }];
 };
 
 export const metadataFromEpub = async (buffer: Buffer): Promise<TextFileMetadata> => {
@@ -76,90 +73,90 @@ export const metadataFromEpub = async (buffer: Buffer): Promise<TextFileMetadata
 };
 
 export const storeEpubContent = async (
-  textPath: string,
-  buffer: Buffer,
-  contentLanguage: Language
+  _textPath: string,
+  _buffer: Buffer,
+  _contentLanguage: Language
 ): Promise<[string | undefined, TextChunkMap, TextSectionTree | undefined]> => {
-  const archive = await zip.loadAsync(buffer);
+  // const archive = await zip.loadAsync(buffer);
 
-  const opfPath = await getOpfPath(archive);
-  const opfFragment = await getOpfFragment(archive, opfPath);
-  const opfManifest = getOpfManifest(opfFragment, [
-    "application/xhtml+xml",
-    "application/x-dtbncx+xml"
-  ]);
-  const opfSpine = getOpfSpine(opfFragment);
-  const itemsDir = path.dirname(opfPath);
+  // const opfPath = await getOpfPath(archive);
+  // const opfFragment = await getOpfFragment(archive, opfPath);
+  // const opfManifest = getOpfManifest(opfFragment, [
+  //   "application/xhtml+xml",
+  //   "application/x-dtbncx+xml"
+  // ]);
+  // const opfSpine = getOpfSpine(opfFragment);
+  // const itemsDir = path.dirname(opfPath);
 
-  const serializer = new XMLSerializer();
-  const wrapWordsInTags = getWrapWordsInTagsFn(contentLanguage);
+  // const serializer = new XMLSerializer();
+  // const wrapWordsInTags = getWrapWordsInTagsFn(contentLanguage);
 
-  const textChunkMap: TextChunkMap = [];
-  let coverPath;
+  // const textChunkMap: TextChunkMap = [];
+  // let coverPath;
 
-  for (const item of opfManifest.items) {
-    const itemPath = path.join(textPath, item.href);
-    await ensurePathExists(path.dirname(itemPath));
-    const itemFile = archive.file(path.join(itemsDir, item.href));
+  // for (const item of opfManifest.items) {
+  //   const itemPath = path.join(textPath, item.href);
+  //   await ensurePathExists(path.dirname(itemPath));
+  //   const itemFile = archive.file(path.join(itemsDir, item.href));
 
-    if (item.mediaType !== "application/xhtml+xml") {
-      if (item.id.includes("cover")) {
-        coverPath = item.href;
-      }
-      writeFile<Buffer>(itemPath, await itemFile.async("nodebuffer"));
-    } else {
-      let chunkWordCount = 0;
-      const itemHtmlContent = await itemFile.async("text");
-      const itemHtmlDocument = parseXml(itemHtmlContent, "text/xml");
+  //   if (item.mediaType !== "application/xhtml+xml") {
+  //     if (item.id.includes("cover")) {
+  //       coverPath = item.href;
+  //     }
+  //     writeFile<Buffer>(itemPath, await itemFile.async("nodebuffer"));
+  //   } else {
+  //     let chunkWordCount = 0;
+  //     const itemHtmlContent = await itemFile.async("text");
+  //     const itemHtmlDocument = parseXml(itemHtmlContent, "text/xml");
 
-      itemHtmlDocument.head.innerHTML =
-        "<meta charset='utf-8' />" + itemHtmlDocument.head.innerHTML;
+  //     itemHtmlDocument.head.innerHTML =
+  //       "<meta charset='utf-8' />" + itemHtmlDocument.head.innerHTML;
 
-      const treeWalker = document.createTreeWalker(
-        itemHtmlDocument.body,
-        NodeFilter.SHOW_TEXT,
-        { acceptNode: _ => NodeFilter.FILTER_ACCEPT },
-        false
-      );
-      while (treeWalker.nextNode()) {
-        const node = treeWalker.currentNode;
-        if (!node.textContent || node.textContent.trim() === "") {
-          continue;
-        }
-        const [newTextContent, wordCount] = await wrapWordsInTags(node.textContent);
-        node.textContent = newTextContent;
-        chunkWordCount += wordCount;
-      }
+  //     const treeWalker = document.createTreeWalker(
+  //       itemHtmlDocument.body,
+  //       NodeFilter.SHOW_TEXT,
+  //       { acceptNode: _ => NodeFilter.FILTER_ACCEPT },
+  //       false
+  //     );
+  //     while (treeWalker.nextNode()) {
+  //       const node = treeWalker.currentNode;
+  //       if (!node.textContent || node.textContent.trim() === "") {
+  //         continue;
+  //       }
+  //       const [newTextContent, wordCount] = await wrapWordsInTags(node.textContent);
+  //       node.textContent = newTextContent;
+  //       chunkWordCount += wordCount;
+  //     }
 
-      let newItemHtmlContent = serializer.serializeToString(itemHtmlDocument);
-      newItemHtmlContent = newItemHtmlContent.replace(/&gt;/g, ">");
-      newItemHtmlContent = newItemHtmlContent.replace(/&lt;/g, "<");
+  //     let newItemHtmlContent = serializer.serializeToString(itemHtmlDocument);
+  //     newItemHtmlContent = newItemHtmlContent.replace(/&gt;/g, ">");
+  //     newItemHtmlContent = newItemHtmlContent.replace(/&lt;/g, "<");
 
-      textChunkMap.push({
-        id: item.id,
-        href: item.href,
-        wordCount: chunkWordCount,
-        startWordNo: -1
-      });
-      writeFile<string>(itemPath, newItemHtmlContent);
-    }
-  }
+  //     textChunkMap.push({
+  //       id: item.id,
+  //       href: item.href,
+  //       wordCount: chunkWordCount,
+  //       startWordNo: -1
+  //     });
+  //     writeFile<string>(itemPath, newItemHtmlContent);
+  //   }
+  // }
 
-  textChunkMap.sort(
-    (a, b) =>
-      opfSpine.itemRefs.findIndex(ref => ref.idRef === a.id) -
-      opfSpine.itemRefs.findIndex(ref => ref.idRef === b.id)
-  );
+  // textChunkMap.sort(
+  //   (a, b) =>
+  //     opfSpine.itemRefs.findIndex(ref => ref.idRef === a.id) -
+  //     opfSpine.itemRefs.findIndex(ref => ref.idRef === b.id)
+  // );
 
-  let currentWordCount = 0;
-  textChunkMap.forEach(chunk => {
-    chunk.startWordNo = currentWordCount;
-    currentWordCount += chunk.wordCount;
-  });
+  // let currentWordCount = 0;
+  // textChunkMap.forEach(chunk => {
+  //   chunk.startWordNo = currentWordCount;
+  //   currentWordCount += chunk.wordCount;
+  // });
 
-  const sectionTree = await getSectionTree(archive, opfManifest, opfSpine, itemsDir);
+  // const sectionTree = await getSectionTree(archive, opfManifest, opfSpine, itemsDir);
 
-  return [coverPath, textChunkMap, sectionTree];
+  return [undefined, [{ id: ":-DDD", href: ":-DDD", wordCount: 9, startWordNo: 9 }], undefined];
 };
 
 const getOpfPath = async (archive: zip): Promise<string> => {
@@ -199,40 +196,40 @@ const getOpfMetadata = (fragment: DocumentFragment): OpfMetadata => {
   return opfMetadata;
 };
 
-const getOpfManifest = (fragment: DocumentFragment, acceptedMediaTypes: string[]): OpfManifest => {
-  const items = Array.from(fragment.querySelectorAll("manifest item"))
-    .map(itemElement => {
-      const mediaType = itemElement.getAttribute("media-type") || "";
-      const id = itemElement.getAttribute("id");
-      if (acceptedMediaTypes.includes(mediaType) || id === "ncx" || (id && id.includes("cover"))) {
-        const href = itemElement.getAttribute("href");
-        return id !== null && href !== null ? { id, mediaType, href } : undefined;
-      }
-      return undefined;
-    })
-    .filter(item => item !== undefined);
-  return { items: items as OpfItem[] };
-};
+// const getOpfManifest = (fragment: DocumentFragment, acceptedMediaTypes: string[]): OpfManifest => {
+//   const items = Array.from(fragment.querySelectorAll("manifest item"))
+//     .map(itemElement => {
+//       const mediaType = itemElement.getAttribute("media-type") || "";
+//       const id = itemElement.getAttribute("id");
+//       if (acceptedMediaTypes.includes(mediaType) || id === "ncx" || (id && id.includes("cover"))) {
+//         const href = itemElement.getAttribute("href");
+//         return id !== null && href !== null ? { id, mediaType, href } : undefined;
+//       }
+//       return undefined;
+//     })
+//     .filter(item => item !== undefined);
+//   return { items: items as OpfItem[] };
+// };
 
-const getOpfSpine = (fragment: DocumentFragment): OpfSpine => {
-  const spineElement = fragment.querySelector("spine");
-  if (!spineElement) {
-    throw new Error("The OPF file is spineless");
-  }
-  let tocValue: string | null | undefined = spineElement.getAttribute("toc");
-  if (!tocValue || tocValue === "") {
-    tocValue = undefined;
-    console.warn("Spine has no toc reference");
-  }
+// const getOpfSpine = (fragment: DocumentFragment): OpfSpine => {
+//   const spineElement = fragment.querySelector("spine");
+//   if (!spineElement) {
+//     throw new Error("The OPF file is spineless");
+//   }
+//   let tocValue: string | null | undefined = spineElement.getAttribute("toc");
+//   if (!tocValue || tocValue === "") {
+//     tocValue = undefined;
+//     console.warn("Spine has no toc reference");
+//   }
 
-  const itemRefs = Array.from(fragment.querySelectorAll("spine itemref"))
-    .map(itemRefElement => ({ idRef: itemRefElement.getAttribute("idref") }))
-    .filter(itemRef => itemRef.idRef !== null);
-  return {
-    toc: tocValue,
-    itemRefs: itemRefs as OpfItemRef[]
-  };
-};
+//   const itemRefs = Array.from(fragment.querySelectorAll("spine itemref"))
+//     .map(itemRefElement => ({ idRef: itemRefElement.getAttribute("idref") }))
+//     .filter(itemRef => itemRef.idRef !== null);
+//   return {
+//     toc: tocValue,
+//     itemRefs: itemRefs as OpfItemRef[]
+//   };
+// };
 
 const parseTocNavLabel = (navLabel: Element): string | undefined => {
   if (navLabel.children.length !== 1) {
@@ -293,47 +290,47 @@ const parseTocNavPoint = (navPoint: Element): TextSectionTreeNode | undefined =>
   return textSectionTreeNode as TextSectionTreeNode;
 };
 
-const parseTocNavMap = async (navMap: Element): Promise<TextSectionTree> => {
-  const topLevelNodes = [];
-  for (const childEl of navMap.children) {
-    if (childEl.tagName.toLowerCase() !== "navpoint") {
-      console.warn(`Encountered unexpected element '${childEl.tagName}' inside <navMap>`);
-      continue;
-    }
-    const navPoint = parseTocNavPoint(childEl);
-    if (navPoint) {
-      topLevelNodes.push(navPoint);
-    }
-  }
-  return { root: { label: "root", contentFilePath: "/", children: topLevelNodes } };
-};
+// const parseTocNavMap = async (navMap: Element): Promise<TextSectionTree> => {
+//   const topLevelNodes = [];
+//   for (const childEl of navMap.children) {
+//     if (childEl.tagName.toLowerCase() !== "navpoint") {
+//       console.warn(`Encountered unexpected element '${childEl.tagName}' inside <navMap>`);
+//       continue;
+//     }
+//     const navPoint = parseTocNavPoint(childEl);
+//     if (navPoint) {
+//       topLevelNodes.push(navPoint);
+//     }
+//   }
+//   return { root: { label: "root", contentFilePath: "/", children: topLevelNodes } };
+// };
 
-const getSectionTree = async (
-  archive: zip,
-  manifest: OpfManifest,
-  spine: OpfSpine,
-  itemsDir: string
-): Promise<TextSectionTree | undefined> => {
-  if (!spine.toc) {
-    return;
-  }
-  const tocItem = manifest.items.find(item => item.id === spine.toc);
-  if (!tocItem) {
-    console.warn("Manifest has no TOC item despite the spine having TOC reference");
-    return;
-  }
-  const tocPath = path.join(itemsDir, tocItem.href);
-  const tocFile = archive.file(tocPath);
-  if (!tocFile) {
-    console.warn("Referenced TOC file not found");
-    return;
-  }
-  const tocContent = await tocFile.async("text");
-  const tocDocument = parseXml(tocContent, "text/xml");
-  const navMapElement = tocDocument.querySelector("navMap");
-  if (!navMapElement) {
-    console.warn("TOC has no 'navMap' element");
-    return;
-  }
-  return parseTocNavMap(navMapElement);
-};
+// const getSectionTree = async (
+//   archive: zip,
+//   manifest: OpfManifest,
+//   spine: OpfSpine,
+//   itemsDir: string
+// ): Promise<TextSectionTree | undefined> => {
+//   if (!spine.toc) {
+//     return;
+//   }
+//   const tocItem = manifest.items.find(item => item.id === spine.toc);
+//   if (!tocItem) {
+//     console.warn("Manifest has no TOC item despite the spine having TOC reference");
+//     return;
+//   }
+//   const tocPath = path.join(itemsDir, tocItem.href);
+//   const tocFile = archive.file(tocPath);
+//   if (!tocFile) {
+//     console.warn("Referenced TOC file not found");
+//     return;
+//   }
+//   const tocContent = await tocFile.async("text");
+//   const tocDocument = parseXml(tocContent, "text/xml");
+//   const navMapElement = tocDocument.querySelector("navMap");
+//   if (!navMapElement) {
+//     console.warn("TOC has no 'navMap' element");
+//     return;
+//   }
+//   return parseTocNavMap(navMapElement);
+// };
