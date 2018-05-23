@@ -12,17 +12,17 @@
   },
   "main": "out/main.bundle.js",
   "scripts": {
-    "postinstall": "run-s clean-cache webpack:dev.renderer-vendor",
+    "postinstall": "run-s clean-cache webpack:dev.vendor",
     "clean-out": "rimraf out",
     "clean-cache": "rimraf .cache-loader",
-    "webpack:dev": "webpack --config webpack.dev.js",
-    "webpack:dev.renderer-vendor": "webpack --config webpack.dev.renderer-vendor.js",
-    "webpack:prod": "webpack --config webpack.prod.js",
-    "build:dev": "run-s clean-out webpack:dev",
-    "build:prod": "run-s clean-out webpack:prod",
+    "dev": "run-s dev-server",
+    "prod": "run-s build:prod",
     "dev-server": "webpack-dev-server --config webpack.dev.js --progress",
-    "dev": "run-s build:dev dev-server",
-    "prod": "run-s build:prod"
+    "build:prod": "run-s clean-out webpack:prod",
+    "build:dev": "run-s clean-out webpack:dev",
+    "webpack:dev": "webpack --config webpack.dev.js --progress",
+    "webpack:dev.vendor": "webpack --config webpack.dev.vendor.js",
+    "webpack:prod": "webpack --config webpack.prod.js --progress"
   },
   "devDependencies": {
     "@types/jszip": "3.1.3",

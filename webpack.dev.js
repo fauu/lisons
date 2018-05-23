@@ -1,84 +1,51 @@
 const fs = require("fs");
 const path = require("path");
 const webpack = require("webpack");
-const merge = require("webpack-merge");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+
+const AddAssetHtmlPlugin = require("add-asset-html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+const merge = require("webpack-merge");
 
 const common = require("./webpack.common");
 
-const mode = "development";
 const devServerHost = "localhost";
 const devServerPort = 3000;
 const devServerUrl = `http://${devServerHost}:${devServerPort}/`;
 
-const templateContent = () => {
-  const html = fs.readFileSync(path.resolve(process.cwd(), common.htmlTemplatePath)).toString();
-  const bodyClosingStart = html.indexOf("</body>");
-  return `
-    ${html.substring(0, bodyClosingStart)}
-    <script
-       type="text/javascript"
-       src="${devServerUrl}${common.dllConfig.vendorBundleFilename}">
-    </script>
-    <script
-       type="text/javascript"
-       src="${devServerUrl}${common.rendererConfig.output.filename}">
-    </script>
-    ${html.substring(bodyClosingStart)}
-  `;
-};
-
-// plugins: [
-//   new webpack.DefinePlugin({
-//     "process.env": {
-//       NODE_ENV: JSON.stringify("dev")
-//     }
-//   }),
-//   new HtmlWebpackPlugin({
-//     templateContent: templateContent(),
-//     inject: false
-//   })
-// ]
-
 const config = merge(common.config, {
-  mode,
+  mode: "development",
   entry: [
     "babel-polyfill",
     `webpack-dev-server/client?${devServerUrl}`,
     "webpack/hot/only-dev-server",
-    common.entryFilename
+    common.entry
   ],
   output: {
-    globalObject: "this", // Needed for worker-loader
     publicPath: common.devServerUrl
   },
   plugins: [
-    // new CopyWebpackPlugin([
-    //   {
-    //     from: path.join(
-    //       __dirname,
-    //       common.dllConfig.dllRelativePath,
-    //       common.dllConfig.vendorBundleFilename
-    //     )
-    //   }
-    // ]),
+    new webpack.DefinePlugin({
+      "process.env": {
+        NODE_ENV: JSON.stringify("dev")
+      }
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(),
     new webpack.DllReferencePlugin({
       context: __dirname,
-      manifest: require(path.join(
-        __dirname,
-        common.dllConfig.dllRelativePath,
-        common.dllConfig.vendorManifestFilename
-      ))
+      manifest: require(path.join(__dirname, common.dllConfig.vendorManifestRelativePath))
+    }),
+    new AddAssetHtmlPlugin({
+      filepath: common.dllConfig.vendorBundleRelativePath,
+      includeSourcemap: false
     })
     //new BundleAnalyzerPlugin()
   ],
   devServer: {
     host: devServerHost,
     port: devServerPort,
-    contentBase: path.join(__dirname, "out"),
+    contentBase: path.join(__dirname, common.outDirName),
     hot: true
   }
 });

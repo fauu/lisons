@@ -1,10 +1,10 @@
-const path = require("path")
-const webpack = require("webpack")
+const path = require("path");
+const webpack = require("webpack");
 
-const common = require("./webpack.common")
+const common = require("./webpack.common");
 
 module.exports = {
-  context: process.cwd(),
+  context: __dirname,
   mode: "development",
   resolve: {
     modules: [__dirname, "node_modules"]
@@ -33,11 +33,7 @@ module.exports = {
   plugins: [
     new webpack.DllPlugin({
       name: "vendor_lib",
-      path: path.join(
-        __dirname,
-        common.dllConfig.dllRelativePath,
-        common.dllConfig.vendorManifestFilename
-      )
+      path: path.join(__dirname, common.dllConfig.vendorBundleRelativePath)
     })
   ]
-}
+};

@@ -1,48 +1,38 @@
 const path = require("path");
 const webpack = require("webpack");
-const AddAssetHtmlPlugin = require("add-asset-html-webpack-plugin");
+
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 const HappyPack = require("happypack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+
 const packageJson = require("./package.json");
 
+const bundleFilename = "main.bundle.js";
 const outDirName = "out";
 const outPath = path.resolve(__dirname, outDirName);
 const srcDirName = "src";
-const srcPath = path.resolve(__dirname, srcDirName);
-const staticResPath = "./src/res/static";
+const staticResPath = "./src/res/static"; // TODO: Move out of `src`?
 const browserIconPath = "./build/icons/128x128.png";
 const browserIconOutFilename = "icon.png";
 const htmlTemplatePath = path.join(srcDirName, "index.html");
-const entryFilename = "./src/index.tsx";
+const entry = "./src/index.tsx";
+
+const dllRelativePath = "./dll";
+const vendorBundleFilename = "vendor.bundle.js";
+const vendorManifestFilename = "vendor-manifest.json";
 const dllConfig = {
-  dllRelativePath: "./dll",
-  vendorBundleFilename: "vendor.bundle.js",
-  vendorManifestFilename: "vendor-manifest.json"
+  dllRelativePath,
+  vendorBundleFilename,
+  vendorBundleRelativePath: path.join(dllRelativePath, vendorBundleFilename),
+  vendorManifestFilename,
+  vendorManifestRelativePath: path.join(dllRelativePath, vendorManifestFilename)
 };
-
-// module: {
-//   rules: [
-//     {
-//       test: /.ts$/,
-//       use: ["cache-loader", "babel-loader", "ts-loader"],
-//       include: srcPath
-//     }
-//   ]
-// },
-
-// plugins: [
-//   new CopyWebpackPlugin([
-//     { from: staticResPath },
-//     { from: browserIconPath, to: browserIconOutFilename }
-//   ])
-// ]
 
 const config = {
   context: __dirname,
   output: {
-    filename: "renderer.bundle.js",
+    filename: bundleFilename,
     path: outPath
   },
   module: {
@@ -60,7 +50,7 @@ const config = {
   resolve: {
     extensions: [".js", ".ts", ".tsx"],
     alias: {
-      "~": path.resolve("./src")
+      "~": path.resolve(srcDirName)
     },
     symlinks: false
   },
@@ -68,6 +58,10 @@ const config = {
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(packageJson.version)
     }),
+    new CopyWebpackPlugin([
+      { from: staticResPath },
+      { from: browserIconPath, to: browserIconOutFilename }
+    ]),
     new HappyPack({
       id: "ts",
       threads: 2,
@@ -80,21 +74,17 @@ const config = {
         }
       ]
     }),
-    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true, watch: ["./src"] }),
-    new webpack.NoEmitOnErrorsPlugin(),
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true, watch: [srcDirName] }),
     new HtmlWebpackPlugin({
-      template: "./src/index.html",
-      filename: "./index.html"
+      template: htmlTemplatePath
     }),
-    new AddAssetHtmlPlugin({ filepath: "./dll/vendor.bundle.js", includeSourcemap: false })
+    new webpack.NoEmitOnErrorsPlugin()
   ]
 };
 
 module.exports = {
   config,
   outDirName,
-  srcPath,
-  htmlTemplatePath,
-  entryFilename,
+  entry,
   dllConfig
 };

@@ -1,17 +1,15 @@
-const path = require("path")
-const webpack = require("webpack")
-const merge = require("webpack-merge")
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin")
-const HtmlWebpackPlugin = require("html-webpack-plugin")
-const common = require("./webpack.common")
+const path = require("path");
+const webpack = require("webpack");
 
-const mode = "production"
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const merge = require("webpack-merge");
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 
-const mainConfig = merge(common.mainConfig, {
-  mode: mode,
-  node: {
-    __dirname: false
-  },
+const common = require("./webpack.common");
+
+module.exports = merge(common.config, {
+  mode: "production",
+  entry: ["babel-polyfill", common.entry],
   plugins: [
     new webpack.DefinePlugin({
       "process.env": {
@@ -19,23 +17,6 @@ const mainConfig = merge(common.mainConfig, {
       }
     }),
     new webpack.optimize.ModuleConcatenationPlugin(),
-    new UglifyJsPlugin()
+    new UglifyJsPlugin({ parallel: true })
   ]
-})
-
-const rendererConfig = merge(common.rendererConfig, {
-  mode: mode,
-  entry: ["babel-polyfill", common.rendererEntry],
-  plugins: [
-    new webpack.DefinePlugin({
-      "process.env": {
-        NODE_ENV: JSON.stringify("production")
-      }
-    }),
-    new webpack.optimize.ModuleConcatenationPlugin(),
-    new HtmlWebpackPlugin({ template: common.htmlTemplatePath }),
-    new UglifyJsPlugin()
-  ]
-})
-
-module.exports = [mainConfig, rendererConfig]
+});
