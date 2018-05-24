@@ -10,6 +10,7 @@ import {
 import { storeEpubContent, storePlaintextContent } from "~/app/textProcessing";
 
 export class TextStore {
+  // XXX: mobx 4.3.0 _entries.entries()
   private _entries: ObservableMap<string, TextIndexEntry> = observable.map<string, TextIndexEntry>(
     undefined,
     { deep: false }
