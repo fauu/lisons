@@ -136,6 +136,7 @@
       font-family: 'Fira Mono', monospace;
       font-weight: 500;
       font-size: 0.95em;
+      padding-top: 20px;
     }
 
     .screenshot {
@@ -185,6 +186,11 @@
 
     .download-section__os-icon--macos {
       width: 5rem;
+    }
+
+    .download-section__text {
+      display: flex;
+      align-items: center;
     }
 
     .download-section__button {
@@ -265,6 +271,21 @@
     .additional-info > a:not(:last-child) {
       margin-bottom: 0.4rem;
     }
+
+    .retirement-notice {
+      margin-top: 3.5rem;
+      font-size: 1.5rem;
+      max-width: 80vw;
+      text-align: center;
+      border: 2px dashed rgb(40, 40, 40);
+      padding: 0.8rem 1rem;
+      border-radius: 5px;
+      line-height: 1.4;
+    }
+
+    .retirement-notice a {
+      border-bottom: 2px solid rgb(40, 40, 40);
+    }
   </style>
 </head>
 
@@ -279,12 +300,16 @@
     <div class="description">Desktop e-book reader for language learners.
     <span class="description__secondary">Gratis and libre. Supports <span class="description__extension">epub</span> and <span class="description__extension">txt</span> files.</span></div>
 
+    <div class="retirement-notice">
+        This project has been <a href="https://github.com/fauu/lisons#retirement-notice">retired in 2018</a>.<br> Release downloads are no longer available.
+    </div>
+
     <img class="screenshot" src="resources/screenshot.png">
 
     <div class="download-section">
       <div class="download-section__panel">
         <img class="download-section__os-icon download-section__os-icon--linux" src="resources/tux.svg">
-        <a class="download-section__button" href="https:&#x2F;&#x2F;github.com&#x2F;fauu&#x2F;lisons&#x2F;releases&#x2F;download&#x2F;v0.1.0&#x2F;Lisons-0.1.0.AppImage">
+        <a class="download-section__button" href="#">
           <img class="download-section__download-icon" src="resources/download-icon.svg">
           <span class="download-section__text">
             Linux <span class="download-section__extension">.AppImage</span>
@@ -294,7 +319,7 @@
       </div>
       <div class="download-section__panel">
         <img class="download-section__os-icon download-section__os-icon--macos" src="resources/apple-logo.svg">
-        <a class="download-section__button" href="https:&#x2F;&#x2F;github.com&#x2F;fauu&#x2F;lisons&#x2F;releases&#x2F;download&#x2F;v0.1.0&#x2F;Lisons-0.1.0.dmg">
+        <a class="download-section__button" href="#">
           <img class="download-section__download-icon" src="resources/download-icon.svg">
           <span class="download-section__text">
             macOS <span class="download-section__extension">.dmg</span>
@@ -304,7 +329,7 @@
       </div>
       <div class="download-section__panel">
         <img class="download-section__os-icon download-section__os-icon--windows" src="resources/windows-logo.svg">
-        <a class="download-section__button" href="https:&#x2F;&#x2F;github.com&#x2F;fauu&#x2F;lisons&#x2F;releases&#x2F;download&#x2F;v0.1.0&#x2F;Lisons.Setup-0.1.0.exe">
+        <a class="download-section__button" href="#">
           <img class="download-section__download-icon" src="resources/download-icon.svg">
           <span class="download-section__text">
             Windows <span class="download-section__extension">.exe</span>
@@ -316,14 +341,11 @@
 
     <div class="platform-note">Available for Linux, macOS and Windows.</div>
 
-    <div class="download-note">Note: This is BETA software, and as such is largely untested and may contain bugs.</div>
-
     <div class="additional-info">
-      <span class="additional-info__current-version">Current version: <span class="additional-info__version-no">0.1.0</span></span>
+      <span class="additional-info__current-version">Current version: <span class="additional-info__version-no">–</span></span>
       <a href="https:&#x2F;&#x2F;github.com&#x2F;fauu&#x2F;lisons/blob/master/README.md">README</a>
       <a href="https:&#x2F;&#x2F;github.com&#x2F;fauu&#x2F;lisons/blob/master/COPYING.md">COPYING</a>
       <a href="https:&#x2F;&#x2F;github.com&#x2F;fauu&#x2F;lisons/blob/master/LICENSE.md">LICENSE</a>
-      <a href="https:&#x2F;&#x2F;github.com&#x2F;fauu&#x2F;lisons/issues">Report a bug</a>
     </div>
   </div>
 
